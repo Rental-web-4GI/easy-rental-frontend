@@ -4,16 +4,20 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/', label: 'Home' },
-  { href: '/client', label: 'Client' },
-  { href: '/agency', label: 'Agency' },
-  { href: '/organisation', label: 'Organisation' },
+  // { href: '/client', label: 'Client' },
+  // { href: '/agency', label: 'Agency' },
+  // { href: '/organisation', label: 'Organisation' },
+  { href: '/help', label: 'Help' },
+  { href: '/feedback', label: 'Feedback' },
+  { href: '/team', label: 'Our Team' },
+
 ];
 
 export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md sticky top-0 z-20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <a href="/" className="text-xl font-bold text-primary-600">

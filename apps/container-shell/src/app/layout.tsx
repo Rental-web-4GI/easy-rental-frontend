@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/footer';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({
         <Navbar />
         <OfflineIndicator />
         <main className="container mx-auto px-4 py-8">{children}</main>
+        <Footer />
       </body>
     </html>
   );
