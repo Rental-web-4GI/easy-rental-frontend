@@ -1,24 +1,28 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { OfflineIndicator } from '@/components/OfflineIndicator';
 
 export const metadata: Metadata = {
-  title: 'Easy Rental',
-  description: 'Easy rental platform for clients, agencies, and organizations',
+  title: 'PWA Easy Rental',
+  description: 'Location digitale sans frontières',
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'EasyRental',
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const viewport: Viewport = {
+  themeColor: '#0528d6',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
-      {/* On enlève les classes de marges/paddings ici pour laisser la page gérer son propre espace */}
+    <html lang="fr" className="scroll-smooth">
       <body className="min-h-screen bg-white dark:bg-[#0f1323] transition-colors duration-300">
-        <OfflineIndicator />
-        {/* On retire la Navbar générique et le main container car la Landing Page a sa propre structure full-width */}
         <main>{children}</main>
       </body>
     </html>

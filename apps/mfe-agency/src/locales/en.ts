@@ -1,4 +1,6 @@
 export const en = {
+  nav: { install: "Install App" },
+  installNotice: "Try changing your browser to be able to install it as an application (Chrome or Edge recommended).",
   sidebar: {
     dash: "Dashboard", listings: "Listings", bookings: "Bookings", calendar: "Calendar", settings: "Settings", status: "Online & Synced"
   },

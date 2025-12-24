@@ -1,3 +1,3 @@
 export { Navbar } from './Navbar';
-export { Footer } from './footer';
+export { Footer } from './Footer';
 export { OfflineIndicator } from './OfflineIndicator';

@@ -1,5 +1,6 @@
 export const en = {
   nav: { search: "Search", bookings: "My Bookings", help: "Help", install: "Install App" },
+  installNotice: "Try changing your browser to be able to install it as an application (Chrome or Edge recommended).",
   hero: { 
     title: "Find the perfect rental for your",
     accent: "next journey",

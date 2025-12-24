@@ -1,4 +1,6 @@
 export const fr = {
+  nav: { install: "Installer l'App" },
+  installNotice: "Essayez de changer de navigateur pour pouvoir l'installer en tant qu'application (Chrome ou Edge recommandé).",
   sidebar: {
     dashboard: "Tableau de Bord",
     agencies: "Agences",

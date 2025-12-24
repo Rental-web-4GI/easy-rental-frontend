@@ -6,24 +6,22 @@ export const fr = {
     titleAccent: "Frontières.",
     desc: "Une plateforme unique pour gérer votre flotte, vos agences et offrir une expérience premium à vos clients. Partout dans le monde.",
     cta: "Réserver un véhicule",
-    demo: "Démo Live"
+    ctaInstall: "Installer l'App",
+    ctaInstallSub: "Desktop & Mobile",
+    installNotice: "Essayez de changer de navigateur pour pouvoir l'installer en tant qu'application (Chrome ou Edge recommandé)."
   },
   auth: {
     chooseRole: "Se connecter en tant que...",
     loginTitle: "Connexion",
-    registerTitle: "Créer un compte",
     email: "Adresse Email",
     password: "Mot de passe",
     submitLogin: "Se connecter",
-    submitRegister: "S'inscrire",
-    noAccount: "Pas encore de compte ?",
-    hasAccount: "Déjà un compte ?",
-    error: "Identifiants incorrects pour ce rôle.",
+    error: "Identifiants incorrects.",
     roles: { client: "Client", agency: "Personnel", org: "Organisation" }
   },
   stakeholders: {
     title: "Conçu pour chaque acteur",
-    subtitle: "Une interface sur-mesure pour chaque utilisateur",
+    subtitle: "Sélectionnez votre rôle pour découvrir l'interface",
     org: "Organisation",
     orgDesc: "Centralisez votre flotte globale avec des contrôles avancés.",
     agency: "Personnel",

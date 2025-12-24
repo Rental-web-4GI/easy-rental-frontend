@@ -1,9 +1,22 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Easy Rental - Portail Client',
-  description: 'Réservez votre véhicule en un clic',
+  title: 'PWA Easy Rental',
+  description: 'Location digitale sans frontières',
+  manifest: '/organisation/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'EasyRental',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0528d6',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

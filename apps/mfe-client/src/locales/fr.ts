@@ -1,5 +1,6 @@
 export const fr = {
   nav: { search: "Rechercher", bookings: "Mes Réservations", help: "Aide", install: "Installer l'App" },
+  installNotice: "Essayez de changer de navigateur pour pouvoir l'installer en tant qu'application (Chrome ou Edge recommandé).",
   hero: { 
     title: "Trouvez la location parfaite pour votre",
     accent: "prochain voyage",
