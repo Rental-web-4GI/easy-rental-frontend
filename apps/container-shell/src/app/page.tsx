@@ -1,361 +1,361 @@
-// import { Button, Card } from '@pwa-easy-rental/shared-ui';
-
-// export default function Home() {
-//   return (
-//       <div className="max-w-4xl mx-auto">
-//         <div className="text-center mb-12">
-//           <h1 className="text-4xl font-bold text-secondary-900 mb-4">
-//             Welcome to Easy Rental
-//           </h1>
-//           <p className="text-lg text-secondary-600">
-//             Your one-stop platform for easy rental management
-//           </p>
-//         </div>
-
-//         <div className="grid md:grid-cols-3 gap-6">
-//           <Card className="text-center hover:shadow-lg transition-shadow">
-//             <div className="mb-4">
-//               <span className="text-4xl">👤</span>
-//             </div>
-//             <h2 className="text-xl font-semibold text-secondary-800 mb-2">
-//               Client Portal
-//             </h2>
-//             <p className="text-secondary-600 mb-4">
-//               Browse rentals, make bookings, and manage your reservations.
-//             </p>
-//             <a href="/client">
-//               <Button variant="primary">Go to Client Portal</Button>
-//             </a>
-//           </Card>
-
-//           <Card className="text-center hover:shadow-lg transition-shadow">
-//             <div className="mb-4">
-//               <span className="text-4xl">🏢</span>
-//             </div>
-//             <h2 className="text-xl font-semibold text-secondary-800 mb-2">
-//               Agency Dashboard
-//             </h2>
-//             <p className="text-secondary-600 mb-4">
-//               Manage your rental listings, bookings, and customer relationships.
-//             </p>
-//             <a href="/agency">
-//               <Button variant="primary">Go to Agency Dashboard</Button>
-//             </a>
-//           </Card>
-
-//           <Card className="text-center hover:shadow-lg transition-shadow">
-//             <div className="mb-4">
-//               <span className="text-4xl">🏛️</span>
-//             </div>
-//             <h2 className="text-xl font-semibold text-secondary-800 mb-2">
-//               Organisation Hub
-//             </h2>
-//             <p className="text-secondary-600 mb-4">
-//               Oversee multiple agencies, analytics, and system settings.
-//             </p>
-//             <a href="/organisation">
-//               <Button variant="primary">Go to Organisation Hub</Button>
-//             </a>
-//           </Card>
-//         </div>
-
-//         <div className="mt-12 text-center">
-//           <Card className="inline-block">
-//             <h3 className="text-lg font-semibold text-secondary-800 mb-2">
-//               ✨ Works Offline
-//             </h3>
-//             <p className="text-secondary-600">
-//               This app supports offline mode. Your data syncs automatically when
-//               you&apos;re back online.
-//             </p>
-//           </Card>
-//         </div>
-//       </div>
-//   );
-// }
+'use client';
 import React from 'react';
-import { Star, User, Building, Briefcase, CheckCircle, Shield, RotateCcw, MapPin} from 'lucide-react';
-import { SatisfiedEntity } from '@/components/satisfiedEntity';
-import { ServiceCard } from '@/components/serviceCard';
-import { Button } from '@/components/button';
-import { VehicleCard } from '@/components/vehicleCard';
-import { Feature } from '@/components/feature';
+import { 
+  CheckCircle2, 
+  PlayCircle, 
+  ArrowRight, 
+  WifiOff, 
+  MapPin, 
+  FileText, 
+  Zap, 
+  Users, 
+  ShieldCheck, 
+  Smartphone,
+  Globe,
+  BarChart3,
+  Check
+} from 'lucide-react';
 
-// --- COMPONENTS ---
-
-const SectionTitle = ({ title, subtitle }: { title: string, subtitle?: string }) => (
-  <div className="text-center mb-12">
-    {subtitle && <p className="text-orange-500 font-medium uppercase tracking-wide mb-2">{subtitle}</p>}
-    <h2 className="text-3xl md:text-4xl font-bold text-blue-700">{title}</h2>
-    <div className="w-24 h-1 bg-orange-500 mx-auto mt-4 rounded-full"></div>
-  </div>
-);
-
-
-// --- MAIN PAGE ---
-
-export default function Home() {
-  const services = [
-            { title: "Vehicle Reservation", desc: "With this app, a customer can book a vehicle, all type of vehicle: car, motorcycle, truck.", img: "/vehicle-service.avif" },
-            { title: "Booking A Driver", desc: "With this app, a customer should be able to book a driver with a car when he cannot drive it.", img: "/driver-service.webp" },
-            { title: "Management of Agency", desc: "With this app, when you have an agency, you can be our partner by signing in your agency.", img: "/agency-service.jpg" },
-          ]
-  const features = [
-                { icon: <CheckCircle className="w-10 h-10 text-orange-500"/>, title: "Easy Rent", text: "Rent a car at our rental with an easy and fast process without disturbing your productivity." },
-                { icon: <Star className="w-10 h-10 text-orange-500"/>, title: "Premium Quality", text: "Our cars are always maintained engine health and cleanliness to provide a more comfortable driving experience." },
-                { icon: <User className="w-10 h-10 text-orange-500"/>, title: "Professional Agent", text: "You can ask your travel companion to escort and guide your journey." },
-                { icon: <Shield className="w-10 h-10 text-orange-500"/>, title: "Car Safety", text: "We guarantee the safety of the engine on the car always running well with regular checks." },
-                { icon: <RotateCcw className="w-10 h-10 text-orange-500"/>, title: "Refund", text: "Our service guarantee provides a money back opportunity if the car does not match the information provided." },
-                { icon: <MapPin className="w-10 h-10 text-orange-500"/>, title: "Live Monitoring", text: "Our service provides direct customer monitoring to monitor trips in terms of safety and comfort." },
-            ]
-  const satisfiedClients = [
-                { name: "M. Cyrille Tchadeu", text: "Je cherchais une voiture de location avec chauffeur à Douala pour un entretien et je ne connaissais personne mais grâce à ce site j'ai pu en trouver une.", rating:5 },
-                { name: "M. Avom Samuel", text: "Très simple d'utilisation on s'y retrouve facilement. Service impeccable.", rating: 1 },
-                { name: "Mlle. Danwe Kagou", text: "Cette application a changé ma vie. Grâce à elle, chaque matin, je m'en vais au travail sans stress car une voiture est toujours prête.", rating:4 },
-            ];
-  const satisfiedAgencies = [
-      { name: "JCD SARL", text: "En tant que concessionnaire, j'ai eu à confier mes véhicules aux gestionnaires de cette application et je n'ai pas été déçu. Bonne gestion.", rating:3 },
-      { name: "M. Yannick SIYAPZE", text: "Ils gèrent plusieurs de mes véhicules, et sont devenus des partenaires financiers fiables.", rating: 2 },
-      { name: "Hotel LE CONFORT", text: "Lorsque nous voulons des véhicules pour nos clients, cette entreprise se montre toujours prompte et efficace.", rating: 5 },
-  ];
+export default function LandingPage() {
   return (
-    <main className="min-h-screen font-sans text-slate-800 bg-gray-50">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
       
-      {/* 1. NAVBAR (Based on PDF Page 1) */}
-      {/* <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600">EASY-<span className="text-orange-500">RENT</span></div>
+      {/* --- NAVBAR --- */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+              <Zap size={24} fill="currentColor" />
+            </div>
+            <span className="text-xl font-black tracking-tighter uppercase italic text-blue-900">
+              PWA <span className="text-blue-600">Easy Rental</span>
+            </span>
+          </div>
           
-          <div className="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-1/3">
-            <Search className="text-gray-400 w-5 h-5" />
-            <input type="text" placeholder="Search here" className="bg-transparent border-none outline-none ml-2 w-full text-sm" />
+          <div className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-widest text-slate-500">
+            <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
+            <a href="#solutions" className="hover:text-blue-600 transition-colors">Solutions</a>
+            <a href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</a>
           </div>
 
-          <div className="hidden md:flex space-x-6 font-medium text-slate-700">
-            <a href="#" className="text-blue-600 border-b-2 border-blue-600">Home</a>
-            <a href="#" className="hover:text-blue-600">Cars</a>
-            <a href="#" className="hover:text-blue-600">Agencies</a>
-            <a href="#" className="hover:text-blue-600">Help</a>
-          </div>
-
-          <div className="flex space-x-3">
-            <button className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"><Heart size={20}/></button>
-            <div className="w-10 h-10 bg-gray-200 rounded-full"></div> 
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex text-xs font-black uppercase tracking-widest text-slate-400 gap-4 mr-4">
+              <a href="/client" className="hover:text-blue-600 transition-colors">Client</a>
+              <a href="/agency" className="hover:text-blue-600 transition-colors">Agency</a>
+              <a href="/organisation" className="hover:text-blue-600 transition-colors">Org</a>
+            </div>
+            <button className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black uppercase tracking-tighter text-sm shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0">
+              Get Started
+            </button>
           </div>
         </div>
-      </nav> */}
+      </nav>
 
-      {/* 2. HERO (Based on PDF Page 1 & 6) */}
-      <section className="bg-blue-600 text-white pt-10 pb-14 relative overflow-hidden">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 z-10">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Rent your dream car <br/> in a click.
+      {/* --- HERO SECTION --- */}
+      <section className="relative pt-16 pb-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-orange-100 animate-fade-in">
+              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+              New: Offline Mode V2.0 Available
+            </div>
+            
+            <h1 className="text-6xl md:text-7xl font-[900] italic leading-[0.9] tracking-tighter text-slate-900 mb-8 uppercase">
+              Rentals Managed <br />
+              <span className="text-blue-600">Anywhere.</span> <br />
+              Even <span className="text-orange-500 underline decoration-orange-200 underline-offset-8">Offline.</span>
             </h1>
-            <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-lg">
-              You can rent all type of vehicle and for many occasions. And in many agencies directly from your home.
-            </p>
-            <Button variant="primary">Join Us Now</Button>
-          </div>
-          <div className="md:w-1/2 mt-10 md:mt-0 relative">
-            {/* Image Placeholder mimicking the red BMW/Toyota */}
-            {/* <div className="w-full h-64 md:h-full relative">
-                 <Image src="/hero_car.png" alt="Dream Car" fill className="object-contain w-full h-full drop-shadow-2xl transform md:scale-125 md:translate-x-10" />
-            </div> */}
-          </div>
-        </div>
-      </section>
-
-       {/* 4. WHO WE ARE (Based on PDF Page 19) */}
-      <section className="bg-blue-50 py-20">
-        <SectionTitle title="About Us" subtitle="Who we are" />
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-2">
-          <div className="md:w-2/3 px-4">
-            <p className=" mb-8 ">
-              {"Easy-rent est une application de location des véhicules d'une part et de gestion des agences de véhicules d’une autre part."}
+            
+            <p className="text-xl text-slate-500 font-medium leading-relaxed max-w-lg mb-10">
+              The all-in-one PWA for managing fleets and goods. Seamless syncing for Organizations, Agencies, and Clients. No internet? No problem.
             </p>
             
+            <div className="flex flex-wrap gap-4 mb-8">
+              <button className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-tighter shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-105">
+                Start Free Trial
+              </button>
+              <button className="bg-white border-2 border-slate-100 text-slate-900 px-8 py-4 rounded-2xl font-black uppercase tracking-tighter flex items-center gap-2 hover:bg-slate-50 transition-all">
+                <PlayCircle size={20} /> View Demo
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-6 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+              <div className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500" /> No credit card required</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500" /> Install on any device</div>
+            </div>
           </div>
-          <div className="md:w-1/3 grid grid-cols-2 gap-4">
-             {"We pride ourselves on:"}
+
+          {/* Hero Visual Mockup */}
+          <div className="relative">
+            <div className="absolute -top-20 -right-20 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-60" />
+            <div className="relative bg-slate-900 rounded-[3rem] p-4 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] border-8 border-slate-800 rotate-2 hover:rotate-0 transition-transform duration-700">
+               <div className="bg-white rounded-[2.2rem] overflow-hidden aspect-video relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent" />
+                  <img 
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop" 
+                    alt="Dashboard Preview" 
+                    className="w-full h-full object-cover grayscale-[0.2]"
+                  />
+                  {/* Floating Sync Card */}
+                  <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur shadow-2xl p-4 rounded-2xl border border-slate-100">
+                    <div className="flex items-center justify-between mb-2">
+                       <span className="text-[10px] font-black text-blue-600 uppercase italic">Offline Syncing...</span>
+                       <span className="text-[10px] font-black text-slate-400">75%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                       <div className="w-3/4 h-full bg-orange-500 rounded-full" />
+                    </div>
+                  </div>
+               </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 4. OUR SERVICES (Based on PDF Page 11) */}
-      <section className="py-20 container mx-auto px-4">
-        <SectionTitle title="Our Services" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {services.map((service, idx) => (
-            <ServiceCard key={idx} title={service.title} description={service.desc} img={service.img} />
+      {/* --- STATS SECTION (Added) --- */}
+      <section className="py-12 border-y border-slate-50 bg-slate-50/30">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { label: 'Organizations', value: '500+' },
+            { label: 'Vehicles Managed', value: '12k+' },
+            { label: 'Offline Sessions', value: '1.2M' },
+            { label: 'Uptime', value: '99.9%' },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <div className="text-3xl font-black text-blue-600 italic tracking-tighter mb-1 uppercase">{stat.value}</div>
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* 5. FEATURED VEHICLES (Based on PDF Page 2 & 17) */}
-      <section className="py-20 container mx-auto px-4">
-        <SectionTitle title="Featured Vehicles" subtitle="Our Flagship" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((item) => (
-            <VehicleCard key={item} img="" title="" description="" />
-          ))}
+      {/* --- STAKEHOLDERS SECTION --- */}
+      <section id="solutions" className="py-24 max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-black italic tracking-tighter uppercase text-slate-900 mb-4">Designed for every stakeholder</h2>
+          <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Select your role to see how it works for you</p>
         </div>
-        <div className="text-center mt-10">
-             <a href="/client/vehicles"><Button variant="primary">View More</Button></a>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Organization */}
+          <div className="group cursor-pointer">
+            <div className="relative h-[300px] rounded-[2.5rem] overflow-hidden mb-6 shadow-xl transition-all group-hover:-translate-y-2">
+              <img src="https://images.unsplash.com/photo-1542362567-b05eef11f94d?w=800&auto=format&fit=crop" className="w-full h-full object-cover" alt="Organization" />
+              <div className="absolute inset-0 bg-blue-900/40 group-hover:bg-blue-900/20 transition-all" />
+              <div className="absolute top-6 left-6 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-white uppercase italic">HQ View</div>
+            </div>
+            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Organization</h3>
+            <p className="text-slate-500 text-sm font-medium mb-4 leading-relaxed">Centralize your entire fleet globally with advanced controls and live analytics dashboards.</p>
+            <a href="/organisation" className="inline-flex items-center gap-2 text-blue-600 font-black text-xs uppercase italic group-hover:gap-4 transition-all">
+              Explore Admin Tools <ArrowRight size={16} />
+            </a>
+          </div>
+
+          {/* Agency */}
+          <div className="group cursor-pointer">
+            <div className="relative h-[300px] rounded-[2.5rem] overflow-hidden mb-6 shadow-xl transition-all group-hover:-translate-y-2">
+              <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800&auto=format&fit=crop" className="w-full h-full object-cover" alt="Agency" />
+              <div className="absolute inset-0 bg-orange-900/40 group-hover:bg-orange-900/20 transition-all" />
+              <div className="absolute top-6 left-6 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-white uppercase italic">Manager View</div>
+            </div>
+            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Agency</h3>
+            <p className="text-slate-500 text-sm font-medium mb-4 leading-relaxed">Streamline client bookings, inventory management, and generate invoices in a single tap.</p>
+            <a href="/agency" className="inline-flex items-center gap-2 text-blue-600 font-black text-xs uppercase italic group-hover:gap-4 transition-all">
+              See Agency Features <ArrowRight size={16} />
+            </a>
+          </div>
+
+          {/* Client */}
+          <div className="group cursor-pointer">
+            <div className="relative h-[300px] rounded-[2.5rem] overflow-hidden mb-6 shadow-xl transition-all group-hover:-translate-y-2 border-2 border-transparent group-hover:border-blue-100">
+              <img src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=800&auto=format&fit=crop" className="w-full h-full object-cover" alt="Client" />
+              <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-slate-900/20 transition-all" />
+              <div className="absolute top-6 left-6 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-white uppercase italic">User App</div>
+            </div>
+            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Client</h3>
+            <p className="text-slate-500 text-sm font-medium mb-4 leading-relaxed">Book vehicles, check-in status, and manage active rentals from any smartphone, anywhere.</p>
+            <a href="/client" className="inline-flex items-center gap-2 text-blue-600 font-black text-xs uppercase italic group-hover:gap-4 transition-all">
+              View Client Experience <ArrowRight size={16} />
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* 6. ROLE: CLIENT (Specific Request) */}
-      <section className="bg-slate-900 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-            <User className="w-16 h-16 mx-auto mb-4 text-orange-500" />
-            <h2 className="text-3xl font-bold mb-4">I am a Client</h2>
-            <p className="mb-8 max-w-2xl mx-auto text-gray">Find the perfect vehicle for your trip easily and quickly. Secure payment and 24/7 support.</p>
-            <Button variant="primary" className="text-lg px-10"><a href="/client" target="_blank">Book a Car</a></Button>
-        </div>
-      </section>
+      {/* --- FEATURES GRID --- */}
+      <section id="features" className="py-24 bg-slate-50/50">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20">
+          <div>
+             <h2 className="text-5xl font-black italic leading-none tracking-tighter text-slate-900 mb-6 uppercase">Powerful <br /><span className="text-blue-600">PWA</span> Features</h2>
+             <p className="text-lg text-slate-500 font-medium mb-10 leading-relaxed">Experience the speed of a native app directly in your browser. Install it on your home screen and work without interruption.</p>
+             <button className="flex items-center gap-2 text-blue-600 font-black uppercase italic text-sm group">
+               See Full Technical Specs <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+             </button>
+          </div>
 
-      {/* 7. OUR AGENCIES (Based on PDF Page 12) */}
-      <section className="py-20 container mx-auto px-4 bg-white">
-        <SectionTitle title="Our Quality Agencies" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600">
-                        <Building />
-                    </div>
-                    <h4 className="font-bold text-lg text-blue-900 mb-2">Company Name</h4>
-                    <p className="text-sm text-gray-500 mb-4">{"C'est une agence de livraison des vivres."}</p>
-                    <div className="flex justify-between items-center mt-4">
-                        <span className="text-xs text-gray-400">Douala</span>
-                        <button className="bg-orange-500 text-white text-xs px-3 py-1 rounded">View More</button>
-                    </div>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[
+              { icon: <WifiOff className="text-blue-600" />, title: 'Works Offline', desc: 'Manage data in dead zones. Everything syncs when you reconnect.' },
+              { icon: <MapPin className="text-orange-500" />, title: 'Real-time GPS', desc: 'Integrated maps to monitor assets health and locations globally.' },
+              { icon: <FileText className="text-blue-600" />, title: 'Auto Invoicing', desc: 'Streamline billing with automated generation based on usage.' },
+              { icon: <Zap className="text-orange-500" />, title: 'Instant Sync', desc: 'Cloud background syncing ensures data is always current.' },
+            ].map((f, i) => (
+              <div key={i} className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all">
+                <div className="bg-slate-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-6">
+                  {f.icon}
                 </div>
+                <h4 className="text-lg font-black uppercase italic tracking-tighter mb-2">{f.title}</h4>
+                <p className="text-slate-500 text-xs font-medium leading-relaxed">{f.desc}</p>
+              </div>
             ))}
-        </div>
-        <div className="text-center mt-10">
-             <a href="/client/agencies"><Button variant="primary">View More</Button></a>
+          </div>
         </div>
       </section>
 
-      {/* 8. ROLE: AGENT (Specific Request) */}
-      <section className="bg-primary text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-            <Briefcase className="w-16 h-16  mx-auto text-secondary" />
-            <h2 className="text-3xl font-bold mb-4">I am an Agent</h2>   
-            <p className="text-blue-100 text-lg">Join our network of professional agents. Manage rentals and earn commissions.</p>
-            <div className="flex gap-4 align-center justify-center mt-8">
-                <a href="/agency" target="_blank"><Button variant="primary">Work Now</Button></a>
-                <a href="/agency" target="_blank"><Button variant="outline">Connect</Button></a>
+      {/* --- STEP BY STEP SECTION (Added) --- */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <div className="bg-slate-900 rounded-[3.5rem] p-12 lg:p-20 text-white relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/10 skew-x-12 translate-x-32" />
+           
+           <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <h2 className="text-4xl lg:text-5xl font-black italic tracking-tighter uppercase mb-6 leading-none">How to <span className="text-blue-400">Launch</span> your fleet in 3 steps</h2>
+                <div className="space-y-12 mt-12">
+                   {[
+                     { step: '01', title: 'Register Org', desc: 'Create your master account and define your global fleet parameters.' },
+                     { step: '02', title: 'Connect Agencies', desc: 'Add local branches and give agents mobile access instantly.' },
+                     { step: '03', title: 'Start Renting', desc: 'Go live! Clients can book via URL or install the PWA on their phone.' },
+                   ].map((item, i) => (
+                     <div key={i} className="flex gap-6">
+                        <div className="text-4xl font-black italic text-blue-500 opacity-50">{item.step}</div>
+                        <div>
+                           <h4 className="text-xl font-black uppercase italic tracking-tighter mb-2">{item.title}</h4>
+                           <p className="text-slate-400 text-sm font-medium">{item.desc}</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+              </div>
+              <div className="hidden lg:block">
+                 <div className="bg-slate-800 rounded-3xl p-8 aspect-square border border-slate-700 flex items-center justify-center">
+                    <Smartphone size={300} className="text-slate-700" />
+                 </div>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* --- PRICING SECTION (Added Simple) --- */}
+      <section id="pricing" className="py-24 max-w-7xl mx-auto px-6">
+         <div className="text-center mb-16">
+            <h2 className="text-4xl font-black italic tracking-tighter uppercase text-slate-900 mb-4">Scalable Pricing</h2>
+            <p className="text-slate-500 font-medium text-sm">Choose the plan that fits your volume</p>
+         </div>
+         <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: 'Starter', price: '$49', features: ['Up to 10 vehicles', 'Basic Analytics', 'Offline Core'] },
+              { name: 'Pro', price: '$199', features: ['Unlimited vehicles', 'Advanced GPS', 'Multi-Agency Support'], highlight: true },
+              { name: 'Enterprise', price: 'Custom', features: ['White-label PWA', 'API Access', 'Dedicated Support'] },
+            ].map((plan, i) => (
+              <div key={i} className={`p-10 rounded-[2.5rem] border ${plan.highlight ? 'border-blue-600 bg-blue-50/30' : 'border-slate-100'} flex flex-col`}>
+                <h4 className="text-xl font-black uppercase italic tracking-tighter mb-4">{plan.name}</h4>
+                <div className="text-4xl font-black text-slate-900 italic tracking-tighter mb-8">{plan.price} <span className="text-sm font-normal text-slate-400">/mo</span></div>
+                <ul className="space-y-4 mb-10 flex-1">
+                  {plan.features.map((f, j) => (
+                    <li key={j} className="flex items-center gap-3 text-sm font-medium text-slate-600">
+                      <Check size={16} className="text-green-500" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <button className={`w-full py-4 rounded-2xl font-black uppercase tracking-tighter text-sm transition-all ${plan.highlight ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'bg-slate-100 text-slate-900 hover:bg-slate-200'}`}>
+                  Select Plan
+                </button>
+              </div>
+            ))}
+         </div>
+      </section>
+
+      {/* --- CTA BANNER --- */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto bg-blue-600 rounded-[3rem] p-16 text-center text-white relative overflow-hidden shadow-2xl shadow-blue-200">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]" />
+          <div className="relative z-10">
+            <h2 className="text-5xl font-black italic tracking-tighter uppercase mb-6">Ready to modernize your fleet?</h2>
+            <p className="text-blue-100 text-lg font-medium mb-10 max-w-xl mx-auto">Join 500+ organizations using PWA Easy Rental to cut costs and improve efficiency.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="bg-white text-blue-600 px-10 py-5 rounded-2xl font-black uppercase tracking-tighter text-sm shadow-xl hover:scale-105 transition-all">
+                Get Started Now
+              </button>
+              <button className="bg-blue-700/50 backdrop-blur-sm border border-blue-400 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-tighter text-sm hover:bg-blue-700 transition-all">
+                Contact Sales
+              </button>
             </div>
+          </div>
         </div>
       </section>
 
-      {/* 9. WHY CHOOSE US (Based on PDF Page 25) */}
-      <section className="py-20 container mx-auto px-4">
-        <SectionTitle title="Why Choose Us?" subtitle="Our Advantages" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {features.map((item, idx) => (
-                <Feature key={idx} icon= {item.icon} title={item.title} description={item.text} />
-            ))}
-        </div>
-      </section>
-
-      {/* 10. ROLE: ORGANIZATION (Specific Request) */}
-      <section className="bg-gray-800 text-white py-16 relative overflow-hidden">
-        {/* Decorative background element */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gray-700 rounded-full -mr-32 -mt-32 opacity-50"></div>
-        
-        <div className="container mx-auto px-4 text-center relative z-10">
-            <Building className="w-16 h-16 mx-auto mb-4 text-blue-400" />
-            <h2 className="text-3xl font-bold mb-4">I am an Organization</h2>
-            <p className="mb-8 max-w-2xl mx-auto text-gray-400">Manage your fleet, track expenses, and optimize your logistics with our dedicated dashboard.</p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="/organisation" target="_blank"><Button variant="primary">Become an Organization</Button></a>
-                <a href="/organisation" target="_blank"><Button variant="outline">Go on Dashboard</Button></a>
-            </div>
-        </div>
-      </section>
-
-      {/* 11. RENT A CAR NOW (Banner) */}
-      {/* <section className="py-24 bg-secondary text-white text-center">
-        <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold mb-6">Ready to hit the road?</h2>
-            <p className="text-xl mb-8 opacity-90">{"Don't wait any longer. Find your ideal car today."}</p>
-            <Button className="bg-white text-orange-600 hover:bg-gray-100 px-12 py-4 text-lg shadow-xl">Rent a Car Now</Button>
-        </div>
-      </section> */}
-
-      {/* 12. SATISFIED CLIENTS (Based on PDF Page 20) */}
-      <section className="py-20 container mx-auto px-4 bg-blue-50">
-        <SectionTitle title="Satisfied Clients" subtitle="Testimonials" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {satisfiedClients.map((client, idx) => (
-                <SatisfiedEntity key={idx} name={client.name} text={client.text} rating={client.rating} />
-            ))}
-        </div>
-      </section>
-
-       {/* 13. SATISFIED AGENCIES (Based on PDF Page 22) */}
-       <section className="py-20 container mx-auto px-4">
-        <SectionTitle title="Satisfied Agencies" subtitle="Partners" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {satisfiedAgencies.map((agency, idx) => (
-                <SatisfiedEntity key={idx} name={agency.name} text={agency.text} rating={agency.rating} />
-            ))}
-        </div>
-      </section>
-
-      {/* 14. PERFORMANCE (Based on PDF Page 24) */}
-      <section className="bg-primary text-white py-10">
-        <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Performance</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                {[
-                    { val: "10000 +", label: "Cars" },
-                    { val: "150 +", label: "Companies" },
-                    { val: "1M +", label: "Users" },
-                    { val: "1000 +", label: "Drivers" },
-                ].map((stat, idx) => (
-                    <div key={idx} className="bg-blue-700/50 p-6 rounded-xl backdrop-blur-sm border border-blue-500">
-                        <div className="text-4xl font-bold mb-2">{stat.val}</div>
-                        <div className="text-blue-200">{stat.label}</div>
-                    </div>
-                ))}
-            </div>
-        </div>
-      </section>
-
-      {/* 15. DON'T BE LATE (Recap Section) */}
-      <section className="py-4 container mx-auto px-4 bg-gray-50">
-        <SectionTitle title="Don't Be Late" subtitle="Start Now" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Client Recap */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center">
-                <User className="w-12 h-12 text-gray-700 mb-4" />
-                <h3 className="text-xl font-bold mb-4">You need a car?</h3>
-                <p className="text-gray-500 text-center mb-8 flex-grow">Book instantly and enjoy your trip.</p>
-                <a href="/client" target="_blank"><Button variant="primary" className="w-full">Rent a car</Button></a>
+      {/* --- FOOTER --- */}
+      <footer className="pt-24 pb-12 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-20">
+            <div className="col-span-2">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                  <Zap size={18} fill="currentColor" />
+                </div>
+                <span className="text-lg font-black tracking-tighter uppercase italic text-blue-900">
+                  PWA <span className="text-blue-600">Easy Rental</span>
+                </span>
+              </div>
+              <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-xs mb-6">
+                The next generation of rental management. Built for the modern web with offline-first architecture.
+              </p>
+              <div className="flex gap-4">
+                <div className="w-8 h-8 bg-slate-50 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 cursor-pointer transition-colors"><Globe size={16} /></div>
+                <div className="w-8 h-8 bg-slate-50 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 cursor-pointer transition-colors"><BarChart3 size={16} /></div>
+                <div className="w-8 h-8 bg-slate-50 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 cursor-pointer transition-colors"><Users size={16} /></div>
+              </div>
             </div>
             
-            {/* Agent Recap */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center">
-                <Briefcase className="w-12 h-12 text-gray-700 mb-4" />
-                <h3 className="text-xl font-bold mb-4">Looking for work?</h3>
-                <p className="text-gray-500 text-center mb-8 flex-grow">Connect as an agent and manage rentals.</p>
-                <a href="/agency" target="_blank"><Button variant="secondary" className="w-full">Agent Space</Button></a>
+            <div>
+              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 mb-6 italic">Product</h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-400">
+                <li className="hover:text-blue-600 cursor-pointer">Features</li>
+                <li className="hover:text-blue-600 cursor-pointer">Pricing</li>
+                <li className="hover:text-blue-600 cursor-pointer">API</li>
+                <li className="hover:text-blue-600 cursor-pointer">Download App</li>
+              </ul>
             </div>
-
-            {/* Org Recap */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center">
-                <Building className="w-12 h-12 text-gray-700 mb-4" />
-                <h3 className="text-xl font-bold mb-4">Fleet Manager?</h3>
-                <p className="text-gray-500 text-center mb-8 flex-grow">Digitize your agency with our tools.</p>
-                <a href="/organisation" target="_blank"><Button className="w-full bg-slate-800 text-white hover:bg-slate-900">Organization</Button></a>
+            
+            <div>
+              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 mb-6 italic">Resources</h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-400">
+                <li className="hover:text-blue-600 cursor-pointer">Documentation</li>
+                <li className="hover:text-blue-600 cursor-pointer">Help Center</li>
+                <li className="hover:text-blue-600 cursor-pointer">Community</li>
+                <li className="hover:text-blue-600 cursor-pointer">Status</li>
+              </ul>
             </div>
+            
+            <div>
+              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 mb-6 italic">Company</h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-400">
+                <li className="hover:text-blue-600 cursor-pointer">About</li>
+                <li className="hover:text-blue-600 cursor-pointer">Blog</li>
+                <li className="hover:text-blue-600 cursor-pointer">Careers</li>
+                <li className="hover:text-blue-600 cursor-pointer">Contact</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="pt-12 border-t border-slate-50 flex flex-col md:row justify-between items-center gap-6">
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">© 2025 PWA EASY RENTAL. ALL RIGHTS RESERVED.</span>
+            <div className="flex gap-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <span className="hover:text-slate-900 cursor-pointer transition-colors">Privacy Policy</span>
+              <span className="hover:text-slate-900 cursor-pointer transition-colors">Terms of Service</span>
+            </div>
+          </div>
         </div>
-      </section>
-
-    </main>
+      </footer>
+    </div>
   );
 }
