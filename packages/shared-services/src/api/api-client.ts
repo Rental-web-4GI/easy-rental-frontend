@@ -17,42 +17,63 @@ export interface ApiError {
 }
 
 /**
- * Base API client for making HTTP requests
+ * Client API de base pour effectuer des requêtes HTTP.
+ * Gère automatiquement l'injection du jeton Authorization via localStorage ou setAuthToken.
  */
 export class ApiClient {
-  private config: ApiConfig;
+  private baseUrl: string;
+  private headers: Record<string, string>;
 
-  constructor(config: ApiConfig) {
-    this.config = {
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...config,
+  constructor(config: { baseUrl: string }) {
+    this.baseUrl = config.baseUrl;
+    this.headers = {
+      'Content-Type': 'application/json',
     };
+  }
+
+  /**
+   * Injecte manuellement un jeton dans les headers de l'instance
+   */
+  setAuthToken(token: string): void {
+    this.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  /**
+   * Supprime le jeton des headers de l'instance
+   */
+  clearAuthToken(): void {
+    if (this.headers['Authorization']) {
+      delete this.headers['Authorization'];
+    }
   }
 
   private async request<T>(
     method: string,
     endpoint: string,
-    data?: unknown,
-    customHeaders?: Record<string, string>
+    data?: unknown
   ): Promise<ApiResponse<T>> {
-    const url = `${this.config.baseUrl}${endpoint}`;
-    const headers = { ...this.config.headers, ...customHeaders };
+    const url = `${this.baseUrl}${endpoint}`;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+    // 1. On récupère le token soit dans les headers de l'instance, soit dans le localStorage
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    
+    const requestHeaders: Record<string, string> = { ...this.headers };
+    
+    if (token) {
+      requestHeaders['Authorization'] = `Bearer ${token}`;
+    }
 
     try {
       const response = await fetch(url, {
         method,
-        headers,
+        headers: requestHeaders,
         body: data ? JSON.stringify(data) : undefined,
-        signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
+      // Gestion du cas "No Content" (ex: DELETE ou PUT sans retour)
+      if (response.status === 204) {
+        return { data: {} as T, status: 204, ok: true };
+      }
 
       const responseData = await response.json().catch(() => null);
 
@@ -62,55 +83,52 @@ export class ApiClient {
         ok: response.ok,
       };
     } catch (error) {
-      clearTimeout(timeoutId);
-      
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw { message: 'Request timeout', status: 408, code: 'TIMEOUT' } as ApiError;
-      }
-      
-      throw {
-        message: error instanceof Error ? error.message : 'Network error',
+      console.error(`[API Error] ${method} ${endpoint}:`, error);
+      return {
+        data: null as any,
         status: 0,
-        code: 'NETWORK_ERROR',
-      } as ApiError;
+        ok: false,
+      };
     }
   }
 
-  async get<T>(endpoint: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('GET', endpoint, undefined, headers);
+  // --- Méthodes HTTP ---
+
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>('GET', endpoint);
   }
 
-  async post<T>(endpoint: string, data: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('POST', endpoint, data, headers);
+  async post<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('POST', endpoint, data);
   }
 
-  async put<T>(endpoint: string, data: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('PUT', endpoint, data, headers);
+  async put<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PUT', endpoint, data);
   }
 
-  async patch<T>(endpoint: string, data: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('PATCH', endpoint, data, headers);
+  async patch<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PATCH', endpoint, data);
   }
 
-  async delete<T>(endpoint: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('DELETE', endpoint, undefined, headers);
-  }
-
-  setAuthToken(token: string): void {
-    this.config.headers = {
-      ...this.config.headers,
-      Authorization: `Bearer ${token}`,
-    };
-  }
-
-  clearAuthToken(): void {
-    if (this.config.headers) {
-      delete this.config.headers.Authorization;
-    }
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>('DELETE', endpoint);
   }
 }
 
-// Create default API client instances for different micro-frontends
+/**
+ * Instance par défaut configurée pour utiliser le proxy Next.js
+ * ou l'URL directe du backend selon l'environnement.
+ */
+export const defaultClient = new ApiClient({
+  baseUrl:
+    typeof window !== 'undefined'
+      ? '/organisation/api-rental' // Utilise le rewrite de Next.js (Proxy)
+      : 'https://apirental5gi.onrender.com', // Serveur direct
+});
+
+/**
+ * Fonction utilitaire pour créer de nouvelles instances si nécessaire
+ */
 export function createApiClient(baseUrl: string): ApiClient {
   return new ApiClient({ baseUrl });
 }
