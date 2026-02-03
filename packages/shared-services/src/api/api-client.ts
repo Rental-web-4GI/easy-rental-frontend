@@ -120,17 +120,32 @@ export class ApiClient {
 }
 
 /**
- * Instance par défaut
- * Correction : On utilise le chemin du proxy Next.js au lieu de l'URL directe
+ * Détecte dynamiquement la base URL en fonction de l'application (MFE) active.
+ * Si on est sur /agency/..., il utilisera /agency/api-rental
  */
-export const defaultClient = new ApiClient({
-  // En développement, on passe par le proxy local pour éviter CORS
-  // En production, on peut utiliser une variable d'environnement
-  baseUrl: typeof window !== 'undefined' // is browser or server
-    ? '/organisation/api-rental' // Utilise le rewrite de Next.js
-    : 'https://apirental5gi-v2.onrender.com'
-});
+const getDynamicBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    return 'https://apirental5gi-v2.onrender.com';
+  }
 
+  const path = window.location.pathname;
+  
+  // On cherche si l'URL commence par l'un de nos segments MFE connus
+  const mfeApps = ['organisation', 'agency', 'client'];
+  const currentApp = mfeApps.find(app => path.startsWith(`/${app}`));
+
+  if (currentApp) {
+    // Retourne par exemple: "/organisation/api-rental" ou "/agency/api-rental"
+    return `/${currentApp}/api-rental`;
+  }
+
+  // Fallback si on est à la racine ou sur une app inconnue
+  return 'https://apirental5gi-v2.onrender.com';
+};
+
+export const defaultClient = new ApiClient({
+  baseUrl: getDynamicBaseUrl()
+});
 /**
  * Fonction utilitaire pour créer de nouvelles instances si nécessaire
  */

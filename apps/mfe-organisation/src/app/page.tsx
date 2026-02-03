@@ -1,56 +1,60 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { authService, orgService } from '@pwa-easy-rental/shared-services';
+
+// Components & Views
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
+import { AuthView } from '../views/AuthView';
 import { DashboardView } from '../views/DashboardView';
 import { AgenciesView } from '../views/AgenciesView';
 import { RolesView } from '../views/RolesView';
-import { SubscriptionView } from '../views/SubscriptionView';
-import { OnboardingStepper } from '../components/OnboardingStepper';
 import { StaffView } from '../views/StaffView';
-import { 
-  Loader2, Mail, Lock, User, Building, 
-  ShieldCheck, LogOut, Sun, Moon 
-} from 'lucide-react';
+import { VehiclesView } from '../views/VehiclesView';
+import { VehicleCategoriesView } from '../views/VehicleCategoriesView';
+import { SubscriptionView } from '../views/SubscriptionView';
+import { ProfileView } from '../views/ProfileView';
+import { OnboardingStepper } from '../components/OnboardingStepper';
 
+// UI
+import { Loader2, LogOut } from 'lucide-react';
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
-import { VehiclesView } from '@/views/VehiclesView';
-import { VehicleCategoriesView } from '@/views/VehicleCategoriesView';
-import { ProfileView } from '@/views/ProfileView';
 
 export default function OrganisationDashboard() {
-  const [isAuth, setIsAuth] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isOnboarded, setIsOnboarded] = useState(false);
-  const [currentView, setCurrentView] = useState<any>('DASHBOARD');
-  
+  // --- STATES DE NAVIGATION & THÈME ---
+  const [currentView, setCurrentView] = useState<string>('DASHBOARD');
   const [lang, setLang] = useState<'FR' | 'EN'>('FR');
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
+  // --- STATES DE DONNÉES (RÉELLES) ---
+  const [isAuth, setIsAuth] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOnboarded, setIsOnboarded] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
   const [orgData, setOrgData] = useState<any>(null);
-  const [userData, setUserData] = useState<any>(null); // AJOUTÉ
   const [agencies, setAgencies] = useState<any[]>([]);
-  const [subscription, setSubscription] = useState<any>(null);
-
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [authForm, setAuthForm] = useState({ firstname: '', lastname: '', email: '', password: '', orgName: '' });
 
   const t = lang === 'FR' ? fr : en;
 
+  // --- INITIALISATION ---
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
+    // 1. PWA Install Prompt
+    const handleBeforeInstallPrompt = (e: any) => { 
+      e.preventDefault(); 
+      setDeferredPrompt(e); 
+    };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
+    // 2. Gestion du Thème
     const isDark = localStorage.getItem('theme') === 'dark';
     setDarkMode(isDark);
     if (isDark) document.documentElement.classList.add('dark');
 
+    // 3. Vérification Session
     const token = localStorage.getItem('auth_token');
     if (token) fetchProfile();
     else setIsLoading(false);
@@ -58,76 +62,76 @@ export default function OrganisationDashboard() {
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   }, []);
 
+  // --- RÉCUPÉRATION DES DONNÉES (ZÉRO MOCKUP) ---
   const fetchProfile = async () => {
     try {
       const meRes = await orgService.getMe();
       if (meRes.ok && meRes.data) {
+        // meRes.data = { user, organization } selon OrgUserResponseDTO
         const { user, organization } = meRes.data;
 
         if (organization) {
           setOrgData(organization);
           setUserData(user);
-
-          console.log('organisation: ', organization);
-          console.log('user: ', user);
-            
-          // LOGIQUE DE VÉRIFICATION BASÉE SUR ISVERIFIED
-          setIsOnboarded(prev => prev || organization.city?.length >= 1);//isVerified === true);
           
-          const [agRes, subRes] = await Promise.all([
-            orgService.getAgencies(organization.id),
-            orgService.getSubscription(organization.id)
-          ]);
+          // Vérification onboarding : si la ville est renseignée, on considère l'étape passée
+          setIsOnboarded(organization.city && organization.city !== "string");
+          
+          // Chargement des données périphériques
+          const agRes = await orgService.getAgencies(organization.id);
           if (agRes.ok) setAgencies(agRes.data || []);
-          if (subRes.ok) setSubscription(subRes.data);
           
           setIsAuth(true);
         }
+      } else {
+        localStorage.removeItem('auth_token');
       }
     } catch (e) {
-      console.error("Fetch Error:", e);
+      console.error("Erreur de profil:", e);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOnboardingComplete = async () => {
-    setIsOnboarded(true); // Verrouillage immédiat pour éviter le retour arrière
-    setOrgData((prev: any) => ({ ...prev, isVerified: true }));
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    await fetchProfile();
-  };
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setAuthError('');
+  // --- ACTIONS AUTHENTIFICATION ---
+  const handleAuthAction = async (isSignUp: boolean, form: any) => {
     try {
       let res;
       if (isSignUp) {
-        res = await authService.registerOrg(authForm);
+        res = await authService.registerOrg(form);
         if (res.ok) {
-          const logRes = await authService.login({ email: authForm.email, password: authForm.password });
+          // Auto-login après inscription
+          const logRes = await authService.login({ email: form.email, password: form.password });
           if (logRes.ok && logRes.data.token) {
             localStorage.setItem('auth_token', logRes.data.token);
             await fetchProfile();
+            return true;
           }
-        } else setAuthError(res.data?.message || t.auth.error);
+        }
       } else {
-        const res = await authService.login({ email: authForm.email, password: authForm.password });
+        res = await authService.login({ email: form.email, password: form.password });
         if (res.ok && res.data.token) {
           localStorage.setItem('auth_token', res.data.token);
           await fetchProfile();
-        } else setAuthError(t.auth.error);
+          return true;
+        }
       }
     } catch (e) {
-      setAuthError("Server Error.");
-    } finally {
-      setIsLoading(false);
+      console.error("Auth error", e);
     }
+    return false; // Retourne false pour que AuthView affiche l'erreur
   };
 
-  const logout = () => { localStorage.clear(); window.location.reload(); };
+  const handleOnboardingComplete = async () => {
+    setIsOnboarded(true);
+    await fetchProfile();
+  };
+
+  const logout = () => { 
+    localStorage.removeItem('auth_token'); 
+    window.location.reload(); 
+  };
+
   const toggleTheme = () => {
     const next = !darkMode;
     setDarkMode(next);
@@ -140,97 +144,83 @@ export default function OrganisationDashboard() {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') setDeferredPrompt(null);
-    } else alert(t.installNotice);
+    }
   };
 
+  // --- RENDU : CHARGEMENT ---
   if (isLoading) return (
-    <div className="h-screen flex items-center justify-center bg-white dark:bg-[#0b1024]">
+    <div className="h-screen flex items-center justify-center bg-[#f4f7fe] dark:bg-[#080b14]">
       <Loader2 className="animate-spin text-[#0528d6] size-12" />
     </div>
   );
 
-  // AUTH SCREEN
+  // --- RENDU : ÉCRAN AUTHENTIFICATION ---
   if (!isAuth) return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] dark:bg-[#0b1024] p-6 transition-all duration-500 overflow-hidden relative">
-      <div className="absolute top-[-10%] left-[-10%] size-[500px] bg-blue-600/10 rounded-full blur-[120px] animate-pulse" />
-      <div className="max-w-[1100px] w-full grid lg:grid-cols-2 bg-white dark:bg-[#161b33] rounded-[3.5rem] shadow-2xl border dark:border-slate-800 animate-in zoom-in duration-700 relative z-10">
-        <div className="hidden lg:flex flex-col justify-between p-16 bg-[#0528d6] text-white">
-            <div className="size-14 bg-white rounded-2xl flex items-center justify-center text-blue-600 italic font-[900] text-3xl">E</div>
-            <h2 className="text-6xl font-[900] italic uppercase tracking-tighter leading-[0.85] mt-12 text-left">{t.auth.subtitle}</h2>
-            <div className="flex items-center gap-4 text-white/80"><ShieldCheck size={20}/><p className="text-xs font-bold uppercase italic tracking-widest text-left">EasyRental Secure Hub</p></div>
-        </div>
-        <div className="p-10 md:p-16 flex flex-col justify-center">
-            <h3 className="text-4xl font-[900] italic uppercase tracking-tighter text-slate-900 dark:text-white mb-10 leading-none text-left">{isSignUp ? t.auth.titleRegister : t.auth.title}</h3>
-            <form onSubmit={handleAuth} className="space-y-4 text-left">
-                {isSignUp && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="grid grid-cols-2 gap-3">
-                            <AuthInput icon={<User size={18}/>} placeholder={t.auth.firstname} value={authForm.firstname} onChange={(v:any)=>setAuthForm({...authForm, firstname:v})} />
-                            <AuthInput icon={<User size={18}/>} placeholder={t.auth.lastname} value={authForm.lastname} onChange={(v:any)=>setAuthForm({...authForm, lastname:v})} />
-                        </div>
-                        <AuthInput icon={<Building size={18}/>} placeholder={t.auth.orgName} value={authForm.orgName} onChange={(v:any)=>setAuthForm({...authForm, orgName:v})} />
-                    </div>
-                )}
-                <AuthInput icon={<Mail size={18}/>} type="email" placeholder={t.auth.email} value={authForm.email} onChange={(v:any)=>setAuthForm({...authForm, email:v})} />
-                <AuthInput icon={<Lock size={18}/>} type="password" placeholder={t.auth.password} value={authForm.password} onChange={(v:any)=>setAuthForm({...authForm, password:v})} />
-                {authError && <div className="p-4 bg-red-50 text-red-500 text-[10px] font-black uppercase italic rounded-2xl">{authError}</div>}
-                <button className="w-full py-5 bg-[#F76513] text-white rounded-2xl font-[900] uppercase italic text-sm shadow-xl shadow-orange-200 hover:scale-[1.02] transition-transform">{isSignUp ? t.auth.submitRegister : t.auth.submitLogin}</button>
-            </form>
-            <div className="flex flex-col items-center gap-6 mt-10">
-                <button onClick={()=>setIsSignUp(!isSignUp)} className="text-[10px] font-black uppercase text-slate-400 hover:text-primary transition-colors tracking-widest italic">{isSignUp ? t.auth.hasAccount : t.auth.noAccount}</button>
-                <div className="flex gap-4">
-                    <button onClick={()=>setLang(lang==='FR'?'EN':'FR')} className="text-xs font-black text-slate-300 hover:text-slate-600 dark:hover:text-white uppercase italic">{lang}</button>
-                    <button onClick={toggleTheme} className="text-slate-300 hover:text-orange-500">{darkMode ? <Sun size={18}/> : <Moon size={18}/>}</button>
-                </div>
-            </div>
-        </div>
-      </div>
-    </div>
+    <AuthView 
+      onAuth={handleAuthAction}
+      t={t}
+      lang={lang}
+      setLang={setLang}
+      darkMode={darkMode}
+      toggleTheme={toggleTheme}
+    />
   );
 
-  // ONBOARDING SCREEN
+  // --- RENDU : ÉCRAN ONBOARDING ---
   if (!isOnboarded) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 dark:bg-[#0b1024] p-6 transition-all duration-500 overflow-y-auto">
-      <button onClick={logout} className="mb-6 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-red-500 italic"><LogOut size={16}/> {t.nav.logout}</button>
-      <OnboardingStepper orgId={orgData?.id} initialName={orgData?.name} onComplete={handleOnboardingComplete} t={t} />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4f7fe] dark:bg-[#080b14] p-6">
+      <OnboardingStepper 
+        orgId={orgData?.id} 
+        initialName={orgData?.name} 
+        onComplete={handleOnboardingComplete} 
+        onLogout={logout} // On passe la fonction ici
+        t={t} 
+      />
     </div>
   );
 
-  // MAIN DASHBOARD
+  // --- RENDU : DASHBOARD PRINCIPAL ---
   return (
-    <div className="flex h-screen bg-[#F8F9FC] dark:bg-[#0b1024] overflow-hidden transition-colors duration-500">
+    <div className="flex h-screen bg-white dark:bg-[#080b14] overflow-hidden transition-colors duration-500">
+      
       <Sidebar 
-        currentView={currentView} setCurrentView={setCurrentView} 
-        sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}
-        t={t} handleInstall={handleInstall} handleLogout={logout}
+        currentView={currentView} 
+        setCurrentView={setCurrentView} 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen}
+        handleInstall={handleInstall} 
+        handleLogout={logout}
       />
+
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <Header 
-            title={t.views[currentView]}
+            title={currentView === 'PROFILE' ? 'Mon Profil' : t.views[currentView] || currentView}
             setCurrentView={setCurrentView}
-            orgData={orgData} lang={lang} setLang={setLang}
-            darkMode={darkMode} toggleTheme={toggleTheme}
-            setSidebarOpen={setSidebarOpen} onInstall={handleInstall}
-            hasPrompt={!!deferredPrompt} t={t}
+            orgData={orgData} 
+            lang={lang} 
+            setLang={setLang}
+            darkMode={darkMode} 
+            toggleTheme={toggleTheme}
+            setSidebarOpen={setSidebarOpen} 
+            onInstall={handleInstall}
+            hasPrompt={!!deferredPrompt} 
+            t={t}
         />
+
+        {/* Zone de contenu avec fond gris technique Google Pro */}
         <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f4f7fe] dark:bg-[#0f1323] custom-scrollbar">
-          {currentView === 'DASHBOARD' && <DashboardView orgData={orgData} agencies={agencies} t={t} />}
-          {currentView === 'AGENCIES' && <AgenciesView orgData={orgData} t={t} />}
-          {currentView === 'ROLES' && <RolesView orgData={orgData} t={t} />}
-          {currentView === 'STAFF' && <StaffView orgData={orgData} t={t} />}
-          {currentView === 'SUBSCRIPTION' && <SubscriptionView orgData={orgData} t={t} />}
-          {currentView === 'VEHICLES' && <VehiclesView orgData={orgData} t={t} />}
-          {currentView === 'CATEGORIES' && <VehicleCategoriesView orgData={orgData} t={t} />}
-          {currentView === 'PROFILE' && <ProfileView orgData={orgData} userData={userData} />}
+          <div className="max-w-[1600px] mx-auto">
+            {currentView === 'DASHBOARD' && <DashboardView orgData={orgData} agencies={agencies} t={t} />}
+            {currentView === 'AGENCIES' && <AgenciesView orgData={orgData} t={t} />}
+            {currentView === 'ROLES' && <RolesView orgData={orgData} t={t} />}
+            {currentView === 'STAFF' && <StaffView orgData={orgData} t={t} />}
+            {currentView === 'VEHICLES' && <VehiclesView orgData={orgData} t={t} />}
+            {currentView === 'CATEGORIES' && <VehicleCategoriesView orgData={orgData} t={t} />}
+            {currentView === 'SUBSCRIPTION' && <SubscriptionView orgData={orgData} t={t} />}
+            {currentView === 'PROFILE' && <ProfileView orgData={orgData} userData={userData} />}
+          </div>
         </div>
       </main>
     </div>
   );
 }
-
-const AuthInput = ({ icon, type = "text", placeholder, value, onChange }: any) => (
-    <div className="relative group w-full">
-        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#F76513] transition-colors">{icon}</div>
-        <input type={type} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-900/50 border-2 border-transparent rounded-[1.4rem] pl-14 pr-6 py-5 text-sm font-bold text-slate-700 dark:text-white outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-[#F76513]/20 focus:ring-4 focus:ring-[#F76513]/5 transition-all text-left" />
-    </div>
-);
