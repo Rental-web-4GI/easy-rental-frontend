@@ -17,42 +17,73 @@ export interface ApiError {
 }
 
 /**
- * Base API client for making HTTP requests
+ * Client API de base pour effectuer des requêtes HTTP.
+ * Gère automatiquement l'injection du jeton Authorization via localStorage ou setAuthToken.
  */
 export class ApiClient {
-  private config: ApiConfig;
+  private baseUrl: string;
+  private headers: Record<string, string>;
 
-  constructor(config: ApiConfig) {
-    this.config = {
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...config,
+  constructor(config: { baseUrl: string }) {
+    this.baseUrl = config.baseUrl;
+    this.headers = {
+      'Content-Type': 'application/json',
     };
+  }
+
+  /**
+   * Injecte manuellement un jeton dans les headers de l'instance
+   */
+  setAuthToken(token: string): void {
+    this.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  /**
+   * Supprime le jeton des headers de l'instance
+   */
+  clearAuthToken(): void {
+    if (this.headers['Authorization']) {
+      delete this.headers['Authorization'];
+    }
   }
 
   private async request<T>(
     method: string,
     endpoint: string,
-    data?: unknown,
-    customHeaders?: Record<string, string>
+    data?: unknown
   ): Promise<ApiResponse<T>> {
-    const url = `${this.config.baseUrl}${endpoint}`;
-    const headers = { ...this.config.headers, ...customHeaders };
+    const url = `${this.baseUrl}${endpoint}`;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+    // 1. On récupère le token soit dans les headers de l'instance, soit dans le localStorage
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const requestHeaders: Record<string, string> = { ...this.headers };
+
+    if (token) {
+      requestHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    // 2. LOGIQUE CRUCIALE POUR L'UPLOAD
+    let body: any;
+    if (data instanceof FormData) {
+      // Pour un upload, on supprime le Content-Type JSON
+      // Le navigateur va mettre "multipart/form-data; boundary=..."
+      delete requestHeaders['Content-Type'];
+      body = data; 
+    } else if (data) {
+      body = JSON.stringify(data);
+    }
 
     try {
       const response = await fetch(url, {
         method,
-        headers,
-        body: data ? JSON.stringify(data) : undefined,
-        signal: controller.signal,
+        headers: requestHeaders,
+        body: body,
       });
 
-      clearTimeout(timeoutId);
+      // Gestion du cas "No Content" (ex: DELETE ou PUT sans retour)
+      if (response.status === 204) {
+        return { data: {} as T, status: 204, ok: true };
+      }
 
       const responseData = await response.json().catch(() => null);
 
@@ -62,55 +93,68 @@ export class ApiClient {
         ok: response.ok,
       };
     } catch (error) {
-      clearTimeout(timeoutId);
-      
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw { message: 'Request timeout', status: 408, code: 'TIMEOUT' } as ApiError;
-      }
-      
-      throw {
-        message: error instanceof Error ? error.message : 'Network error',
+      console.error(`[API Error] ${method} ${endpoint}:`, error);
+      return {
+        data: null as any,
         status: 0,
-        code: 'NETWORK_ERROR',
-      } as ApiError;
+        ok: false,
+      };
     }
   }
 
-  async get<T>(endpoint: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('GET', endpoint, undefined, headers);
+  // --- Méthodes HTTP ---
+
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>('GET', endpoint);
   }
 
-  async post<T>(endpoint: string, data: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('POST', endpoint, data, headers);
+  async post<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('POST', endpoint, data);
   }
 
-  async put<T>(endpoint: string, data: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('PUT', endpoint, data, headers);
+  async put<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PUT', endpoint, data);
   }
 
-  async patch<T>(endpoint: string, data: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('PATCH', endpoint, data, headers);
+  async patch<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>('PATCH', endpoint, data);
   }
 
-  async delete<T>(endpoint: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>('DELETE', endpoint, undefined, headers);
-  }
-
-  setAuthToken(token: string): void {
-    this.config.headers = {
-      ...this.config.headers,
-      Authorization: `Bearer ${token}`,
-    };
-  }
-
-  clearAuthToken(): void {
-    if (this.config.headers) {
-      delete this.config.headers.Authorization;
-    }
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>('DELETE', endpoint);
   }
 }
 
-// Create default API client instances for different micro-frontends
+/**
+ * Détecte dynamiquement la base URL en fonction de l'application (MFE) active.
+ * Si on est sur /agency/..., il utilisera /agency/api-rental
+ */
+const getDynamicBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    return 'https://apirental5gi-v2.onrender.com';
+  }
+
+  const path = window.location.pathname;
+  
+  // On cherche si l'URL commence par l'un de nos segments MFE connus
+  const mfeApps = ['organisation', 'agency', 'client'];
+  const currentApp = mfeApps.find(app => path.startsWith(`/${app}`));
+
+  if (currentApp) {
+    // Retourne par exemple: "/organisation/api-rental" ou "/agency/api-rental"
+    return `/${currentApp}/api-rental`;
+  }
+
+  // Fallback si on est à la racine ou sur une app inconnue
+  return 'https://apirental5gi-v2.onrender.com';
+};
+
+export const defaultClient = new ApiClient({
+  baseUrl: getDynamicBaseUrl()
+});
+/**
+ * Fonction utilitaire pour créer de nouvelles instances si nécessaire
+ */
 export function createApiClient(baseUrl: string): ApiClient {
   return new ApiClient({ baseUrl });
 }

@@ -6,7 +6,12 @@ module.exports = {
   ],
   presets: [require('../../packages/shared-ui/tailwind.config.js')],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Roboto', 'system-ui', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };

@@ -28,8 +28,11 @@ module.exports = {
 
         white: "#FFFFFF",
         black: "#000000"
-      }
-
+      },
+      fontFamily: {
+        sans: ['Roboto', 'system-ui', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],

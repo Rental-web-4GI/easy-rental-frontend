@@ -18,7 +18,8 @@ module.exports = {
         'huge': '3rem',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Roboto', 'system-ui', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
     },
   },
