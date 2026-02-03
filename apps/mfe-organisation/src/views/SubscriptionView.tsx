@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Shield, LayoutGrid, Loader2, AlertCircle, Clock, Zap } from 'lucide-react';
 import { orgService } from '@pwa-easy-rental/shared-services';
 import { PlanCard } from './subscription/PlanCard';
 
-export const SubscriptionView = ({ orgData, t }: any) => {
+export const SubscriptionView = ({ orgData }: any) => {
   const [plans, setPlans] = useState<any[]>([]);
   const [currentSub, setCurrentSub] = useState<any>(null);
   const [realAgenciesCount, setRealAgenciesCount] = useState(0);
@@ -46,7 +47,7 @@ export const SubscriptionView = ({ orgData, t }: any) => {
         await loadSubscriptionData();
         alert(isCancellation ? "Retour au plan FREE effectué." : `Félicitations ! Vous êtes passé au plan ${planName}`);
       }
-    } catch (error) {
+    } catch {
       alert("Erreur lors du changement de plan.");
     } finally {
       setActionLoading(null);
@@ -101,7 +102,7 @@ export const SubscriptionView = ({ orgData, t }: any) => {
               />
             </div>
             <p className="mt-4 text-[10px] font-medium text-slate-400 italic">
-              Cette jauge indique le nombre d'agences physiques actives sur votre réseau par rapport à votre limite autorisée.
+              Cette jauge indique le nombre d&apos;agences physiques actives sur votre réseau par rapport à votre limite autorisée.
             </p>
           </div>
         </div>
