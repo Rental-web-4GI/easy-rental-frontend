@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { AlertTriangle, X, ArrowUpCircle, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ArrowUpCircle, ShieldCheck } from 'lucide-react';
 import { Portal } from './Portal';
 
 export const QuotaAlertModal = ({ onClose, onUpgrade, type, limit }: any) => (

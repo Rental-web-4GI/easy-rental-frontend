@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { LayoutGrid, Plus, Search, Loader2, ShieldCheck, Box } from 'lucide-react';
@@ -6,7 +7,7 @@ import { StatCard } from '../components/StatCard';
 import { CategoryCard } from './categories/CategoryCard';
 import { CategoryFormModal } from './categories/CategoryFormModal';
 
-export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) => {
+export const VehicleCategoriesView = ({ orgData }: { orgData: any }) => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

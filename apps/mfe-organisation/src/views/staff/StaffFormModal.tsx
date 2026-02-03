@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState } from 'react';
 import { X, Loader2, Mail, User, Store, Shield, UserCheck } from 'lucide-react';
@@ -26,13 +27,13 @@ export const StaffFormModal = ({ editingStaff, agencies, postes, initialData, on
 
           <div className="p-10 overflow-y-auto custom-scrollbar space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Prénom" value={formData.firstname} onChange={v => setFormData({...formData, firstname: v})} required icon={<User size={16}/>} />
-              <Input label="Nom" value={formData.lastname} onChange={v => setFormData({...formData, lastname: v})} required icon={<User size={16}/>} />
+              <Input label="Prénom" value={formData.firstname} onChange={(v: any) => setFormData({...formData, firstname: v})} required icon={<User size={16}/>} />
+              <Input label="Nom" value={formData.lastname} onChange={(v: any) => setFormData({...formData, lastname: v})} required icon={<User size={16}/>} />
             </div>
 
             {/* Email uniquement à la création selon StaffRequestDTO */}
             {!editingStaff && (
-              <Input label="Email de l'utilisateur" type="email" value={formData.email} onChange={v => setFormData({...formData, email: v})} required icon={<Mail size={16}/>} />
+              <Input label="Email de l'utilisateur" type="email" value={formData.email} onChange={(v: any) => setFormData({...formData, email: v})} required icon={<Mail size={16}/>} />
             )}
 
             <div className="space-y-4 pt-4 border-t border-slate-50 dark:border-slate-800">

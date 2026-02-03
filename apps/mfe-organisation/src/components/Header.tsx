@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
 import { Menu, Sun, Moon, Languages, Download, Bell, Search } from 'lucide-react';
@@ -31,7 +32,7 @@ export const Header = ({
             {title}
           </h2>
           <p className="hidden md:block text-[11px] font-medium text-slate-400 uppercase tracking-widest italic">
-            Console d'administration
+            Console d&apos;administration
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Car, Plus, Search, Loader2, CheckCircle2, Settings2, BarChart3 } from 'lucide-react';
+import { Car, Plus, Search, Loader2, CheckCircle2, Settings2 } from 'lucide-react';
 import { orgService } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { VehicleCard } from './vehicles/VehicleCard';

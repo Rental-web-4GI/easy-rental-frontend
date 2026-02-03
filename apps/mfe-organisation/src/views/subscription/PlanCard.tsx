@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { Check, Loader2, Zap } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 
 export const PlanCard = ({ plan, isCurrent, onSelect, loading }: any) => (
   <div className={`

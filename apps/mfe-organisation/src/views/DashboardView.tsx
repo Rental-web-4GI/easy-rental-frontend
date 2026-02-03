@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Store, Zap, BarChart3, ShieldCheck } from 'lucide-react';
 import { KpiCard } from '../components/KpiCard';
 

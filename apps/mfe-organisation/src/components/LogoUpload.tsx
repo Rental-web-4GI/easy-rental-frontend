@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Loader2, UploadCloud, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle2 } from 'lucide-react';
 import { orgService } from '@pwa-easy-rental/shared-services';
 
 export const LogoUpload = ({ value, onUploadSuccess }: { value: string, onUploadSuccess: (url: string) => void }) => {
@@ -62,7 +62,7 @@ export const LogoUpload = ({ value, onUploadSuccess }: { value: string, onUpload
   return (
     <div className="space-y-2 group w-full">
       <label className="text-[11px] font-bold uppercase text-slate-400 tracking-wider ml-1 italic">
-        Logo de l'organisation <span className="text-[#0528d6]">*</span>
+        Logo de l&apos;organisation <span className="text-[#0528d6]">*</span>
       </label>
       
       {/* Conteneur principal */}

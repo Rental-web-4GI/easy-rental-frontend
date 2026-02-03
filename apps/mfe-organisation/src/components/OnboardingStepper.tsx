@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState } from 'react';
 import { 
   Loader2, ArrowRight, CheckCircle2, Building2, MapPin, 
   ShieldCheck, Globe, ChevronLeft, Sparkles, AlignLeft,
-  Mail, Phone, Clock, Hash, Image as ImageIcon,
+  Mail, Phone, Clock, Hash,
   LogOut
 } from 'lucide-react';
 import { orgService } from '@pwa-easy-rental/shared-services';
@@ -11,7 +12,7 @@ import { StepperInput } from './StepperInput';
 import { StepperArea } from './StepperArea';
 import { LogoUpload } from './LogoUpload';
 
-export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t }: any) => {
+export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout }: any) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +52,7 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
       // On envoie exactement le OrgUpdateDTO au service
       const res = await orgService.updateOrg(orgId, { ...formData, isVerified: true });
       if (res.ok) onComplete();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       alert("Erreur de connexion au serveur.");
     } finally {
@@ -110,7 +112,7 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
                </button>
                
                <p className="mt-6 text-[10px] text-slate-400 leading-relaxed italic">
-                 Besoin d'aide ? Contactez le support technique Rental.
+                 Besoin d&apos;aide ? Contactez le support technique Rental.
                </p>
             </div>
         </div>
@@ -120,7 +122,7 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
             <div className="flex-1">
                 {step === 1 && (
                   <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 border-b border-slate-50 pb-4">Identité de l'organisation</h2>
+                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 border-b border-slate-50 pb-4">Identité de l&apos;organisation</h2>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                           {/* Section Upload à gauche (1/3) */}

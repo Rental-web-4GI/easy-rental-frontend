@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { Car, MapPin, Gauge, Users, Fuel, Trash2, Edit3, Settings } from 'lucide-react';
+import { Car, MapPin, Gauge, Users, Trash2, Edit3, Settings } from 'lucide-react';
 
 export const VehicleCard = ({ vehicle, agencyName, categoryName, onEdit, onDelete }: any) => {
   const getStatusColor = (status: string) => {

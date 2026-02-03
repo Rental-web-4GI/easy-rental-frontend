@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { Mail, Store, Shield, Edit3, Trash2, User } from 'lucide-react';
+import { Mail, Store, Shield, Edit3, Trash2 } from 'lucide-react';
 
 export const StaffCard = ({ staff, agencies, onEdit, onDelete, onView }: any) => {
   const agencyName = agencies.find((a: any) => a.id === staff.agencyId)?.name || 'Non assignée';

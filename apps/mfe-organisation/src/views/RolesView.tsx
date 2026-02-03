@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Search, Loader2, ShieldCheck, Key, Lock } from 'lucide-react';
@@ -37,9 +38,9 @@ export const RolesView = ({ orgData }: { orgData: any }) => {
   // --- LOGIQUE DE TRAITEMENT ---
   const permissionsByModule = useMemo(() => {
     return allPermissions.reduce((acc: any, perm) => {
-      const module = perm.module || 'Autres';
-      if (!acc[module]) acc[module] = [];
-      acc[module].push(perm);
+      const moduleName = perm.module || 'Autres';
+      if (!acc[moduleName]) acc[moduleName] = [];
+      acc[moduleName].push(perm);
       return acc;
     }, {});
   }, [allPermissions]);

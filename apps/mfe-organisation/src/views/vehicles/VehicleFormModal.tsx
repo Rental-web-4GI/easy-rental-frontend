@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState } from 'react';
-import { X, Loader2, Car, Hash, Info, Calendar } from 'lucide-react';
+import { X, Loader2, Hash } from 'lucide-react';
 import { Portal } from '../../components/Portal';
 
 export const VehicleFormModal = ({ editingVehicle, agencies, categories, initialData, onSubmit, onClose, modalLoading }: any) => {
@@ -26,14 +27,14 @@ export const VehicleFormModal = ({ editingVehicle, agencies, categories, initial
 
           <div className="p-10 overflow-y-auto custom-scrollbar space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input label="Marque" value={formData.brand} onChange={v => setFormData({...formData, brand: v})} required placeholder="ex: Toyota" />
-              <Input label="Modèle" value={formData.model} onChange={v => setFormData({...formData, model: v})} required placeholder="ex: RAV4" />
-              <Input label="Plaque d'immatriculation" value={formData.licencePlate} onChange={v => setFormData({...formData, licencePlate: v.toUpperCase()})} required placeholder="LT-000-AA" icon={<Hash size={16}/>} />
-              <Input label="Numéro VIN (Châssis)" value={formData.vinNumber} onChange={v => setFormData({...formData, vinNumber: v})} placeholder="Optionnel" />
+              <Input label="Marque" value={formData.brand} onChange={(v: any) => setFormData({...formData, brand: v})} required placeholder="ex: Toyota" />
+              <Input label="Modèle" value={formData.model} onChange={(v: any) => setFormData({...formData, model: v})} required placeholder="ex: RAV4" />
+              <Input label="Plaque d'immatriculation" value={formData.licencePlate} onChange={(v: any) => setFormData({...formData, licencePlate: v.toUpperCase()})} required placeholder="LT-000-AA" icon={<Hash size={16}/>} />
+              <Input label="Numéro VIN (Châssis)" value={formData.vinNumber} onChange={(v: any) => setFormData({...formData, vinNumber: v})} placeholder="Optionnel" />
               
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Kilométrage" type="number" value={formData.kilometrage} onChange={v => setFormData({...formData, kilometrage: v})} required />
-                <Input label="Places" type="number" value={formData.places} onChange={v => setFormData({...formData, places: v})} required />
+                <Input label="Kilométrage" type="number" value={formData.kilometrage} onChange={(v: any) => setFormData({...formData, kilometrage: v})} required />
+                <Input label="Places" type="number" value={formData.places} onChange={(v: any) => setFormData({...formData, places: v})} required />
               </div>
 
               <div className="space-y-1.5">
@@ -46,7 +47,7 @@ export const VehicleFormModal = ({ editingVehicle, agencies, categories, initial
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 italic">Agence d'affectation</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 italic">Agence d&apos;affectation</label>
                 <select required value={formData.agencyId} onChange={e => setFormData({...formData, agencyId: e.target.value})}
                         className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6]">
                   <option value="">Choisir une agence...</option>

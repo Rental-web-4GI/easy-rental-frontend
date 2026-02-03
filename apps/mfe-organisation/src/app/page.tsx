@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authService, orgService } from '@pwa-easy-rental/shared-services';
 
 // Components & Views
@@ -18,7 +18,7 @@ import { ProfileView } from '../views/ProfileView';
 import { OnboardingStepper } from '../components/OnboardingStepper';
 
 // UI
-import { Loader2, LogOut } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
 
@@ -196,7 +196,7 @@ export default function OrganisationDashboard() {
 
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <Header 
-            title={currentView === 'PROFILE' ? 'Mon Profil' : t.views[currentView] || currentView}
+            title={(t.views as any)[currentView] || currentView}
             setCurrentView={setCurrentView}
             orgData={orgData} 
             lang={lang} 
@@ -213,11 +213,11 @@ export default function OrganisationDashboard() {
         <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f4f7fe] dark:bg-[#0f1323] custom-scrollbar">
           <div className="max-w-[1600px] mx-auto">
             {currentView === 'DASHBOARD' && <DashboardView orgData={orgData} agencies={agencies} t={t} />}
-            {currentView === 'AGENCIES' && <AgenciesView orgData={orgData} setCurrentView={setCurrentView} t={t} />}
-            {currentView === 'ROLES' && <RolesView orgData={orgData} t={t} />}
-            {currentView === 'STAFF' && <StaffView orgData={orgData} t={t} />}
+            {currentView === 'AGENCIES' && <AgenciesView orgData={orgData} setCurrentView={setCurrentView} />}
+            {currentView === 'ROLES' && <RolesView orgData={orgData} />}
+            {currentView === 'STAFF' && <StaffView orgData={orgData} />}
             {currentView === 'VEHICLES' && <VehiclesView orgData={orgData} t={t} />}
-            {currentView === 'CATEGORIES' && <VehicleCategoriesView orgData={orgData} t={t} />}
+            {currentView === 'CATEGORIES' && <VehicleCategoriesView orgData={orgData} />}
             {currentView === 'SUBSCRIPTION' && <SubscriptionView orgData={orgData} t={t} />}
             {currentView === 'PROFILE' && <ProfileView orgData={orgData} userData={userData} />}
           </div>

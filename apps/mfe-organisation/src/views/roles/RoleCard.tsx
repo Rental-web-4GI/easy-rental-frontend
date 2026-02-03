@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { ShieldCheck, Lock, Edit3, ChevronRight } from 'lucide-react';
+import { ShieldCheck, Lock, Edit3 } from 'lucide-react';
 
 export const RoleCard = ({ role, onEdit, isSystem }: any) => (
   <div className="bg-white dark:bg-[#1a1d2d] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">

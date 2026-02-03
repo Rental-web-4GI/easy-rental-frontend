@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
 import { LayoutGrid, Lock, Edit3, Trash2, CheckCircle2 } from 'lucide-react';

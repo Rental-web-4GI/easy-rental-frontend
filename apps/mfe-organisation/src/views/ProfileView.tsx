@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
 import { 
-  User, Mail, Building2, Globe, MapPin, 
-  ShieldCheck, FileText, Calendar, Hash,
+  Mail, Building2, MapPin, 
+  ShieldCheck, FileText,
   Zap, BarChart3, Clock, Globe2,
   Download
 } from 'lucide-react';
@@ -84,7 +85,7 @@ export const ProfileView = ({ userData, orgData }: ProfileViewProps) => {
               {orgData.businessLicense && (
                 <div className="md:col-span-2">
                     <a href={orgData.businessLicense} target="_blank" className="text-xs font-bold text-primary hover:underline flex items-center gap-2">
-                        <Download size={14}/> Consulter la licence d'exploitation
+                        <Download size={14}/> Consulter la licence d&apos;exploitation
                     </a>
                 </div>
               )}
