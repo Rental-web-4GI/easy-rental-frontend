@@ -4,7 +4,7 @@ import { Shield, LayoutGrid, Loader2, AlertCircle, Clock, Zap } from 'lucide-rea
 import { orgService } from '@pwa-easy-rental/shared-services';
 import { PlanCard } from './subscription/PlanCard';
 
-export const SubscriptionView = ({ orgData, t }: any) => {
+export const SubscriptionView = ({ orgData }: any) => {
   const [plans, setPlans] = useState<any[]>([]);
   const [currentSub, setCurrentSub] = useState<any>(null);
   const [realAgenciesCount, setRealAgenciesCount] = useState(0);

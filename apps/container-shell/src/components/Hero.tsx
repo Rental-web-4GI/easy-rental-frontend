@@ -2,6 +2,7 @@
 import React from 'react';
 import { DownloadCloud } from 'lucide-react';
 import { MFE_URLS } from '../config/mfe-urls';
+import Image from 'next/image';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Hero = ({ t, onInstall }: any) => (
@@ -40,7 +41,7 @@ export const Hero = ({ t, onInstall }: any) => (
       <div className="absolute inset-0 bg-blue-600/20 rounded-full blur-[120px] opacity-20" />
       <div className="relative bg-slate-900 rounded-[4rem] p-4 shadow-2xl border-8 border-slate-800 rotate-2 group-hover:rotate-0 transition-all duration-700">
          <div className="bg-white rounded-[3.2rem] overflow-hidden aspect-video">
-            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop" alt="Dashboard" className="w-full h-full object-cover" />
+            <Image src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop" alt="Dashboard" className="w-full h-full object-cover" />
          </div>
       </div>
     </div>

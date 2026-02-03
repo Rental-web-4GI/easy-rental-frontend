@@ -1,6 +1,6 @@
 "use client"; // <--- THIS IS REQUIRED
 
-import type { Metadata, Viewport } from 'next';
+// import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import React, { useState, useEffect } from 'react';
 import { Navbar } from '../components/Navbar';
@@ -13,10 +13,15 @@ import { en } from '../locales/en';
 // this component must be split if you want SEO metadata 
 // because "use client" components cannot export metadata.
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [lang, setLang] = useState<'FR' | 'EN'>('FR');
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent|null>(null);
   const [mounted, setMounted] = useState(false); // Fix hydration
 
   const t = lang === 'FR' ? fr : en;
@@ -32,9 +37,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     if (isDark) document.documentElement.classList.add('dark');
 
     // 2. PWA Logic
-    const handler = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+    const handler = (e: Event) => {
+       e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      
     };
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
@@ -52,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }
   };
 
-  const handleInstallApp = async () => {
+  const handleInstallApp = async (): Promise<void> => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;

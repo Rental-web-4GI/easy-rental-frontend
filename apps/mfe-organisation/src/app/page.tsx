@@ -43,7 +43,7 @@ export default function OrganisationDashboard() {
   // --- INITIALISATION ---
   useEffect(() => {
     // 1. PWA Install Prompt
-    const handleBeforeInstallPrompt = (e: any) => { 
+    const handleBeforeInstallPrompt = (e: Event) => { 
       e.preventDefault(); 
       setDeferredPrompt(e); 
     };

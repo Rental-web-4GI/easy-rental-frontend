@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, Building2, MapPin, Star, Users, ChevronDown, X } from 'lucide-react';
+import { Search, Filter, Building2, ChevronDown, X } from 'lucide-react';
 import { Agency } from '@/types/agencyType';
 import { agencyService } from '@/services/agencyService';
 import { AgencyCard } from '@/components/AgencyCard';

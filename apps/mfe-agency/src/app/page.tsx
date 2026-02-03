@@ -9,6 +9,7 @@ import { authService } from '@pwa-easy-rental/shared-services';
 
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
+import Image from 'next/image';
 
 export default function AgencyDashboard() {
   // --- STATES ---
@@ -168,7 +169,7 @@ export default function AgencyDashboard() {
           <div className="flex items-center gap-4">
             <button onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[9px] font-black uppercase border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white">{lang}</button>
             <button onClick={toggleTheme} className="p-3 bg-white dark:bg-slate-800 rounded-xl text-slate-400 border border-slate-100 dark:border-slate-700">{darkMode ? <Sun size={18}/> : <Moon size={18}/>}</button>
-            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 shadow-xl shrink-0"><img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" /></div>
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 shadow-xl shrink-0"><Image width={10} src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt='photo'/></div>
           </div>
         </header>
 

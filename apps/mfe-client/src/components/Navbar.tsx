@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Bell, Car, Building2, Info, Phone, UserCircle2, Home } from 'lucide-react';
+import { Menu, X, Bell, Car, Building2, UserCircle2, Home } from 'lucide-react';
 
 const mainNavItems = [
   { href: '/', label: 'Accueil', icon: Home },

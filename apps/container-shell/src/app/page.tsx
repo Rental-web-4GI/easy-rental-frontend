@@ -11,8 +11,8 @@ import { MFE_URLS } from '../config/mfe-urls';
 import Link from 'next/link';
 
 export default function LandingPage() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [lang, setLang] = useState<'FR' | 'EN'>('FR');
+  const [, setDarkMode] = useState(false);
+  const [lang,] = useState<'FR' | 'EN'>('FR');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   
@@ -34,12 +34,6 @@ export default function LandingPage() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  const toggleTheme = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', next ? 'dark' : 'light');
-  };
 
   const handleInstallApp = async () => {
     console.log('Install App clicked');

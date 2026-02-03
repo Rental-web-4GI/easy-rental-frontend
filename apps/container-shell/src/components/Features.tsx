@@ -1,5 +1,5 @@
 import React from 'react';
-import { WifiOff, MapPin, FileText, Zap, LayoutGrid } from 'lucide-react';
+import { WifiOff, MapPin, FileText, Zap } from 'lucide-react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Features = ({ t }: any) => (

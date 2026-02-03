@@ -89,6 +89,7 @@ export const authApi = {
       email: string;
       firstName: string;
       lastName: string;
+      phone: string;
       role: string;
     }>('/auth/me');
   },
