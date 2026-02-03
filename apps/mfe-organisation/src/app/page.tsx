@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { authService, orgService } from '@pwa-easy-rental/shared-services';
@@ -11,13 +12,14 @@ import { OnboardingStepper } from '../components/OnboardingStepper';
 import { StaffView } from '../views/StaffView';
 import { 
   Loader2, Mail, Lock, User, Building, 
-  ArrowRight, Sparkles, ShieldCheck, Globe, LogOut, Sun, Moon 
+  ShieldCheck, LogOut, Sun, Moon 
 } from 'lucide-react';
 
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
 import { VehiclesView } from '@/views/VehiclesView';
 import { VehicleCategoriesView } from '@/views/VehicleCategoriesView';
+import { ProfileView } from '@/views/ProfileView';
 
 export default function OrganisationDashboard() {
   const [isAuth, setIsAuth] = useState(false);
@@ -31,6 +33,7 @@ export default function OrganisationDashboard() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   const [orgData, setOrgData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null); // AJOUTÉ
   const [agencies, setAgencies] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
 
@@ -59,10 +62,14 @@ export default function OrganisationDashboard() {
     try {
       const meRes = await orgService.getMe();
       if (meRes.ok && meRes.data) {
-        const { organization } = meRes.data;
+        const { user, organization } = meRes.data;
 
         if (organization) {
           setOrgData(organization);
+          setUserData(user);
+
+          console.log('organisation: ', organization);
+          console.log('user: ', user);
             
           // LOGIQUE DE VÉRIFICATION BASÉE SUR ISVERIFIED
           setIsOnboarded(prev => prev || organization.city?.length >= 1);//isVerified === true);
@@ -199,13 +206,14 @@ export default function OrganisationDashboard() {
       />
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <Header 
-            title={t.views[currentView] || currentView}
+            title={t.views[currentView]}
+            setCurrentView={setCurrentView}
             orgData={orgData} lang={lang} setLang={setLang}
             darkMode={darkMode} toggleTheme={toggleTheme}
             setSidebarOpen={setSidebarOpen} onInstall={handleInstall}
             hasPrompt={!!deferredPrompt} t={t}
         />
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f4f7fe] dark:bg-[#0f1323] custom-scrollbar">
           {currentView === 'DASHBOARD' && <DashboardView orgData={orgData} agencies={agencies} t={t} />}
           {currentView === 'AGENCIES' && <AgenciesView orgData={orgData} t={t} />}
           {currentView === 'ROLES' && <RolesView orgData={orgData} t={t} />}
@@ -213,6 +221,7 @@ export default function OrganisationDashboard() {
           {currentView === 'SUBSCRIPTION' && <SubscriptionView orgData={orgData} t={t} />}
           {currentView === 'VEHICLES' && <VehiclesView orgData={orgData} t={t} />}
           {currentView === 'CATEGORIES' && <VehicleCategoriesView orgData={orgData} t={t} />}
+          {currentView === 'PROFILE' && <ProfileView orgData={orgData} userData={userData} />}
         </div>
       </main>
     </div>

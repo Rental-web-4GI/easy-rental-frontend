@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Menu, Sun, Moon, Languages, Download, Bell } from 'lucide-react';
+import { Menu, Sun, Moon, Languages, Download, Bell, Search } from 'lucide-react';
 
 export const Header = ({ 
   title, 
@@ -12,51 +12,94 @@ export const Header = ({
   setSidebarOpen, 
   onInstall,
   hasPrompt,
+  setCurrentView, // Ajouté
   t 
 }: any) => {
   return (
-    <header className="h-24 px-6 md:px-10 flex items-center justify-between shrink-0 border-b border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-[#0f1323]/50 backdrop-blur-md sticky top-0 z-[50]">
-      <div className="flex items-center gap-4">
-        <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white">
-          <Menu size={20} />
+    <header className="h-20 px-6 md:px-10 flex items-center justify-between shrink-0 border-b-4 border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0f1323]/80 backdrop-blur-lg sticky top-0 z-[50]">
+      
+      <div className="flex items-center gap-6">
+        <button 
+          onClick={() => setSidebarOpen(true)} 
+          className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+        >
+          <Menu size={22} />
         </button>
-        <h2 className="text-xl md:text-3xl font-[900] italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
-          {title}
-        </h2>
+        
+        <div className="flex flex-col">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {title}
+          </h2>
+          <p className="hidden md:block text-[11px] font-medium text-slate-400 uppercase tracking-widest italic">
+            Console d'administration
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4">
-        {/* PWA INSTALL */}
+      <div className="flex items-center gap-3 md:gap-4">
+        <div className="hidden xl:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-2 border border-transparent focus-within:border-blue-500/50 focus-within:bg-white transition-all w-64">
+          <Search size={16} className="text-slate-400" />
+          <input 
+            type="text" 
+            placeholder="Rechercher..." 
+            className="bg-transparent border-none outline-none text-xs ml-3 w-full font-medium"
+          />
+        </div>
+
         {hasPrompt && (
-            <button onClick={onInstall} className="hidden sm:flex items-center gap-2 p-3 bg-orange-50 text-[#F76513] rounded-xl font-black uppercase text-[9px] italic border border-orange-100 animate-pulse">
-                <Download size={16} /> {t.header.installBtn}
+            <button 
+              onClick={onInstall} 
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-500/10 text-[#F76513] rounded-full font-bold text-[11px] border border-orange-100 dark:border-orange-500/20 hover:bg-orange-100 transition-colors animate-pulse"
+            >
+                <Download size={14} /> {t.header.installBtn || "Installer"}
             </button>
         )}
 
-        {/* TRANSLATION */}
-        <button 
-          onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} 
-          className="p-3 bg-white dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white flex items-center gap-2 shadow-sm"
-        >
-          <Languages size={16} className="text-blue-600" /> {lang}
+        <button className="p-2.5 text-slate-400 hover:text-[#0528d6] hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-full transition-all relative">
+          <Bell size={20} />
+          <span className="absolute top-2 right-2.5 size-2 bg-red-500 border-2 border-white dark:border-[#0f1323] rounded-full"></span>
         </button>
 
-        {/* THEME TOGGLE */}
+        <button 
+          onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} 
+          className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-500/50 transition-all"
+        >
+          <Languages size={16} className="text-[#0528d6]" />
+          <span className="hidden sm:inline">{lang}</span>
+        </button>
+
         <button 
           onClick={toggleTheme} 
-          className="p-3 bg-white dark:bg-slate-800 rounded-xl text-slate-400 border border-slate-100 dark:border-slate-700 shadow-sm hover:text-orange-500 transition-colors"
+          className="p-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:text-orange-500 transition-colors"
         >
           {darkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        {/* PROFILE */}
-        <div className="flex items-center gap-3 ml-2 pl-4 border-l border-slate-100 dark:border-slate-800">
+        {/* PROFILE SECTION : RENDUE CLIQUABLE */}
+        <div 
+            onClick={() => setCurrentView('PROFILE')}
+            className="flex items-center gap-3 ml-2 pl-4 border-l border-slate-200 dark:border-slate-800 cursor-pointer group"
+        >
            <div className="text-right hidden sm:block">
-              <p className="text-[9px] font-black uppercase text-slate-400 leading-none mb-1">{t.header.adminRole}</p>
-              <p className="text-xs font-bold dark:text-white italic">{orgData?.name}</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none mb-1 group-hover:text-[#0528d6] transition-colors">
+                Administrateur
+              </p>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-200 max-w-[120px] truncate">
+                {orgData?.name || "Organisation"}
+              </p>
            </div>
-           <div className="size-11 rounded-2xl bg-[#0528d6] shadow-lg border-2 border-white dark:border-slate-800 overflow-hidden shrink-0">
-              <img src={orgData?.logoUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330"} alt={t.header.avatarAlt} className="w-full h-full object-cover" />
+           
+           <div className="relative">
+              <div className="size-10 rounded-xl bg-gradient-to-br from-[#0528d6] to-blue-400 p-[2px] shadow-md group-hover:scale-105 transition-all">
+                <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[10px] overflow-hidden">
+                  <img 
+                    src={orgData?.logoUrl || "https://ui-avatars.com/api/?name=Org&background=0528d6&color=fff"} 
+                    alt="Logo" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+              </div>
+              <span className="absolute -bottom-1 -right-1 size-3 bg-green-500 border-2 border-white dark:border-[#0f1323] rounded-full"></span>
            </div>
         </div>
       </div>

@@ -58,7 +58,11 @@ export class ApiClient {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     
     const requestHeaders: Record<string, string> = { ...this.headers };
-    
+
+    if (data instanceof FormData) {
+      delete requestHeaders['Content-Type'];
+    }
+
     if (token) {
       requestHeaders['Authorization'] = `Bearer ${token}`;
     }
@@ -116,14 +120,15 @@ export class ApiClient {
 }
 
 /**
- * Instance par défaut configurée pour utiliser le proxy Next.js
- * ou l'URL directe du backend selon l'environnement.
+ * Instance par défaut
+ * Correction : On utilise le chemin du proxy Next.js au lieu de l'URL directe
  */
 export const defaultClient = new ApiClient({
-  baseUrl:
-    typeof window !== 'undefined'
-      ? '/organisation/api-rental' // Utilise le rewrite de Next.js (Proxy)
-      : 'https://apirental5gi.onrender.com', // Serveur direct
+  // En développement, on passe par le proxy local pour éviter CORS
+  // En production, on peut utiliser une variable d'environnement
+  baseUrl: typeof window !== 'undefined' // is browser or server
+    ? '/organisation/api-rental' // Utilise le rewrite de Next.js
+    : 'https://apirental5gi-v2.onrender.com'
 });
 
 /**

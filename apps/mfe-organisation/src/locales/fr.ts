@@ -75,6 +75,7 @@ export const fr = {
     install: "Installer l'app"
   },
   views: {
+    PROFILE: "Profil",
     DASHBOARD: "Tableau de Bord",
     AGENCIES: "Agences du Réseau",
     ROLES: "Postes & Permissions",
