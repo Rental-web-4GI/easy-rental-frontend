@@ -25,11 +25,11 @@ export const fr = {
     title: "Accédez à votre portail",
     subtitle: "Sélectionnez votre profil pour continuer",
     org: "Organisation",
-    orgDesc: "Pour les propriétaires de flottes souhaitant créer leur réseau.",
+    orgDesc: "Pour les propriétaires de flottes souhaitant mettre en location leurs véhicules.",
     agency: "Personnel",
-    agencyDesc: "Pour les agents gérant les départs et les retours en agence.",
+    agencyDesc: "Pour les agents gérant les départs et les retours des véhicules en agence.",
     client: "Client",
-    clientDesc: "Pour parcourir le catalogue et réserver instantanément.",
+    clientDesc: "Pour parcourir le catalogue et réserver un véhicule en 4 étapes.",
     cta: "Entrer"
   },
   features: { 

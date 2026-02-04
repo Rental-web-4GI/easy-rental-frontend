@@ -6,9 +6,9 @@ import Image from 'next/image';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Solutions = ({ t }: any) => {
   const cards = [
-    { img: "https://images.unsplash.com/photo-1542362567-b05eef11f94d", label: "HQ View", title: t.org, desc: t.orgDesc, url: MFE_URLS.organisation },
-    { img: "https://images.unsplash.com/photo-1556740758-90de374c12ad", label: "Manager View", title: t.agency, desc: t.agencyDesc, url: MFE_URLS.agency },
-    { img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42", label: "User App", title: t.client, desc: t.clientDesc, url: MFE_URLS.client },
+    { img: "/org.webp", label: "HQ View", title: t.org, desc: t.orgDesc, url: MFE_URLS.organisation },
+    { img: "/agence.webp", label: "Manager View", title: t.agency, desc: t.agencyDesc, url: MFE_URLS.agency },
+    { img: "/user.webp", label: "User App", title: t.client, desc: t.clientDesc, url: MFE_URLS.client },
   ];
 
   return (
@@ -21,7 +21,7 @@ export const Solutions = ({ t }: any) => {
         {cards.map((item, i) => (
           <div key={i} className="group card-pwa p-5 dark:bg-slate-800 dark:border-slate-700 hover:border-blue-600 transition-all">
             <div className="h-72 rounded-[2.5rem] overflow-hidden mb-8 bg-slate-100 relative">
-              <Image src={item.img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="img" />
+              <Image src={item.img} width={100} height={100} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="img" />
               <div className="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 px-3 py-1 rounded-full text-[10px] font-black  italic text-blue-600">{item.label}</div>
             </div>
             <h3 className="text-2xl font-black  italic text-slate-900 dark:text-white mb-3">{item.title}</h3>
