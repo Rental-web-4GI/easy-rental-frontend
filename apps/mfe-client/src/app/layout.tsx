@@ -19,7 +19,7 @@ export default function RootLayout({
     const [darkMode, setDarkMode] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(false);
+    const [, setIsSignUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
