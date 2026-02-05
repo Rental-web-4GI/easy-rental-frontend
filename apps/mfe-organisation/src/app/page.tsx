@@ -65,7 +65,7 @@ export default function OrganisationDashboard() {
   // --- RÉCUPÉRATION DES DONNÉES (ZÉRO MOCKUP) ---
   const fetchProfile = async () => {
     try {
-      const meRes = await authService.getMe();
+      const meRes = await authService.getOrgUserMe();
       if (meRes.ok && meRes.data) {
         // meRes.data = { user, organization } selon OrgUserResponseDTO
         const { user, organization } = meRes.data;

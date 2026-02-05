@@ -34,7 +34,7 @@ export default function ClientHome() {
 
   const fetchProfile = async () => {
     try {
-      const res = await authService.getMe();
+      const res = await authService.getUserMe();
       if (res.ok && res.data) {
         setUserData(res.data);
         setIsAuth(true);

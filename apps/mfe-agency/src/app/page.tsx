@@ -29,7 +29,7 @@ export default function AgencyDashboard() {
 
   const fetchContext = useCallback(async () => {
     try {
-      const meRes = await authService.getMe();
+      const meRes = await authService.getUserMe();
       if (meRes.ok && meRes.data) {
         const user = meRes.data;
         setUserData(user);
