@@ -577,7 +577,7 @@ export default function ClientPortal() {
           ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {filteredVehicles.map((vehicle) => (
-                    <Link key={vehicle.id} href={`/client/cars/${vehicle.id}`}>
+                    <Link key={vehicle.id} href={`/cars/${vehicle.id}`}>
                       <div className="group bg-white dark:bg-slate-800 rounded-[2.5rem] p-4 border border-slate-50 dark:border-slate-800 hover:shadow-2xl transition-all cursor-pointer">
                         <div className="aspect-square rounded-[2rem] overflow-hidden mb-6 relative shadow-inner bg-slate-50 dark:bg-[#0f1323]">
                           <div className="absolute top-4 left-4 bg-white/95 dark:bg-[#0f1323]/95 px-3 py-1 rounded-full text-xs font-semibold text-blue-600 z-10 shadow-sm">
