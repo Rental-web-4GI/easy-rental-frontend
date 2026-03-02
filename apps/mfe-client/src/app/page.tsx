@@ -21,13 +21,13 @@ export default function ClientDashboard() {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [lang, setLang] = useState<'FR' | 'EN'>('FR');
   const [darkMode, setDarkMode] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [, setDeferredPrompt] = useState<any>(null);
 
   const [isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState<any>(null);
 
-  const t = lang === 'FR' ? fr : en;
+  // const t = lang === 'FR' ? fr : en;
 
   const fetchProfile = useCallback(async () => {
     try {

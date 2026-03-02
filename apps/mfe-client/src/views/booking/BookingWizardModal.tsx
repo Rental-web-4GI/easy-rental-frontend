@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, CreditCard, CheckCircle2, Loader2, ChevronRight, Smartphone, AlertCircle, User, Star, ShieldCheck, Clock } from 'lucide-react';
+import { X, CreditCard, CheckCircle2, Loader2, ChevronRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { rentalService, driverService } from '@pwa-easy-rental/shared-services';
 import { Portal } from '../../components/Portal';
 
@@ -51,8 +51,9 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
       } else {
         setError(res.data?.message || "Désolé, ce créneau n'est plus disponible.");
       }
-    } catch (e) {
+    } catch {
       setError("Le service de calcul est momentanément indisponible.");
+
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
       } else {
         setError("La transaction a été refusée par l'opérateur.");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors du traitement du paiement.");
     } finally {
       setLoading(false);
@@ -183,7 +184,7 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
                 <div className="size-28 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center mx-auto border border-green-100 dark:border-green-800 shadow-inner"><CheckCircle2 size={56} /></div>
                 <div>
                    <h3 className="text-4xl font-[900] italic tracking-tighter uppercase text-slate-900 dark:text-white leading-tight">Voyage <br/><span className="text-[#0528d6]">Confirmé !</span></h3>
-                   <p className="mt-4 text-slate-500 dark:text-slate-400 font-bold italic text-sm max-w-xs mx-auto">Votre dossier est transmis à l&apos;agence. Retrouvez vos détails dans "Mes Réservations".</p>
+                   <p className="mt-4 text-slate-500 dark:text-slate-400 font-bold italic text-sm max-w-xs mx-auto">Votre dossier est transmis à l&apos;agence. Retrouvez vos détails dans <strong>Mes Réservations</strong>.</p>
                 </div>
                 <button onClick={onClose} className="w-full py-5 bg-slate-900 dark:bg-white dark:text-[#0528d6] text-white rounded-[2rem] font-black text-xs uppercase italic tracking-widest">Retour au parc</button>
               </div>

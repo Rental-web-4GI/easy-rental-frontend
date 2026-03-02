@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, Wind, Usb, Bluetooth, MapPin, Briefcase, Zap, 
-  ShieldCheck, Loader2, Settings, HardDrive, Gauge, 
+  ShieldCheck, Loader2, Settings, HardDrive,
   Award, Building2, Store, Phone, Star, Calendar, MessageSquare, 
-  AlertCircle, CheckCircle2, Clock, Car, Hash, ShieldAlert, 
-  Fuel, Milestone, Palette, Users, ListChecks, Info, 
-  UserCheck, Timer, Banknote, CalendarRange,
+  CheckCircle2, Clock, ShieldAlert, 
+  Fuel, Palette, Users, ListChecks, Info, 
+  UserCheck, CalendarRange,
   ChevronRight
 } from 'lucide-react';
 import { vehicleService, agencyService, orgService } from '@pwa-easy-rental/shared-services';
@@ -126,7 +126,7 @@ export const VehicleDetailsView = ({ vehicleId, onBack, userData }: any) => {
                         <UserCheck size={24} className="text-orange-600 shrink-0 mt-0.5" />
                         <div>
                             <p className="text-[11px] font-black text-orange-800 dark:text-orange-400 uppercase tracking-widest leading-none mb-1 italic">Assistance Chauffeur Obligatoire</p>
-                            <p className="text-[10px] text-orange-700/80 dark:text-orange-300/80 font-bold leading-tight">Ce véhicule haut standing nécessite l'accompagnement d'un chauffeur agréé par l'organisation.</p>
+                            <p className="text-[10px] text-orange-700/80 dark:text-orange-300/80 font-bold leading-tight">{"Ce véhicule haut standing nécessite l'accompagnement d'un chauffeur agréé par l'organisation."}</p>
                         </div>
                     </div>
                 )}
@@ -205,7 +205,7 @@ export const VehicleDetailsView = ({ vehicleId, onBack, userData }: any) => {
                 </p>
             </div>
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-                <h5 className="text-[10px] font-black uppercase text-slate-800 dark:text-white italic mb-2">Périodes d'indisponibilité</h5>
+                <h5 className="text-[10px] font-black uppercase text-slate-800 dark:text-white italic mb-2">{"Périodes d'indisponibilité"}</h5>
                 <div className="max-h-[120px] overflow-y-auto custom-scrollbar pr-2 space-y-2">
                     {schedule?.length > 0 ? schedule.map((s:any, i:number) => (
                         <div key={i} className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
@@ -238,11 +238,11 @@ export const VehicleDetailsView = ({ vehicleId, onBack, userData }: any) => {
                                 {[...Array(5)].map((_, star) => <Star key={star} size={10} fill={star < r.rating ? "currentColor" : "none"} className={star < r.rating ? "text-orange-500" : "text-slate-300"} />)}
                             </div>
                         </div>
-                        <p className="text-xs text-slate-800 dark:text-slate-300 font-bold italic leading-relaxed">"{r.comment}"</p>
+                        <p className="text-xs text-slate-800 dark:text-slate-300 font-bold italic leading-relaxed">{r.comment}</p>
                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Le {new Date(r.createdAt).toLocaleDateString()}</p>
                     </div>
                 )) : (
-                    <div className="col-span-2 py-10 text-center text-slate-400 text-[11px] font-black uppercase italic tracking-widest">Aucun retour d'expérience pour le moment</div>
+                    <div className="col-span-2 py-10 text-center text-slate-400 text-[11px] font-black uppercase italic tracking-widest">{"Aucun retour d'expérience pour le moment"}</div>
                 )}
             </div>
          </div>
@@ -293,17 +293,17 @@ const IconFeature = ({ label, active, icon }: any) => (
     </div>
 );
 
-const PriceCard = ({ label, value, unit, active }: any) => (
-    <div className={`flex justify-between items-center p-5 rounded-2xl border-2 transition-all ${active ? 'border-[#0528d6] bg-blue-50/10 shadow-inner' : 'border-slate-100 dark:border-slate-800'}`}>
-        <div className="flex items-center gap-3">
-            <div className={`size-2 rounded-full ${active ? 'bg-[#0528d6] animate-pulse' : 'bg-slate-300'}`} />
-            <span className="text-[10px] font-black uppercase text-slate-800 dark:text-slate-300 italic tracking-widest">{label}</span>
-        </div>
-        <div className="text-right">
-            <p className={`text-2xl font-[900] italic tracking-tighter leading-none ${active ? 'text-[#0528d6]' : 'text-slate-900 dark:text-slate-200'}`}>
-                {value?.toLocaleString()} <span className="text-xs">XAF</span>
-            </p>
-            <p className="text-[8px] font-black uppercase text-slate-500 mt-1 italic opacity-70">{unit}</p>
-        </div>
-    </div>
-);
+// const PriceCard = ({ label, value, unit, active }: any) => (
+//     <div className={`flex justify-between items-center p-5 rounded-2xl border-2 transition-all ${active ? 'border-[#0528d6] bg-blue-50/10 shadow-inner' : 'border-slate-100 dark:border-slate-800'}`}>
+//         <div className="flex items-center gap-3">
+//             <div className={`size-2 rounded-full ${active ? 'bg-[#0528d6] animate-pulse' : 'bg-slate-300'}`} />
+//             <span className="text-[10px] font-black uppercase text-slate-800 dark:text-slate-300 italic tracking-widest">{label}</span>
+//         </div>
+//         <div className="text-right">
+//             <p className={`text-2xl font-[900] italic tracking-tighter leading-none ${active ? 'text-[#0528d6]' : 'text-slate-900 dark:text-slate-200'}`}>
+//                 {value?.toLocaleString()} <span className="text-xs">XAF</span>
+//             </p>
+//             <p className="text-[8px] font-black uppercase text-slate-500 mt-1 italic opacity-70">{unit}</p>
+//         </div>
+//     </div>
+// );

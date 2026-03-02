@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect } from 'react';
-import { notifService, rentalService } from '@pwa-easy-rental/shared-services';
-import { Clock, MapPin, Bell, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { rentalService } from '@pwa-easy-rental/shared-services';
+import { Clock, Bell, Loader2 } from 'lucide-react';
 
 export const MyBookingsView = ({ userData }: { userData: any }) => {
-  const [rentals, setRentals] = useState<any[]>([]);
+  // const [rentals, setRentals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,12 +17,12 @@ export const MyBookingsView = ({ userData }: { userData: any }) => {
     fetchRentals();
   }, [userData]);
 
-  const handleSignalEnd = async (id: string) => {
-    if (confirm("Signaler la restitution du véhicule à l'agence ?")) {
-      const res = await rentalService.signalEnd(id);
-      if (res.ok) alert("Fin de location signalée !");
-    }
-  };
+  // const handleSignalEnd = async (id: string) => {
+  //   if (confirm("Signaler la restitution du véhicule à l'agence ?")) {
+  //     const res = await rentalService.signalEnd(id);
+  //     if (res.ok) alert("Fin de location signalée !");
+  //   }
+  // };
 
   if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin text-[#0528d6] size-12" /></div>;
 

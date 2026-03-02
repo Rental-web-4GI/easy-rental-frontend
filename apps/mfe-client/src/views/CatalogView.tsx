@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Car, Loader2, LayoutGrid } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { vehicleService } from '@pwa-easy-rental/shared-services';
 import { VehicleCard } from './catalog/VehicleCard';
 import { VehicleDetailsView } from './VehicleDetailsView';

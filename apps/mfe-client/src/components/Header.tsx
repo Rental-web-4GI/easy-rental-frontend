@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { Menu, Sun, Moon, Languages, Bell, UserCircle, LogOut, Car, Ticket, Home } from 'lucide-react';
+import { Menu, Sun, Moon, LogOut, Car, Home } from 'lucide-react';
 
 export const Header = ({ isAuth, userData, currentView, setCurrentView, toggleTheme, darkMode, lang, setLang, onLogout }: any) => {
   return (

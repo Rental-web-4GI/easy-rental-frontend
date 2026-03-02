@@ -2,8 +2,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { 
-  Car, Zap, ShieldCheck, MapPin, ChevronRight, 
-  Star, Clock, Search, Filter, Loader2, Calendar, 
+  Zap, ShieldCheck, MapPin, ChevronRight, 
+  Star, Clock, Search, Filter, Loader2,
   Users
 } from 'lucide-react';
 import { vehicleService } from '@pwa-easy-rental/shared-services';
@@ -52,7 +52,7 @@ export const HomeView = ({ onSearch, setViewAll, onSelectVehicle }: any) => {
                 Prêt pour le <br /><span className="text-blue-300">Grand Départ ?</span>
             </h1>
             <p className="text-lg text-blue-100/70 font-medium italic leading-relaxed max-w-xl mx-auto">
-                Trouvez le véhicule parfait pour votre prochain trajet parmi des centaines d'offres certifiées.
+            {"Trouvez le véhicule parfait pour votre prochain trajet parmi des centaines d'offres certifiées."}
             </p>
           </div>
 
