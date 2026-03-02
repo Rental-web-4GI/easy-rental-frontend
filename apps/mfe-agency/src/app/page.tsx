@@ -11,6 +11,7 @@ import { ProfileView } from '../views/ProfileView';
 import { VehiclesView } from '@/views/VehiclesView';
 import { DriversView } from '@/views/DriversView';
 import { Loader2 } from 'lucide-react';
+import { BookingsView } from '@/views/BookingsView';
 
 export default function AgencyDashboard() {
   const [currentView, setCurrentView] = useState<string>('DASHBOARD');
@@ -146,6 +147,7 @@ export default function AgencyDashboard() {
             {currentView === 'PROFILE' && <ProfileView userData={userData} agencyData={agencyData} parentOrg={parentOrg} />}
             {currentView === 'VEHICLES' && <VehiclesView userData={userData} />}
             {currentView === 'DRIVERS' && <DriversView userData={userData} />}
+            {currentView === 'BOOKINGS' && <BookingsView userData={userData} />}
           </div>
         </div>
       </main>

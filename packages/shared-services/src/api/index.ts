@@ -9,3 +9,5 @@ export { vehicleService } from './vehicle.service';
 export { driverService } from './driver.service';
 export { notifService } from './notif.service';
 export { extraService } from './extra.service';
+export { rentalService } from './rental.service';
+export { statsService } from './stats.service';

@@ -48,7 +48,7 @@ export const Sidebar = ({
           <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-4 px-2">Opérations</p>
           <div className="space-y-1">
             <SidebarItem icon={<LayoutDashboard size={20}/>} label="Vue d'ensemble" active={currentView === 'DASHBOARD'} onClick={() => setCurrentView('DASHBOARD')} />
-            <SidebarItem icon={<Calendar size={20}/>} label="Planning" active={currentView === 'BOOKINGS'} onClick={() => setCurrentView('BOOKINGS')} />
+            <SidebarItem icon={<Calendar size={20}/>} label="Réservations" active={currentView === 'BOOKINGS'} onClick={() => setCurrentView('BOOKINGS')} />
           </div>
         </div>
 
