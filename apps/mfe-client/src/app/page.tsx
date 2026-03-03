@@ -13,8 +13,8 @@ import { ProfileView } from '../views/ProfileView';
 import { NotificationsView } from '../views/NotificationsView';
 
 import { Loader2 } from 'lucide-react';
-import { fr } from '../locales/fr';
-import { en } from '../locales/en';
+// import { fr } from '../locales/fr';
+// import { en } from '../locales/en';
 
 export default function ClientDashboard() {
   const [currentView, setCurrentView] = useState<string>('HOME');

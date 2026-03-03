@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { User, Car, CheckCircle2, ChevronRight, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Car, CheckCircle2,  Phone, ArrowRight } from 'lucide-react';
 
 export const BookingCard = ({ rental, onStart, onValidate }: any) => {
   const getStatusStyle = (s: string) => {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect } from 'react';
-import { rentalService } from '@pwa-easy-rental/shared-services';
+// import { rentalService } from '@pwa-easy-rental/shared-services';
 import { Clock, Bell, Loader2 } from 'lucide-react';
 
 export const MyBookingsView = ({ userData }: { userData: any }) => {
