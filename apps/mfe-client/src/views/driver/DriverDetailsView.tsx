@@ -3,7 +3,7 @@ import {
   User, Star, Phone, ShieldCheck, 
    MessageSquareOff, ExternalLink 
 } from 'lucide-react';
-import Calendar from '@/components/Calendar';
+import MyCalendar from '@/components/MyCalendar';
 
 // --- Interfaces ---
 interface Pricing {
@@ -163,7 +163,7 @@ const DriverDetailView: React.FC<DriverDetailsProps> = ({ data }) => {
               <p className="text-xs">Le chauffeur est entièrement libre.</p>
             </div>
           )} */}
-          <Calendar schedules={data.schedule} />
+          <MyCalendar schedules={data.schedule} />
         </div>
 
         {/* 3. AVIS CLIENTS */}

@@ -20,6 +20,7 @@ export const Header = ({ isAuth, userData, currentView, setCurrentView, toggleTh
           <NavLink label="Accueil" active={currentView === 'HOME'} onClick={() => setCurrentView('HOME')} icon={<Home size={16}/>} />
           <NavLink label="Catalogue" active={currentView === 'CATALOG'} onClick={() => setCurrentView('CATALOG')} icon={<Car size={16}/>} />
           <NavLink label="Mes Trajets" active={currentView === 'MY_BOOKINGS'} onClick={() => setCurrentView('MY_BOOKINGS')} icon={<Ticket size={16}/>} />
+          <NavLink label="Mes Réservations" active={currentView === 'MY_RESERVATIONS'} onClick={() => setCurrentView('MY_RESERVATIONS')} icon={<Ticket size={16}/>} />
         </nav>
       </div>
 

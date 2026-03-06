@@ -13,6 +13,7 @@ import { ProfileView } from '../views/ProfileView';
 import { NotificationsView } from '../views/NotificationsView';
 
 import { Loader2 } from 'lucide-react';
+import { MyReservationsView } from '@/views/ReservationsView';
 // import { fr } from '../locales/fr';
 // import { en } from '../locales/en';
 
@@ -104,6 +105,7 @@ export default function ClientDashboard() {
         {currentView === 'CATALOG' && <CatalogView userData={userData} />}
         {currentView === 'DETAILS' && selectedVehicleId && <VehicleDetailsView vehicleId={selectedVehicleId} isAuth={isAuth} onBack={() => setCurrentView('CATALOG')} onAuthRequired={() => setCurrentView('AUTH')} onStartBooking={() => setCurrentView('CATALOG')} />}
         {currentView === 'MY_BOOKINGS' && <MyBookingsView userData={userData} />}
+        {currentView === 'MY_RESERVATIONS' && <MyReservationsView userData={userData} />}
         {currentView === 'PROFILE' && <ProfileView userData={userData} onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} />}
         {currentView === 'NOTIFICATIONS' && <NotificationsView userData={userData} />}
       </main>
