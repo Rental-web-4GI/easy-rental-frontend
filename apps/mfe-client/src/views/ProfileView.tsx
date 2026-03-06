@@ -6,16 +6,18 @@ import { authService } from '@shared-services/api';
 
 
 export const ProfileView = ({ userData, onLogout, onBack }: any) => {
-  if (!userData) return null;
   const [identity, setIdentity] = useState<any>(null);
-  const [passwords, setPasswords] = useState({ old: '', new: '' });
+  const [passwords, setPasswords] = useState<any>({ old: '', new: '' });
 
   useEffect(() => { 
-    setIdentity({
-      firstname: userData.firstname,
-      lastname: userData.lastname
-    });
+    if (userData){
+      setIdentity({
+        firstname: userData.firstname,
+        lastname: userData.lastname
+      });
+    }
   }, [userData]);
+  if (!userData) return null;
 
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +35,7 @@ export const ProfileView = ({ userData, onLogout, onBack }: any) => {
     console.log("Mise à jour mot de passe");
   };
 
+  
   return (
     <div className="mx-auto animate-in fade-in duration-700 pb-20 px-6 text-left">
       
@@ -97,9 +100,12 @@ export const ProfileView = ({ userData, onLogout, onBack }: any) => {
                   className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold focus:border-[#0528d6] outline-none transition-all"
                 />
               </div>
-              <button type="submit" className=" bg-[#0528d6] text-white p-3 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all">
-                Mettre à jour l'identité
-              </button>
+              <div className="space-y-6 flex items-end">
+                <label className="h-[10px]"></label>
+                <button type="submit" className=" bg-[#0528d6] text-white p-3 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all">
+                  Mettre à jour le profil
+                </button>
+              </div>
             </form>
             <form onSubmit={updatePassword} className="flex gap-3">
               <div className="space-y-2">
@@ -122,9 +128,13 @@ export const ProfileView = ({ userData, onLogout, onBack }: any) => {
                   className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold focus:border-[#0528d6] outline-none transition-all"
                 />
               </div>
-              <button type="submit" className=" bg-slate-900 text-white p-3 rounded-xl text-[10px] font-black hover:bg-black transition-all">
-                Modifier le mot de passe
-              </button>
+              <div className="space-y-3 flex items-end">
+                <label className="h-[10px]"></label>
+                <button type="submit" className="bg-slate-900 text-white p-3 rounded-xl text-[10px] font-black hover:bg-black transition-all ">
+                  Modifier le mot de passe
+                </button>
+              </div>
+              
             </form>
             </section>
           </div>
@@ -174,14 +184,3 @@ export const ProfileView = ({ userData, onLogout, onBack }: any) => {
     </div>
   );
 };
-
-
-const MenuButton = ({ icon, label }: any) => (
-  <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all group">
-    <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 group-hover:text-[#0528d6]">
-      {icon}
-      <span className="text-xs font-bold    tracking-tight">{label}</span>
-    </div>
-    <ChevronRight size={14} className="text-slate-300 group-hover:translate-x-1 transition-transform"/>
-  </button>
-);
