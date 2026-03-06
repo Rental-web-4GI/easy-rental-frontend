@@ -11,7 +11,7 @@ import {
   parseISO 
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Calendar as CalendarIcon, Info } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
 
 interface Schedule {
   startDate: string;

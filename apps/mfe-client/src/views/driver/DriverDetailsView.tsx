@@ -51,7 +51,7 @@ interface DriverDetailsProps {
 }
 
 const DriverDetailView: React.FC<DriverDetailsProps> = ({ data }) => {
-  const { driver, pricing, schedule, reviews, rating } = data;
+  const { driver, pricing, reviews, rating } = data;
 
   // Formateur de date
   const formatDate = (dateStr: string) => 
@@ -186,7 +186,7 @@ const DriverDetailView: React.FC<DriverDetailsProps> = ({ data }) => {
                       <Star key={i} size={12} className={i < rev.rating ? "fill-current" : "text-gray-200"} />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-600 italic">"{rev.comment}"</p>
+                  <p className="text-sm text-gray-600 italic">{rev.comment}</p>
                 </div>
               ))}
             </div>
@@ -211,7 +211,7 @@ const DriverDetailView: React.FC<DriverDetailsProps> = ({ data }) => {
             </a>
             <a href={driver.cniUrl} target="_blank" rel="noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors border border-gray-100">
               <span className="text-sm font-semibold flex items-center gap-2">
-                <ShieldCheck className="text-blue-600" size={18}/> Pièce d'identité (CNI)
+                <ShieldCheck className="text-blue-600" size={18}/> {"Pièce d'identité (CNI)"}
               </span>
               <ExternalLink size={14} className="text-gray-400"/>
             </a>
