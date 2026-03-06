@@ -32,7 +32,7 @@ export const HomeView = ({ onSearch, setViewAll, onSelectVehicle }: any) => {
     <div className="space-y-20 animate-in fade-in duration-700 pb-20">
       
       {/* SECTION HERO + SEARCH-FIRST UX */}
-      <section className="relative min-h-[550px] rounded-[3.5rem] bg-[#0528d6] overflow-hidden flex flex-col items-center justify-center px-6 text-white shadow-2xl shadow-blue-600/20">
+      <section className="relative min-h-[400px] rounded-[1.5rem] bg-[#0528d6] overflow-hidden flex flex-col items-center justify-center px-6 text-white shadow-2xl shadow-blue-600/20">
         {/* Background Image/Decor */}
         <div className="absolute inset-0 opacity-20">
             <img 
@@ -75,7 +75,7 @@ export const HomeView = ({ onSearch, setViewAll, onSelectVehicle }: any) => {
                 <button type="button" className="p-5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-3xl hover:bg-slate-200 transition-colors">
                     <Filter size={20} />
                 </button>
-                <button type="submit" className="px-8 py-5 bg-[#0528d6] text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/40 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">
+                <button type="submit" className="px-8 py-3 bg-[#0528d6] text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/40 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">
                     Rechercher
                 </button>
             </div>
