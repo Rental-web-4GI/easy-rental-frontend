@@ -23,7 +23,7 @@ export default function ClientDashboard() {
   const[, setDeferredPrompt] = useState<any>(null);
 
   // Ajout de l'état pour gérer le menu mobile du nouveau Header
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [, setSidebarOpen] = useState(false);
 
   const[isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
