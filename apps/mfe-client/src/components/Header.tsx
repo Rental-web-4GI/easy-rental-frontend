@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect } from "react";
-import {Sun,Moon,LogOut,Car,Home,Ticket,Bell} from "lucide-react";
+import {Sun,Moon,LogOut,Car,Home,Ticket,Bell, Route} from "lucide-react";
 import { notifService } from "@shared-services/api";
 
 export const Header = ({isAuth,userData,currentView,setCurrentView,toggleTheme,darkMode,lang,setLang,onLogout}: any) => {
@@ -35,8 +35,11 @@ export const Header = ({isAuth,userData,currentView,setCurrentView,toggleTheme,d
         <nav className="hidden lg:flex items-center gap-6">
           <NavLink label="Accueil"  active={currentView === "HOME"}  onClick={() => setCurrentView("HOME")}  icon={<Home size={16} />}/>
           <NavLink  label="Catalogue"  active={currentView === "CATALOG"}  onClick={() => setCurrentView("CATALOG")}  icon={<Car size={16} />}/>
-          <NavLink  label="Mes trajets"  active={currentView === "MY_BOOKINGS"}  onClick={() => setCurrentView("MY_BOOKINGS")}  icon={<Ticket size={16} />}/>
-          <NavLink  label="Réservations"  active={currentView === "MY_RESERVATIONS"}  onClick={() => setCurrentView("MY_RESERVATIONS")}  icon={<Ticket size={16} />}/>
+          {isAuth? (<div className="hidden lg:flex items-center gap-6">
+            <NavLink  label="Mes trajets"  active={currentView === "MY_BOOKINGS"}  onClick={() => setCurrentView("MY_BOOKINGS")}  icon={<Route size={16} />}/>
+            <NavLink  label="Réservations"  active={currentView === "MY_RESERVATIONS"}  onClick={() => setCurrentView("MY_RESERVATIONS")}  icon={<Ticket size={16} />}/>
+        </div>
+          ):(<> </>)}
         </nav>
       </div>
 
