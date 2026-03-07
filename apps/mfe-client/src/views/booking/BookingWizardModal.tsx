@@ -29,6 +29,7 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
     rentalType: initialRentalType || 'DAILY'
   });
 
+  const [paymentAmount, setPaymentAmount] = useState(0);
   const [method, setMethod] = useState<'MOMO' | 'OM' | 'CARD'>('MOMO');
 
   useEffect(() => {
@@ -58,6 +59,8 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
       const res = await rentalService.initiateRental(form);
       if (res.ok && res.data.isAllowed) {
         setInitRes(res.data);
+        const calculatedAmount = initRes.totalAmount * 0.6; // 60% du montant total
+        setPaymentAmount(calculatedAmount);
         setStep(3);
       } else {
         setError(res.data?.message || "Désolé, ce créneau n'est plus disponible.");
@@ -77,7 +80,7 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
     try {
       console.log("Processing payment with rentalId:", initRes.rentalId, "amount:", initRes.totalAmount, "method:", method);
       const res = await rentalService.payRental(initRes.rentalId, {
-        amount: initRes.totalAmount,
+        amount: paymentAmount,
         method
       });
       if (res.ok) {
@@ -91,6 +94,8 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
       setLoading(false);
     }
   };
+
+  const reste = initRes ? initRes.totalAmount - paymentAmount : 0;
 
   const getDurationLabel = () => {
     const start = new Date(form.startDate).getTime();
@@ -160,7 +165,7 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
                     <DriverDetailView data = {driverDetails}/>
                   )
                 : (
-                  <p> Selectionne un chauffeur parmi ceux de la colonne de gauche</p>
+                  <p className="text-xs font-bold text-slate-400 tracking-widest text-center"> Selectionne un chauffeur parmi ceux de la colonne de gauche</p>
                 )}
 
                 </div>
@@ -183,9 +188,10 @@ export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initia
                   <div className="relative z-10 text-center">
                     <p className="text-[10px] font-bold  opacity-60 mb-1 tracking-widest italic">Devis Global Certifié</p>
                     <h4 className="text-xl font-black italic tracking-tighter leading-none">{initRes.totalAmount?.toLocaleString()} <span className="text-2xl">XAF</span></h4>
+                    <p className="text-xs text-white/80 leading-relaxed mt-2">Pour reserver votre véhicule il vous est demandé d'effectuer un paiement de 60% du montant total.</p>
                     <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 gap-6 text-[10px] font-black  italic">
-                        <div className="bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner"><p className="opacity-60 mb-1">Caution Gérée</p><p>{initRes.depositAmount?.toLocaleString()} XAF</p></div>
-                        <div className="bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner"><p className="opacity-60 mb-1">Commission</p><p>{initRes.commissionAmount?.toLocaleString()} XAF</p></div>
+                        <div className="bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner"><p className="opacity-60 mb-1">Montant à débiter</p><p>{paymentAmount?.toLocaleString()} XAF</p></div>
+                        <div className="bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner"><p className="opacity-60 mb-1">Reste</p><p>{reste?.toLocaleString()} XAF</p></div>
                     </div>
                   </div>
                 </div>
