@@ -5,10 +5,7 @@ import {
   ArrowUpRight,
   Store,
   Clock,
-  Phone,
-  Mail,
   CreditCard,
-  Globe,
 } from "lucide-react";
 
 interface AgencyCardProps {
