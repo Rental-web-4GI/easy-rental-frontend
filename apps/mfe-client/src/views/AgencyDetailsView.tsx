@@ -18,7 +18,7 @@ export const AgencyDetailsView = ({ agencyId, userData, onBack }: { agencyId: st
         // On récupère les détails ET les véhicules en parallèle
         const [resA, resV] = await Promise.all([
           agencyService.getAgencyDetails(agencyId),
-          vehicleService.getVehiclesByAgency(agencyId) // Vérifie que cette méthode existe dans ton service
+          vehicleService.getVehiclesByAgency(agencyId) 
         ]);
         
         if (resA.ok) setAgency(resA.data);
