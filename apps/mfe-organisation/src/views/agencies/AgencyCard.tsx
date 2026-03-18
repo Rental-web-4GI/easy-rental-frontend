@@ -9,8 +9,7 @@ export const AgencyCard = ({ agency, onEdit, onDelete, onView }: any) => (
     <div className="flex justify-between items-start mb-6">
       <div className="flex items-center gap-4 flex-1 min-w-0 pr-4">
         <div className="w-16 h-16 rounded-2xl bg-[#0528d6] text-white flex items-center justify-center font-black text-2xl italic shadow-lg shadow-blue-600/20 shrink-0 overflow-hidden border-2 border-slate-100 dark:border-slate-700">
-          {agency.logoUrl ? <img src={agency.logoUrl} alt="logo" className="w-full h-full object-cover"/> : agency.{name.charAt(0).toUpperCase()}
-}
+          {agency.logoUrl ? <img src={agency.logoUrl} alt="logo" className="w-full h-full object-cover"/> : agency.name.charAt(0).toUpperCase()}
         </div>
         <div className="overflow-hidden min-w-0 flex-1">
           <h4 className="text-lg font-black text-slate-900 dark:text-white leading-tight  italic tracking-tighter truncate" title={agency.name}>
