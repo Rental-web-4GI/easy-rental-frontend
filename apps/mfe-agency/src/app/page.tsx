@@ -102,7 +102,7 @@ export default function AgencyDashboard() {
         localStorage.removeItem('auth_token');
         setIsAuth(false);
       }
-    } catch (e) {
+    } catch {
       // console.error("Erreur lors de la récupération du contexte agency", e);
       setIsAuth(false);
     } finally {
@@ -131,7 +131,7 @@ export default function AgencyDashboard() {
         await fetchContext();
         return true;
       }
-    } catch (e) {
+    } catch {
       // console.error(e);
     }
     return false;
