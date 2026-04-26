@@ -1,20 +1,21 @@
-// FILE: apps/mfe-organisation/src/views/NotificationsView.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Bell, Check, Clock, Info, AlertTriangle, Loader2 } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Bell, Check, Clock, Info, AlertTriangle, Loader2, Search } from 'lucide-react';
 import { notifService } from '@pwa-easy-rental/shared-services';
 
-export const NotificationsView = ({ orgId }: { orgId: string }) => {
+export const NotificationsView = ({ orgId, t }: { orgId: string, t: any }) => {
   const [notifs, setNotifs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<'ALL' | 'UNREAD' | 'ALERTS'>('ALL');
 
   const loadNotifs = async (silent = false) => {
     if (!orgId) return;
     if (!silent) setLoading(true);
     try {
       const res = await notifService.getOrgNotifications(orgId);
-      if (res.ok) setNotifs(res.data ||[]);
+      if (res.ok) setNotifs(res.data || []);
     } finally {
       if (!silent) setLoading(false);
     }
@@ -35,6 +36,22 @@ export const NotificationsView = ({ orgId }: { orgId: string }) => {
     }
   };
 
+  const filteredNotifs = useMemo(() => {
+    return notifs.filter(n => {
+      const matchesSearch = (n.details?.toLowerCase().includes(searchTerm.toLowerCase())) || 
+                           (n.reason?.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesFilter = 
+        filterType === 'ALL' ? true :
+        filterType === 'UNREAD' ? !n.isRead :
+        filterType === 'ALERTS' ? n.reason?.includes('ALERT') : true;
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [notifs, searchTerm, filterType]);
+
+  const unreadCount = notifs.filter(n => !n.isRead).length;
+
   if (loading && notifs.length === 0) return (
     <div className="h-96 flex items-center justify-center">
       <Loader2 className="animate-spin text-[#0528d6]" size={40}/>
@@ -42,25 +59,73 @@ export const NotificationsView = ({ orgId }: { orgId: string }) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500 text-left">
-      <div className="flex justify-between items-center mb-8 px-2">
+    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500 text-left pb-20">
+      
+      {/* HEADER & TOTALS */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 px-2">
         <div>
+<<<<<<< HEAD
           <h2 className="text-3xl font-[900] italic tracking-tighter  text-slate-900 dark:text-white">Centre de Notifications</h2>
           <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1 italic">Suivi des activités réseau en temps réel</p>
+=======
+          <h2 className="text-3xl font-[900] italic tracking-tighter uppercase text-slate-900 dark:text-white">{t.notifications.title}</h2>
+          <div className="flex items-center gap-4 mt-2">
+            <span className="text-[10px] font-black uppercase px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full border border-slate-200 dark:border-slate-700">
+                {t.notifications.total}: {notifs.length}
+            </span>
+            <span className="text-[10px] font-black uppercase px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-[#0528d6] rounded-full border border-blue-100 dark:border-blue-800">
+                {t.notifications.unread}: {unreadCount}
+            </span>
+          </div>
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
-        <button onClick={() => loadNotifs(false)} className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:text-[#0528d6] transition-all">
+        <button onClick={() => loadNotifs(false)} className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:text-[#0528d6] transition-all border border-slate-100 dark:border-slate-800">
           <Clock size={20}/>
         </button>
       </div>
 
-      {notifs.length === 0 ? (
+      {/* FILTERS & SEARCH BAR */}
+      <div className="flex flex-col lg:flex-row items-center gap-4 bg-white dark:bg-[#1a1d2d] p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl w-full lg:w-auto shrink-0">
+            {[
+                { id: 'ALL', label: t.notifications.tabAll },
+                { id: 'UNREAD', label: t.notifications.tabUnread },
+                { id: 'ALERTS', label: t.notifications.tabAlerts }
+            ].map(tab => (
+                <button 
+                    key={tab.id} 
+                    onClick={() => setFilterType(tab.id as any)}
+                    className={`flex-1 lg:flex-none px-6 py-2 rounded-xl text-[10px] font-black uppercase italic transition-all ${filterType === tab.id ? 'bg-white dark:bg-slate-800 text-[#0528d6] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    {tab.label}
+                </button>
+            ))}
+        </div>
+
+        <div className="relative w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0528d6]" size={18} />
+          <input 
+            placeholder={t.notifications.searchPlaceholder} 
+            className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+          />
+        </div>
+      </div>
+
+      {/* NOTIFICATIONS LIST */}
+      {filteredNotifs.length === 0 ? (
         <div className="p-20 text-center bg-white dark:bg-[#1a1d2d] rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-slate-800">
           <Bell className="mx-auto text-slate-200 mb-4" size={48} />
+<<<<<<< HEAD
           <p className="text-slate-400 font-bold italic  text-xs tracking-widest">Aucune notification pour le moment</p>
+=======
+          <p className="text-slate-400 font-bold italic uppercase text-xs tracking-widest">{t.notifications.noNotifs}</p>
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
       ) : (
         <div className="space-y-4">
-          {notifs.map((n) => (
+          {filteredNotifs.map((n) => (
             <div 
               key={n.id} 
               className={`p-6 rounded-[2.5rem] border transition-all flex items-start gap-5 ${
@@ -77,8 +142,13 @@ export const NotificationsView = ({ orgId }: { orgId: string }) => {
               
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
+<<<<<<< HEAD
                   <h4 className="font-black text-slate-900 dark:text-white  text-xs tracking-tight italic">
                     {n.reason || 'Notification Système'}
+=======
+                  <h4 className="font-black text-slate-900 dark:text-white uppercase text-xs tracking-tight italic">
+                    {n.reason || t.notifications.systemNotif}
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   </h4>
                   <span className="text-[9px] font-bold text-slate-400 ">{new Date(n.createdAt).toLocaleString()}</span>
                 </div>
@@ -90,12 +160,17 @@ export const NotificationsView = ({ orgId }: { orgId: string }) => {
                       onClick={() => handleMarkRead(n.id)} 
                       className="text-[9px] font-black  text-[#0528d6] flex items-center gap-1.5 hover:underline"
                     >
-                      <Check size={12}/> Marquer comme lu
+                      <Check size={12}/> {t.notifications.markAsRead}
                     </button>
                   )}
                   {n.locationId && (
+<<<<<<< HEAD
                     <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500  tracking-tighter italic">
                       Dossier: #{n.locationId.substring(0,8)}
+=======
+                    <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500 uppercase tracking-tighter italic">
+                      {t.notifications.folderId}: #{n.locationId.substring(0,8)}
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     </div>
                   )}
                 </div>

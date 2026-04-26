@@ -1,38 +1,70 @@
-// FILE: apps/mfe-agency/src/views/bookings/BookingCard.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { User, Car, CheckCircle2, Phone, X, DollarSign } from 'lucide-react';
+import { User, Car, Phone, Info } from 'lucide-react';
+import { hasPermission } from '../../utils/permissions';
 
-export const BookingCard = ({ rental, onPay, onStart, onValidate, onCancel }: any) => {
+interface BookingCardProps {
+    rental: any;
+    userData: any;
+    onStart?: () => void;
+    onView: () => void;
+    staffPermissions: any;
+    t: any;
+}
+
+export const BookingCard = ({ rental, userData, onStart, staffPermissions, onView, t }: BookingCardProps) => {
+  const isPaidTotal = rental.amountPaid >= rental.totalAmount;
+  const remaining = rental.totalAmount - rental.amountPaid;
+
   const getStatusStyle = (s: string) => {
     switch (s) {
-      case 'PAID': return 'bg-green-50 text-green-700 border-green-100';
-      case 'ONGOING': return 'bg-blue-50 text-blue-700 border-blue-100';
-      case 'RESERVED': return 'bg-orange-50 text-orange-700 border-orange-100';
-      case 'PENDING': return 'bg-yellow-50 text-yellow-700 border-yellow-100';
-      case 'COMPLETED': return 'bg-slate-50 text-slate-700 border-slate-100';
-      case 'CANCELLED': return 'bg-red-50 text-red-700 border-red-100';
-      default: return 'bg-slate-50 text-slate-700 border-slate-100';
+      case 'PAID': return 'bg-green-50 text-green-700 border-green-100 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
+      case 'ONGOING': return 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
+      case 'COMPLETED': return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+      case 'CANCELLED': return 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+      default: return 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
     }
   };
 
   return (
+<<<<<<< HEAD
     <div className="bg-white dark:bg-[#1a1d2d] rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-left flex flex-col h-full">
       <div className="flex justify-between items-center mb-8">
         <div className={`px-3 py-1 rounded-full text-[9px] font-black  tracking-widest border ${getStatusStyle(rental.status)}`}>{rental.status}</div>
         <span className="text-[10px] font-mono font-bold text-slate-300">#REF-{rental.id.substring(0,6).to()}</span>
+=======
+    <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-left flex flex-col h-full relative overflow-hidden group">
+      
+      <div className="flex justify-between items-start mb-8">
+        <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border italic ${getStatusStyle(rental.status)}`}>
+            {rental.status}
+        </div>
+        <button onClick={onView} className="size-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-[#0528d6] transition-all">
+            <Info size={18}/>
+        </button>
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       </div>
 
       <div className="flex items-center gap-4 mb-8">
-        <div className="size-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-[#0528d6] shrink-0 shadow-inner"><User size={24} /></div>
+        <div className="size-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0528d6] shrink-0 border border-white dark:border-slate-700">
+            <User size={24} />
+        </div>
         <div className="overflow-hidden">
+<<<<<<< HEAD
           <h4 className="font-bold text-slate-900 dark:text-white leading-tight truncate">{rental.clientName || 'Walk-in Client'}</h4>
           <div className="flex items-center gap-2 mt-1 text-slate-400 font-bold text-[10px]  italic"><Phone size={10} className="text-[#0528d6]"/> {rental.clientPhone}</div>
+=======
+          <h4 className="font-black text-slate-800 dark:text-white leading-tight truncate uppercase italic tracking-tighter leading-none">{rental.clientName || 'Walk-in'}</h4>
+          <p className="flex items-center gap-2 mt-1 text-slate-400 font-bold text-[10px] uppercase italic">
+            <Phone size={10} className="text-[#0528d6]"/> {rental.clientPhone}
+          </p>
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
       </div>
 
       <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 mb-8 grid grid-cols-2 gap-4 border border-slate-100 dark:border-slate-800">
+<<<<<<< HEAD
         <div className="space-y-0.5"><p className="text-[9px] font-black text-slate-400  italic">Prise en charge</p><p className="text-xs font-bold truncate">{new Date(rental.startDate).toLocaleDateString()}</p></div>
         <div className="space-y-0.5"><p className="text-[9px] font-black text-slate-400  italic">Restitution</p><p className="text-xs font-bold truncate">{new Date(rental.endDate).toLocaleDateString()}</p></div>
       </div>
@@ -41,12 +73,43 @@ export const BookingCard = ({ rental, onPay, onStart, onValidate, onCancel }: an
         <div>
           <p className="text-[9px] font-black text-slate-400  italic mb-0.5">Montant</p>
           <p className="text-lg font-black text-[#0528d6] leading-none">{rental.totalAmount?.toLocaleString()} XAF</p>
+=======
+        <div className="space-y-0.5">
+            <p className="text-[9px] font-black text-slate-400 uppercase italic">{t.table.start}</p>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{new Date(rental.startDate).toLocaleDateString()}</p>
         </div>
+        <div className="space-y-0.5">
+            <p className="text-[9px] font-black text-slate-400 uppercase italic">{t.table.end}</p>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{new Date(rental.endDate).toLocaleDateString()}</p>
+        </div>
+      </div>
+
+      <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 space-y-5">
+        <div className="flex justify-between items-end">
+            <div>
+                <p className="text-[9px] font-black text-slate-400 uppercase italic mb-1">{t.kpi.revenue}</p>
+                <div className="flex items-baseline gap-1">
+                    <span className={`text-xl font-black ${isPaidTotal ? 'text-green-500' : 'text-[#0528d6]'}`}>
+                        {rental.amountPaid?.toLocaleString()}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400 italic">/ {rental.totalAmount?.toLocaleString()} XAF</span>
+                </div>
+            </div>
+            {!isPaidTotal && remaining > 0 && (
+                <div className="px-2 py-1 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded text-[8px] font-black uppercase italic animate-pulse">
+                    Reste: {remaining.toLocaleString()}
+                </div>
+            )}
+>>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
+        </div>
+
         <div className="flex gap-2">
-          {onCancel && <button onClick={onCancel} title="Annuler" className="size-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shadow-sm hover:bg-red-500 hover:text-white transition-all"><X size={20}/></button>}
-          {onPay && <button onClick={onPay} title="Encaisser" className="size-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center shadow-sm hover:bg-orange-500 hover:text-white transition-all"><DollarSign size={20}/></button>}
-          {onStart && <button onClick={onStart} title="Valider Départ" className="size-12 bg-[#0528d6] text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-105 transition-all"><Car size={20}/></button>}
-          {onValidate && <button onClick={onValidate} title="Valider Retour" className="size-12 bg-green-600 text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-105 transition-all"><CheckCircle2 size={20}/></button>}
+            {onStart && hasPermission(userData, staffPermissions, 'rental:create') && (
+                <button onClick={onStart} className="flex-1 py-4 bg-[#0528d6] text-white rounded-2xl font-black text-[11px] uppercase flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all italic tracking-widest">
+                    <Car size={18}/> 
+                    {isPaidTotal ? t.table.handover : t.reservations.actionStart}
+                </button>
+            )}
         </div>
       </div>
     </div>

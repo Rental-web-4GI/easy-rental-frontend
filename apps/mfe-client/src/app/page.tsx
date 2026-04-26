@@ -88,7 +88,9 @@ export default function ClientDashboard() {
           return true;
         }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      // console.error(e);
+    }
     return false;
   };
 
