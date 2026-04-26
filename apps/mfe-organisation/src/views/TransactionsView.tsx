@@ -73,11 +73,7 @@ export const TransactionsView = ({ orgData , t }: { orgData: any, t: any }) => {
         {paginated.length === 0 ? (
           <div className="p-20 text-center">
              <FileText className="mx-auto text-slate-200 mb-4" size={48} />
-<<<<<<< HEAD
-             <p className="text-slate-400 font-black  italic tracking-widest">Aucune transaction trouvée</p>
-=======
              <p className="text-slate-400 font-black uppercase italic tracking-widest">{t.transactions.noData}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           </div>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -116,11 +112,7 @@ export const TransactionsView = ({ orgData , t }: { orgData: any, t: any }) => {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 pt-4">
           <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 shadow-sm transition-all"><ChevronLeft size={18}/></button>
-<<<<<<< HEAD
-          <span className="text-[10px] font-black text-slate-500  italic px-4 tracking-widest">Page {currentPage} / {totalPages}</span>
-=======
           <span className="text-[10px] font-black text-slate-500 uppercase italic px-4 tracking-widest">{t.common.page} {currentPage} / {totalPages}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 shadow-sm transition-all"><ChevronRight size={18}/></button>
         </div>
       )}

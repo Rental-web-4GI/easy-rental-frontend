@@ -56,13 +56,9 @@ export const Sidebar = ({
       {/* Nav Section */}
       <nav className="flex-1 overflow-y-auto no-scrollbar px-4 space-y-8 pb-8 text-left">
         <div>
-<<<<<<< HEAD
-          <p className="text-[11px] font-bold  tracking-widest text-slate-400 mb-4 px-2">Opérations</p>
-=======
           <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-2 italic">
             {t.sidebar.ops}
           </p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="space-y-1">
             {hasPermission(userData, staffPermissions, 'stats:dashboard') && (
               <SidebarItem icon={<LayoutDashboard size={20}/>} label={t.sidebar.dash} active={currentView === 'DASHBOARD'} onClick={() => { setCurrentView('DASHBOARD'); setSidebarOpen(false); }} />
@@ -82,13 +78,9 @@ export const Sidebar = ({
         </div>
 
         <div>
-<<<<<<< HEAD
-          <p className="text-[11px] font-bold  tracking-widest text-slate-400 mb-4 px-2">Ressources</p>
-=======
           <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-2 italic">
             {t.sidebar.resources}
           </p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="space-y-1">
             {hasPermission(userData, staffPermissions, 'vehicle:list') && (
                 <SidebarItem icon={<Car size={20}/>} label={t.sidebar.fleet} active={currentView === 'VEHICLES'} onClick={() => { setCurrentView('VEHICLES'); setSidebarOpen(false); }} />
@@ -108,13 +100,8 @@ export const Sidebar = ({
                 <img src={parentOrg.logoUrl || `https://ui-avatars.com/api/?name=${parentOrg.name}&background=0528d6&color=fff`} alt="Org" className="w-full h-full object-cover" />
              </div>
              <div className="overflow-hidden">
-<<<<<<< HEAD
-                <p className="text-[9px] font-bold text-slate-400  leading-none mb-1">Affiliation</p>
-                <p className="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">{parentOrg.name}</p>
-=======
                 <p className="text-[8px] font-black text-slate-400 uppercase leading-none mb-1 italic">{t.sidebar.network}</p>
                 <p className="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate uppercase">{parentOrg.name}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
              </div>
           </div>
         )}
@@ -128,13 +115,9 @@ export const Sidebar = ({
            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="size-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />
-<<<<<<< HEAD
-                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400  tracking-tight">Agence active</span>
-=======
                 <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest italic">
                   {t.sidebar.status}
                 </span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </div>
               <Activity size={12} className="text-slate-300 dark:text-slate-700" />
            </div>

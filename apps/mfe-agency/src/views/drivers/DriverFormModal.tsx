@@ -37,33 +37,11 @@ export const DriverFormModal = ({ editingDriver, onSubmit, onClose, modalLoading
               <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
                 {editingDriver ? t.staff.modal.titleEdit : t.staff.addBtn}
               </h3>
-<<<<<<< HEAD
-              <p className="text-[10px] text-slate-400  font-bold tracking-widest mt-1 italic">Enregistrement DriverRequest (Multipart)</p>
-=======
               <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1 italic">{t.driverForm.docHint}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
             </div>
             <button type="button" onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"><X size={22}/></button>
           </div>
 
-<<<<<<< HEAD
-          <div className="p-10 overflow-y-auto custom-scrollbar space-y-8">
-            {error && <div className="p-4 bg-red-50 border-2 border-red-100 rounded-xl text-red-600 text-xs font-bold  italic">{error}</div>}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Prénom</label>
-                <input required value={form.firstname} onChange={e => setForm({...form, firstname: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Nom</label>
-                <input required value={form.lastname} onChange={e => setForm({...form, lastname: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Téléphone</label>
-                <input required type="tel" value={form.tel} onChange={e => setForm({...form, tel: e.target.value.replace(/\D/g, '')})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-              </div>
-=======
           <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar space-y-8">
             {error && <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900/30 rounded-2xl text-red-600 dark:text-red-400 text-[10px] font-black uppercase italic tracking-widest">{error}</div>}
 
@@ -71,36 +49,20 @@ export const DriverFormModal = ({ editingDriver, onSubmit, onClose, modalLoading
               <Input label={t.auth.firstname} value={form.firstname} onChange={(v:any) => setForm({...form, firstname: v})} required icon={<User size={14}/>} />
               <Input label={t.auth.lastname} value={form.lastname} onChange={(v:any) => setForm({...form, lastname: v})} required icon={<User size={14}/>} />
               <Input label={t.agencies.modal.phone} type="tel" value={form.tel} onChange={(v:any) => setForm({...form, tel: v.replace(/\D/g, '')})} required icon={<Phone size={14}/>} />
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               <div className="grid grid-cols-2 gap-4">
                 <Input label={t.driverForm.age} type="number" value={form.age} onChange={(v:any) => setForm({...form, age: v})} required />
                 <div className="space-y-1.5">
-<<<<<<< HEAD
-                  <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Âge</label>
-                  <input required type="number" value={form.age} onChange={e => setForm({...form, age: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Genre</label>
-                  <select value={form.gender} onChange={e => setForm({...form, gender: parseInt(e.target.value)})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6]">
-                    <option value={0}>Homme</option>
-                    <option value={1}>Femme</option>
-=======
                   <label className="text-[10px] font-black text-slate-400 uppercase italic ml-1 tracking-widest">{t.driverForm.gender}</label>
                   <select value={form.gender} onChange={e => setForm({...form, gender: parseInt(e.target.value)})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-xs outline-none focus:border-[#0528d6] dark:text-white transition-all">
                     <option value={0}>{t.driverForm.male}</option>
                     <option value={1}>{t.driverForm.female}</option>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   </select>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4 pt-4 border-t border-slate-50 dark:border-slate-800 text-left">
-<<<<<<< HEAD
-              <h4 className="text-xs font-black  text-slate-400 tracking-widest italic mb-4">Documents requis</h4>
-=======
               <h4 className="text-[10px] font-black uppercase text-[#0528d6] tracking-[0.2em] italic mb-6">{t.driverForm.scanDocs}</h4>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <FileUpload label={t.driverForm.photoProfil} onFile={(f:any) => setFiles(p => ({...p, profil: f}))} hasFile={!!files.profil} />
                 <FileUpload label={t.driverForm.scanCni} onFile={(f:any) => setFiles(p => ({...p, cni: f}))} hasFile={!!files.cni} />
@@ -123,15 +85,9 @@ export const DriverFormModal = ({ editingDriver, onSubmit, onClose, modalLoading
 };
 
 const FileUpload = ({ label, onFile, hasFile }: any) => (
-<<<<<<< HEAD
-  <div className="relative group flex flex-col items-center justify-center p-4 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl transition-all hover:border-[#0528d6]">
-    {hasFile ? <CheckCircle2 className="text-green-500 mb-1" size={20} /> : <UploadCloud className="text-slate-300 mb-1" size={20} />}
-    <span className="text-[9px] font-bold  text-slate-500 text-center leading-tight">{label}</span>
-=======
   <div className="relative group flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl transition-all hover:border-[#0528d6] hover:bg-white dark:hover:bg-slate-800 cursor-pointer">
     {hasFile ? <CheckCircle2 className="text-green-500 mb-2" size={24} /> : <UploadCloud className="text-slate-300 mb-2 group-hover:text-[#0528d6]" size={24} />}
     <span className="text-[8px] font-black uppercase text-slate-500 text-center leading-tight tracking-widest">{label}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
     <input type="file" onChange={e => onFile(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
   </div>
 );

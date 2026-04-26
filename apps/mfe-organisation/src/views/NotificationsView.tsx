@@ -64,10 +64,6 @@ export const NotificationsView = ({ orgId, t }: { orgId: string, t: any }) => {
       {/* HEADER & TOTALS */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 px-2">
         <div>
-<<<<<<< HEAD
-          <h2 className="text-3xl font-[900] italic tracking-tighter  text-slate-900 dark:text-white">Centre de Notifications</h2>
-          <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1 italic">Suivi des activités réseau en temps réel</p>
-=======
           <h2 className="text-3xl font-[900] italic tracking-tighter uppercase text-slate-900 dark:text-white">{t.notifications.title}</h2>
           <div className="flex items-center gap-4 mt-2">
             <span className="text-[10px] font-black uppercase px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full border border-slate-200 dark:border-slate-700">
@@ -77,7 +73,6 @@ export const NotificationsView = ({ orgId, t }: { orgId: string, t: any }) => {
                 {t.notifications.unread}: {unreadCount}
             </span>
           </div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         <button onClick={() => loadNotifs(false)} className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:text-[#0528d6] transition-all border border-slate-100 dark:border-slate-800">
           <Clock size={20}/>
@@ -117,11 +112,7 @@ export const NotificationsView = ({ orgId, t }: { orgId: string, t: any }) => {
       {filteredNotifs.length === 0 ? (
         <div className="p-20 text-center bg-white dark:bg-[#1a1d2d] rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-slate-800">
           <Bell className="mx-auto text-slate-200 mb-4" size={48} />
-<<<<<<< HEAD
-          <p className="text-slate-400 font-bold italic  text-xs tracking-widest">Aucune notification pour le moment</p>
-=======
           <p className="text-slate-400 font-bold italic uppercase text-xs tracking-widest">{t.notifications.noNotifs}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
       ) : (
         <div className="space-y-4">
@@ -142,13 +133,8 @@ export const NotificationsView = ({ orgId, t }: { orgId: string, t: any }) => {
               
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
-<<<<<<< HEAD
-                  <h4 className="font-black text-slate-900 dark:text-white  text-xs tracking-tight italic">
-                    {n.reason || 'Notification Système'}
-=======
                   <h4 className="font-black text-slate-900 dark:text-white uppercase text-xs tracking-tight italic">
                     {n.reason || t.notifications.systemNotif}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   </h4>
                   <span className="text-[9px] font-bold text-slate-400 ">{new Date(n.createdAt).toLocaleString()}</span>
                 </div>
@@ -164,13 +150,8 @@ export const NotificationsView = ({ orgId, t }: { orgId: string, t: any }) => {
                     </button>
                   )}
                   {n.locationId && (
-<<<<<<< HEAD
-                    <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500  tracking-tighter italic">
-                      Dossier: #{n.locationId.substring(0,8)}
-=======
                     <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500 uppercase tracking-tighter italic">
                       {t.notifications.folderId}: #{n.locationId.substring(0,8)}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     </div>
                   )}
                 </div>

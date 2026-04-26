@@ -41,55 +41,6 @@ export const VehiclesView = ({ orgData, t }: any) => {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-<<<<<<< HEAD
-  // Handler pour PUT /api/vehicles/{id} (Formulaire complet)
-  // const handleFormSubmit = async (formData: any) => {
-  //   setModalLoading(true);
-  //   try {
-  //     const res = editingVehicle 
-  //       ? await vehicleService.updateVehicle(editingVehicle.id, formData)
-  //       : await vehicleService.createVehicle(orgData.id, formData);
-  //     if (res.ok) { setActiveModal(null); loadData(); }
-  //   } finally { setModalLoading(false); }
-  // };
-  const handleFormSubmit = async (formData: any) => {
-  setModalLoading(true);
-  try {
-    // Nettoyage des données pour le DTO
-    const cleanData = {
-      ...formData,
-      places: Number(formData.places),
-      kilometrage: Number(formData.kilometrage),
-      yearProduction: formData.yearProduction ? new Date(formData.yearProduction).toISOString() : new Date().toISOString(),
-      engineDetails: {
-        ...formData.engineDetails,
-        horsepower: Number(formData.engineDetails.horsepower),
-        capacity: Number(formData.engineDetails.capacity),
-      },
-      insuranceDetails: {
-        ...formData.insuranceDetails,
-        expiry: formData.insuranceDetails.expiry ? new Date(formData.insuranceDetails.expiry).toISOString() : null
-      }
-    };
-
-    const res = editingVehicle
-      ? await vehicleService.updateVehicle(editingVehicle.id, cleanData)
-      : await vehicleService.createVehicle(orgData.id, cleanData);
-
-    if (res.ok) {
-      setActiveModal(null);
-      loadData();
-    } else {
-      // Affiche l'erreur du serveur pour debug
-      alert(`Erreur: ${res.data?.message || 'Vérifiez les champs'}`);
-    }
-  } catch (err) {
-    console.error("Erreur critique creation:", err);
-  } finally {
-    setModalLoading(false);
-  }
-};
-=======
   const handleFormSubmit = async (formData: any) => {
     setModalLoading(true);
     try {
@@ -116,7 +67,6 @@ export const VehiclesView = ({ orgData, t }: any) => {
       if (res.ok) { setActiveModal(null); loadData(); }
     } finally { setModalLoading(false); }
   };
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
 
   const handleQuickStatusSubmit = async (id: string, payload: any) => {
     setModalLoading(true);
@@ -149,13 +99,8 @@ export const VehiclesView = ({ orgData, t }: any) => {
           <input placeholder={t.vehicles.searchPlaceholder} className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
                  value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
         </div>
-<<<<<<< HEAD
-        <button onClick={() => { setEditingVehicle(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs  shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
-          <Plus size={18} /> Ajouter à l&apos;inventaire
-=======
         <button onClick={() => { setEditingVehicle(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
           <Plus size={18} /> {t.vehicles.addBtn}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </button>
       </div>
 
@@ -179,11 +124,7 @@ export const VehiclesView = ({ orgData, t }: any) => {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 pt-8">
           <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 transition-all"><ChevronLeft/></button>
-<<<<<<< HEAD
-          <span className="text-[10px] font-black text-slate-500 dark:text-slate-400  italic tracking-widest px-4">Page {currentPage} / {totalPages}</span>
-=======
           <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase italic tracking-widest px-4">{t.common.page} {currentPage} / {totalPages}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 transition-all"><ChevronRight/></button>
         </div>
       )}

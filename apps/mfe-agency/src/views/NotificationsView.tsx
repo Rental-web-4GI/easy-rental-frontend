@@ -50,10 +50,6 @@ export const NotificationsView = ({ agencyId, t }: { agencyId: string, t: any })
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2">
         <div>
-<<<<<<< HEAD
-          <h2 className="text-3xl font-[900] italic tracking-tighter  text-slate-900 dark:text-white">Activité de l&apos;agence</h2>
-          <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1 italic">Alertes et événements opérationnels</p>
-=======
           <h2 className="text-3xl font-black italic tracking-tighter uppercase text-slate-900 dark:text-white">{t.header.notifications}</h2>
           <div className="flex items-center gap-4 mt-2">
             <span className="text-[10px] font-black uppercase px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full border dark:border-slate-700 italic">Total: {notifs.length}</span>
@@ -61,19 +57,12 @@ export const NotificationsView = ({ agencyId, t }: { agencyId: string, t: any })
                 {t.sidebar.status}: {notifs.filter(n => !n.isRead).length}
             </span>
           </div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         <button onClick={() => loadNotifs(false)} className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:text-[#0528d6] transition-all border dark:border-slate-800">
           <Clock size={20}/>
         </button>
       </div>
 
-<<<<<<< HEAD
-      {notifs.length === 0 ? (
-        <div className="p-20 text-center bg-white dark:bg-[#1a1d2d] rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-slate-800">
-          <Bell className="mx-auto text-slate-200 mb-4" size={48} />
-          <p className="text-slate-400 font-bold italic  text-xs tracking-widest">Aucune notification pour le moment</p>
-=======
       <div className="flex flex-col lg:flex-row items-center gap-4 bg-white dark:bg-[#1a1d2d] p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl w-full lg:w-auto shrink-0">
             {['ALL', 'UNREAD', 'ALERTS'].map(id => (
@@ -82,7 +71,6 @@ export const NotificationsView = ({ agencyId, t }: { agencyId: string, t: any })
                     {id === 'ALL' ? t.common.all : id === 'UNREAD' ? 'Non lues' : 'Alertes'}
                 </button>
             ))}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         <div className="relative w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0528d6]" size={18} />
@@ -104,37 +92,16 @@ export const NotificationsView = ({ agencyId, t }: { agencyId: string, t: any })
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
-<<<<<<< HEAD
-                  <h4 className="font-black text-slate-900 dark:text-white  text-xs tracking-tight italic">
-                    {n.reason || 'Information système'}
-                  </h4>
-                  <span className="text-[9px] font-bold text-slate-400 ">{new Date(n.createdAt).toLocaleString()}</span>
-=======
                   <h4 className="font-black text-slate-900 dark:text-white uppercase text-xs italic tracking-tighter">{n.reason || 'Système'}</h4>
                   <span className="text-[9px] font-black text-slate-400 uppercase italic">{new Date(n.createdAt).toLocaleString()}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-4">{n.details}</p>
                 <div className="flex items-center gap-6">
                   {!n.isRead && (
-<<<<<<< HEAD
-                    <button 
-                      onClick={() => handleMarkRead(n.id)} 
-                      className="text-[9px] font-black  text-[#0528d6] flex items-center gap-1.5 hover:underline"
-                    >
-                      <Check size={12}/> Marquer lu
-                    </button>
-                  )}
-                  {n.locationId && (
-                    <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500  tracking-tighter italic">
-                      Dossier: #{n.locationId.substring(0,8)}
-                    </div>
-=======
                     <button onClick={() => handleMarkRead(n.id)} className="text-[9px] font-black uppercase text-[#0528d6] flex items-center gap-1.5 hover:underline italic"><Check size={12}/> {t.common.confirm}</button>
                   )}
                   {n.locationId && (
                     <div className="px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500 uppercase italic tracking-widest">Dossier: #{n.locationId.substring(0,8)}</div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   )}
                 </div>
               </div>

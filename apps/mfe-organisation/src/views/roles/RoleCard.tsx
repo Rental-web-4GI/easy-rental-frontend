@@ -8,13 +8,8 @@ export const RoleCard = ({ role, onEdit, isSystem, t }: any) => (
     isSystem ? 'border-blue-50 dark:border-blue-900/20 shadow-sm' : 'border-slate-100 dark:border-slate-800 hover:shadow-md'
   }`}>
     {isSystem && (
-<<<<<<< HEAD
-      <div className="absolute top-0 right-0 bg-blue-600 text-white px-3 py-1 rounded-bl-xl text-[9px] font-bold  tracking-wider italic z-10">
-        Système
-=======
       <div className="absolute top-0 right-0 bg-[#0528d6] text-white px-4 py-1.5 rounded-bl-2xl text-[9px] font-black uppercase tracking-widest italic z-10 shadow-lg">
         {t.roles.systemBadge}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       </div>
     )}
     
@@ -24,15 +19,9 @@ export const RoleCard = ({ role, onEdit, isSystem, t }: any) => (
           {isSystem ? <Key size={24} /> : <ShieldCheck size={24} />}
         </div>
         <div>
-<<<<<<< HEAD
-          <h4 className="font-bold text-slate-900 dark:text-white leading-tight">{role.name}</h4>
-          <p className="text-[10px] font-bold text-slate-400  tracking-tight mt-0.5 italic">
-            {role.permissions?.length || 0} privilèges attribués
-=======
           <h4 className="font-black text-slate-900 dark:text-white uppercase italic tracking-tighter text-lg leading-none">{role.name}</h4>
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 italic">
             {role.permissions?.length || 0} {t.roles.privileges}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           </p>
         </div>
       </div>

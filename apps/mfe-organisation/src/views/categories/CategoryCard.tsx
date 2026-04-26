@@ -46,21 +46,12 @@ export const CategoryCard = ({ category, onEdit, onDelete, t }: any) => {
       </div>
 
       <div className="mt-6 pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
-<<<<<<< HEAD
-        <span className={`text-[9px] font-bold  tracking-wider px-2 py-0.5 rounded-md ${
-          isSystem ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-[#F76513]'
-=======
         <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md italic ${
           isSystem ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20' : 'bg-orange-50 text-[#F76513] dark:bg-orange-900/20'
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         }`}>
           {isSystem ? t.categories.filterSystem : t.categories.customLabel}
         </span>
-<<<<<<< HEAD
-        <span className="text-[10px] font-bold text-slate-300">#{category.id.substring(0, 4).to()}</span>
-=======
         <span className="text-[10px] font-mono font-bold text-slate-300 dark:text-slate-600">#{category.id.substring(0, 4).toUpperCase()}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       </div>
     </div>
   );

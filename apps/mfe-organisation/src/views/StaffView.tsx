@@ -81,13 +81,8 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
           <input placeholder={t.staff.searchPlaceholder} className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
                  value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
         </div>
-<<<<<<< HEAD
-        <button onClick={() => { setSelectedStaff(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs  shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
-          <Plus size={18} /> Recruter staff
-=======
         <button onClick={() => { setSelectedStaff(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
           <Plus size={18} /> {t.staff.recruitBtn}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </button>
       </div>
 
@@ -105,11 +100,7 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 pt-8">
           <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm"><ChevronLeft/></button>
-<<<<<<< HEAD
-          <span className="text-[10px] font-black text-slate-500  italic px-4 tracking-widest">Page {currentPage} / {totalPages}</span>
-=======
           <span className="text-[10px] font-black text-slate-500 uppercase italic px-4 tracking-widest">{t.common.page} {currentPage} / {totalPages}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm"><ChevronRight/></button>
         </div>
       )}
@@ -123,20 +114,12 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
               <div className="size-20 bg-blue-50 dark:bg-blue-500/10 rounded-3xl flex items-center justify-center text-[#0528d6] mx-auto mb-6 shadow-inner">
                 <Key size={40} />
               </div>
-<<<<<<< HEAD
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter  italic mb-2 leading-none">Compte Prêt !</h3>
-=======
               <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic mb-2 leading-none">{t.staff.popupTitle}</h3>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               <p className="text-xs text-slate-500 dark:text-slate-400 italic mb-8">
                 {t.staff.popupDesc}
                 <span className="block mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl font-mono text-xl font-black text-[#0528d6] border-2 border-blue-100 dark:border-blue-900/50 shadow-sm">password123</span>
               </p>
-<<<<<<< HEAD
-              <button onClick={() => setShowPasswordPopup(false)} className="w-full py-4 bg-[#0528d6] text-white rounded-2xl font-black text-xs  tracking-widest shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition-all italic">J&apos;ai noté</button>
-=======
               <button onClick={() => setShowPasswordPopup(false)} className="w-full py-4 bg-[#0528d6] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition-all italic">{t.staff.popupBtn}</button>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
             </div>
           </div>
         </Portal>

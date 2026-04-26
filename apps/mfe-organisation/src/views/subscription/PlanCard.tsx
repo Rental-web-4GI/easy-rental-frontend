@@ -9,13 +9,8 @@ export const PlanCard = ({ plan, isCurrent, onSelect, loading, t }: any) => (
     ${isCurrent ? 'border-[#0528d6] shadow-2xl scale-[1.02] z-10' : 'border-slate-100 dark:border-slate-800 hover:border-blue-200'}
   `}>
     {isCurrent && (
-<<<<<<< HEAD
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0528d6] text-white px-4 py-1 rounded-full text-[10px] font-bold  tracking-widest shadow-md">
-        Plan actuel
-=======
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0528d6] text-white px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl italic">
         {t.subscription.activePlanBadge}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       </div>
     )}
 

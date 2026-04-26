@@ -52,11 +52,7 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: an
 
           <div className="relative z-10 flex items-center gap-4 text-blue-200">
              <ShieldCheck size={20} className="text-blue-300" />
-<<<<<<< HEAD
-             <p className="text-[10px] font-bold  tracking-[0.2em]">EasyRental Secure Infrastructure</p>
-=======
              <p className="text-[10px] font-bold uppercase tracking-[0.2em]">{t.auth.secureInfra}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           </div>
         </div>
 

@@ -21,47 +21,19 @@ export const Header = ({ title, orgData, lang, setLang, darkMode, toggleTheme, s
   }, [orgData?.id]);
 
   return (
-<<<<<<< HEAD
-    <header className="h-20 px-6 md:px-10 flex items-center justify-between shrink-0 border-b-4 border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0f1323]/80 backdrop-blur-lg sticky top-0 z-[50]">
-      
-      <div className="flex items-center gap-6">
-        <button 
-          onClick={() => setSidebarOpen(true)} 
-          className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-        >
-          <Menu size={22} />
-        </button>
-        
-        <div className="flex flex-col text-left">
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
-            {title}
-          </h2>
-          <p className="hidden md:block text-[10px] font-black text-slate-400  tracking-[0.2em] italic mt-1">
-            Console d&apos;administration
-          </p>
-=======
     <header className="h-20 px-4 md:px-10 flex items-center justify-between shrink-0 border-b-4 border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0f1323]/80 backdrop-blur-lg sticky top-0 z-[50]">
       <div className="flex items-center gap-4 text-left">
         <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"><Menu size={22} /></button>
         <div className="flex flex-col">
           <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">{title}</h2>
           <p className="hidden sm:block text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] italic mt-1.5">{t.header.admin || "Console Administration"}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
         {hasPrompt && (
-<<<<<<< HEAD
-            <button 
-              onClick={onInstall} 
-              className="hidden sm:flex items-center gap-2 px-5 py-2 bg-orange-50 dark:bg-orange-500/10 text-[#F76513] rounded-full font-black text-[10px]  border border-orange-100 dark:border-orange-500/20 hover:bg-orange-100 transition-colors animate-pulse"
-            >
-                <Download size={14} /> {t.header.installBtn || "Installer"}
-=======
             <button onClick={onInstall} className="hidden md:flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-500/10 text-[#F76513] rounded-full font-black text-[9px] uppercase border border-orange-100 dark:border-orange-500/20 hover:bg-orange-100 transition-all animate-pulse">
                 <Download size={14} /> {t.header.installBtn}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
             </button>
         )}
 
@@ -83,17 +55,8 @@ export const Header = ({ title, orgData, lang, setLang, darkMode, toggleTheme, s
 
         <div onClick={() => setCurrentView('PROFILE')} className="flex items-center gap-3 ml-2 pl-4 border-l border-slate-200 dark:border-slate-800 cursor-pointer group">
            <div className="text-right hidden sm:block">
-<<<<<<< HEAD
-              <p className="text-[9px] font-black text-slate-400  tracking-tighter leading-none mb-1 group-hover:text-[#0528d6] transition-colors">
-                Administrateur
-              </p>
-              <p className="text-xs font-black text-slate-700 dark:text-slate-200 max-w-[120px] truncate italic">
-                {orgData?.name || "Organisation"}
-              </p>
-=======
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 group-hover:text-[#0528d6] transition-colors italic">{t.header.adminRole}</p>
               <p className="text-xs font-black text-slate-700 dark:text-slate-200 max-w-[120px] truncate italic uppercase tracking-tighter">{orgData?.name}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
            </div>
            <div className="size-10 rounded-xl bg-gradient-to-br from-[#0528d6] to-blue-400 p-[2px] shadow-lg group-hover:scale-110 transition-all">
               <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[10px] overflow-hidden">

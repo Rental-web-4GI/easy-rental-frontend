@@ -24,13 +24,8 @@ export const AgencyCard = ({ agency, onEdit, onDelete, onView, t }: any) => (
       </div>
       
       <div className="flex flex-col gap-2 shrink-0 items-end">
-<<<<<<< HEAD
-        <div className={`px-2.5 py-1 rounded-lg text-[9px] font-black  tracking-widest italic border flex items-center gap-1 ${agency.is24Hours ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-500 border-slate-200'}`}>
-          <Clock size={10} /> {agency.is24Hours ? '24H/24' : 'LIMITÉ'}
-=======
         <div className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest italic border flex items-center gap-1 ${agency.is24Hours ? 'bg-green-50 text-green-600 border-green-100 dark:bg-green-900/20' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800'}`}>
           <Clock size={10} /> {agency.is24Hours ? (t.agencies.modal.hours24 || '24H/24') : 'LIMITÉ'}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         
         {/* Actions conditionnelles aux permissions */}
@@ -57,13 +52,8 @@ export const AgencyCard = ({ agency, onEdit, onDelete, onView, t }: any) => (
     </div>
 
     <div className="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
-<<<<<<< HEAD
-      <button onClick={() => onView(agency.id)} className="w-full py-3 bg-slate-900 text-white dark:bg-white dark:text-[#0528d6] rounded-xl text-[10px] font-black  italic tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-md">
-          <Info size={16}/> Détails & Opérations
-=======
       <button onClick={() => onView(agency.id)} className="w-full py-3 bg-slate-900 text-white dark:bg-white dark:text-[#0528d6] rounded-xl text-[10px] font-black uppercase italic tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-md">
           <Info size={16}/> {t.agencies.card.details || 'Détails & Opérations'}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       </button>
     </div>
   </div>

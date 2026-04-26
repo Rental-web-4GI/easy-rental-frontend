@@ -43,15 +43,10 @@ export const DriverStatusPricingModal = ({ driver, onSubmit, onClose, modalLoadi
           
           <div className="px-8 md:px-10 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-[#0528d6] text-white">
             <div>
-<<<<<<< HEAD
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Opérations & Tarification</h3>
-              <p className="text-[10px] text-slate-400  font-bold tracking-widest mt-1 italic">
-=======
               <h3 className="text-xl font-black uppercase italic tracking-tighter leading-none">
                 {t.driverStatus.modalTitle}
               </h3>
               <p className="text-[10px] opacity-70 font-black uppercase tracking-widest mt-2 italic">
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 {driver.firstname} {driver.lastname}
               </p>
             </div>
@@ -62,24 +57,14 @@ export const DriverStatusPricingModal = ({ driver, onSubmit, onClose, modalLoadi
 
           <div className="p-8 md:p-10 overflow-y-auto custom-scrollbar space-y-10">
             {error && (
-<<<<<<< HEAD
-              <div className="p-4 bg-red-50 border-2 border-red-100 rounded-xl text-red-600 text-xs font-bold  italic">
-=======
               <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900/30 rounded-2xl text-red-600 dark:text-red-400 text-[10px] font-black uppercase italic tracking-widest">
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 {error}
               </div>
             )}
 
-<<<<<<< HEAD
-            <section className="space-y-4">
-              <h4 className="text-[11px] font-black  text-[#0528d6] tracking-wider flex items-center gap-2">
-                <AlertCircle size={14}/> Statut Global de l&apos;activité
-=======
             <section className="space-y-6">
               <h4 className="text-[11px] font-black uppercase text-[#0528d6] dark:text-blue-400 tracking-widest flex items-center gap-2 italic">
                 <AlertCircle size={14}/> {t.driverStatus.availabilitySection}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {['ACTIVE', 'INACTIVE'].map(s => (
@@ -94,20 +79,6 @@ export const DriverStatusPricingModal = ({ driver, onSubmit, onClose, modalLoadi
               </div>
             </section>
 
-<<<<<<< HEAD
-            <section className="space-y-4">
-              <h4 className="text-[11px] font-black  text-[#0528d6] tracking-wider flex items-center gap-2">
-                <DollarSign size={14}/> Grille Tarifaire (XAF)
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-400  ml-1">Prix par heure</label>
-                  <input type="number" required value={formData.pricePerHour} onChange={e => setFormData({...formData, pricePerHour: Number(e.target.value)})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-400  ml-1">Prix par jour</label>
-                  <input type="number" required value={formData.pricePerDay} onChange={e => setFormData({...formData, pricePerDay: Number(e.target.value)})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-=======
             <section className="space-y-6">
               <h4 className="text-[11px] font-black uppercase text-[#0528d6] dark:text-blue-400 tracking-widest flex items-center gap-2 italic">
                 <DollarSign size={14}/> {t.driverStatus.pricingSection}
@@ -124,36 +95,16 @@ export const DriverStatusPricingModal = ({ driver, onSubmit, onClose, modalLoadi
                     {t.driverStatus.pricePerDay}
                   </label>
                   <input type="number" required value={formData.pricePerDay} onChange={e => setFormData({...formData, pricePerDay: Number(e.target.value)})} className="w-full p-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-black text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all shadow-inner" />
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </div>
               </div>
             </section>
 
-<<<<<<< HEAD
-            <section className="space-y-4">
-              <h4 className="text-[11px] font-black  text-[#0528d6] tracking-wider flex items-center gap-2">
-                <Calendar size={14}/> Planning d&apos;indisponibilité
-=======
             <section className="bg-slate-50 dark:bg-slate-900/50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 space-y-6 shadow-inner">
               <h4 className="text-[11px] font-black uppercase text-[#0528d6] dark:text-blue-400 tracking-widest flex items-center gap-2 italic">
                 <Calendar size={14}/> {t.driverStatus.planningSection}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-<<<<<<< HEAD
-                  <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Date de début</label>
-                  <input type="datetime-local" value={formData.schedule.startDate} onChange={e => setFormData({...formData, schedule: {...formData.schedule, startDate: e.target.value}})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Date de fin</label>
-                  <input type="datetime-local" value={formData.schedule.endDate} onChange={e => setFormData({...formData, schedule: {...formData.schedule, endDate: e.target.value}})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-400  ml-1 italic">Motif du changement</label>
-                  <input placeholder="ex: Repos hebdomadaire, Congés..." value={formData.schedule.reason} onChange={e => setFormData({...formData, schedule: {...formData.schedule, reason: e.target.value}})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] transition-all" />
-=======
                   <label className="text-[9px] font-black text-slate-400 uppercase italic ml-1">{t.table.start}</label>
                   <input type="datetime-local" value={formData.schedule.startDate} onChange={e => setFormData({...formData, schedule: {...formData.schedule, startDate: e.target.value}})} className="w-full p-3 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl font-bold text-xs dark:text-white" />
                 </div>
@@ -172,7 +123,6 @@ export const DriverStatusPricingModal = ({ driver, onSubmit, onClose, modalLoadi
                     onChange={e => setFormData({...formData, schedule: {...formData.schedule, reason: e.target.value}})} 
                     className="w-full p-4 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl font-bold text-xs dark:text-white" 
                   />
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </div>
             </section>
           </div>

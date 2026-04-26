@@ -8,13 +8,8 @@ export const StatCard = ({ label, value, icon }: { label: string; value: string 
       {React.cloneElement(icon as React.ReactElement, { size: 24, className: "group-hover:scale-110 transition-transform" })}
     </div>
     <div className="overflow-hidden text-left">
-<<<<<<< HEAD
-      <p className="text-[11px] font-bold  text-slate-400 tracking-wider italic mb-0.5 truncate">{label}</p>
-      <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none truncate">{value}</p>
-=======
       <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] italic mb-0.5 truncate">{label}</p>
       <p className="text-2xl font-black text-slate-900 dark:text-white leading-none truncate tracking-tighter italic">{value}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
     </div>
   </div>
 );

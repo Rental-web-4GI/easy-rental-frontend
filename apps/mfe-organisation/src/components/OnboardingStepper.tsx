@@ -44,19 +44,10 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
   ];
 
   return (
-<<<<<<< HEAD
-    <div className="max-w-5xl w-full flex flex-col items-center animate-in fade-in duration-700 px-4">
-      
-      {/* Header informatif */}
-      <div className="w-full mb-10 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-[#0528d6] rounded-full text-[10px] font-bold  tracking-widest border border-blue-100 dark:border-blue-900/30 mb-4">
-          <Sparkles size={14} /> Étape {step} sur 3
-=======
     <div className="max-w-5xl w-full flex flex-col items-center animate-in fade-in duration-700 px-2">
       <div className="w-full mb-8 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-[#0528d6] rounded-full text-[10px] font-black uppercase tracking-widest border dark:border-blue-900/30 mb-4 italic">
           <Sparkles size={14} /> {t.onboarding.step} {step} {t.onboarding.of} 3
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">{t.onboarding.mainTitle} <span className="text-[#0528d6]">{t.onboarding.accentTitle}</span></h1>
       </div>
@@ -70,36 +61,16 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
                         <div className={`size-12 rounded-2xl flex items-center justify-center shadow-lg transition-all ${step === i+1 ? 'bg-[#0528d6] text-white scale-110 shadow-blue-600/20' : step > i+1 ? 'bg-green-500 text-white' : 'bg-white dark:bg-slate-800 text-slate-400'}`}>
                             {step > i+1 ? <CheckCircle2 size={24} /> : info.icon}
                         </div>
-<<<<<<< HEAD
-                        <div className="flex flex-col text-left leading-tight">
-                            <span className="text-[10px] font-bold  text-slate-400">Phase 0{i+1}</span>
-                            <span className={`text-sm font-bold ${step === i+1 ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>{info.title}</span>
-=======
                         <div className="flex flex-col text-left leading-none">
                             <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest italic mb-1">Phase 0{i+1}</span>
                             <span className="text-sm font-black uppercase italic text-slate-900 dark:text-white">{info.title}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                         </div>
                     </div>
                 ))}
             </div>
-<<<<<<< HEAD
-
-            {/* NOUVELLE POSITION DU BOUTON QUITTER (FOOTER DE SIDEBAR) */}
-            <div className="mt-auto pt-10 border-t border-slate-200/50 dark:border-slate-800/50">
-               <button 
-                 onClick={onLogout}
-                 className="flex items-center gap-3 text-slate-400 hover:text-red-500 transition-all group"
-               >
-                 <div className="p-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm group-hover:bg-red-50 dark:group-hover:bg-red-900/20 transition-colors">
-                    <LogOut size={16} />
-                 </div>
-                 <span className="text-[11px] font-bold  tracking-wider italic">Quitter la session</span>
-=======
             <div className="mt-auto pt-8 border-t dark:border-slate-800">
                <button onClick={onLogout} className="flex items-center gap-3 text-slate-400 hover:text-red-500 transition-all font-black text-[10px] uppercase italic tracking-widest">
                  <LogOut size={16} /> {t.sidebar.logout}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                </button>
             </div>
         </div>
@@ -151,26 +122,10 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
 
             <div className="mt-8 flex items-center justify-between pt-8 border-t dark:border-slate-800">
                 {step > 1 ? (
-<<<<<<< HEAD
-                <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-slate-400 font-bold  text-[10px] hover:text-[#0528d6] transition-colors italic">
-                    <ChevronLeft size={16} /> Précédent
-                </button>
-                ) : <div />}
-                
-                <button 
-                  onClick={step < 3 ? () => setStep(step + 1) : handleFinalSubmit} 
-                  disabled={loading || !isStepValid()}
-                  className={`px-10 py-4 ${step < 3 ? 'bg-[#0528d6]' : 'bg-green-600'} text-white rounded-xl font-bold  text-xs shadow-xl shadow-blue-600/10 flex items-center gap-3 transition-all hover:scale-[1.02] disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed`}
-                >
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : (
-                        <>{step < 3 ? "Continuer" : "Activer mon Dashboard"} <ArrowRight size={18} /></>
-                    )}
-=======
                 <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-slate-400 font-black uppercase text-[10px] hover:text-[#0528d6] transition-all italic tracking-widest"><ChevronLeft size={16} /> {t.onboarding.btns.prev}</button>
                 ) : <div />}
                 <button onClick={step < 3 ? () => setStep(step + 1) : handleFinalSubmit} disabled={loading || !isStepValid()} className={`px-10 py-4 ${step < 3 ? 'bg-[#0528d6]' : 'bg-green-600'} text-white rounded-2xl font-black uppercase text-xs shadow-xl flex items-center gap-3 transition-all hover:scale-[1.02] disabled:opacity-30 italic tracking-widest`}>
                     {loading ? <Loader2 className="animate-spin" size={18} /> : <>{step < 3 ? t.onboarding.btns.next : t.onboarding.btns.finish} <ArrowRight size={18} /></>}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </button>
             </div>
         </div>

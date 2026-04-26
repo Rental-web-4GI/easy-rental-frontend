@@ -36,11 +36,7 @@ export const Sidebar = ({
 
       <nav className="flex-1 overflow-y-auto no-scrollbar px-4 space-y-8 pb-8 text-left">
         <div>
-<<<<<<< HEAD
-          <p className="text-[11px] font-bold  tracking-widest text-slate-400 mb-4 px-2">Hub principal</p>
-=======
           <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-2 italic">{t.sidebar.hub}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="space-y-1">
             <SidebarItem icon={<LayoutDashboard size={20}/>} label={t.sidebar.dashboard} active={currentView === 'DASHBOARD'} onClick={() => {setCurrentView('DASHBOARD'); setSidebarOpen(false);}} />
             <SidebarItem icon={<CalendarDays size={20}/>} label={t.sidebar.reservations} active={currentView === 'RESERVATIONS'} onClick={() => {setCurrentView('RESERVATIONS'); setSidebarOpen(false);}} />
@@ -51,11 +47,7 @@ export const Sidebar = ({
         </div>
 
         <div>
-<<<<<<< HEAD
-          <p className="text-[11px] font-bold  tracking-widest text-slate-400 mb-4 px-2">Opérations réseau</p>
-=======
           <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-2 italic">{t.sidebar.network}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="space-y-1">
             <SidebarItem icon={<ShieldCheck size={20}/>} label={t.sidebar.roles} active={currentView === 'ROLES'} onClick={() => {setCurrentView('ROLES'); setSidebarOpen(false);}} />
             <SidebarItem icon={<UserCircle size={20}/>} label={t.sidebar.staff} active={currentView === 'STAFF'} onClick={() => {setCurrentView('STAFF'); setSidebarOpen(false);}} />
@@ -79,13 +71,7 @@ export const Sidebar = ({
            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="size-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />
-<<<<<<< HEAD
-                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400  tracking-tight">
-                  Réseau en direct
-                </span>
-=======
                 <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest italic">{t.sidebar.status}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </div>
               <Activity size={12} className="text-slate-300 dark:text-slate-700" />
            </div>

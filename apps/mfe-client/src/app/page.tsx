@@ -76,7 +76,7 @@ export default function ClientDashboard() {
   }
 
   const handleAuthAction = async (isSignUp: boolean, form: any) => {
-    try {
+  
       const res = isSignUp ? await authService.registerClient(form) : await authService.login(form);
       if (res.ok) {
         const credentials = isSignUp ? { email: form.email, password: form.password } : form;
@@ -88,9 +88,7 @@ export default function ClientDashboard() {
           return true;
         }
       }
-    } catch (e) {
-      // console.error(e);
-    }
+    
     return false;
   };
 

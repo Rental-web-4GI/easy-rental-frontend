@@ -36,13 +36,8 @@ export const DriverCard = ({ driver, onEdit, onDelete, staffPermissions, t, user
         <h4 className="font-black text-slate-900 dark:text-white leading-tight truncate uppercase italic tracking-tighter text-lg">
           {driver.firstname} {driver.lastname}
         </h4>
-<<<<<<< HEAD
-        <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1">
-          {driver.age} ans — {driver.gender === 0 ? 'Homme' : 'Femme'}
-=======
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">
           {driver.age} {t.driverCard.years} — {driver.gender === 0 ? t.driverForm.male : t.driverForm.female}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </p>
       </div>
 
@@ -59,19 +54,11 @@ export const DriverCard = ({ driver, onEdit, onDelete, staffPermissions, t, user
       </div>
 
       <div className="grid grid-cols-2 gap-2 pt-4 border-t border-slate-50 dark:border-slate-800">
-<<<<<<< HEAD
-        <a href={driver.drivingLicenseUrl} target="_blank" className="flex items-center justify-center gap-2 py-2 bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-lg text-[10px] font-bold  hover:bg-blue-50 hover:text-[#0528d6] transition-all">
-          <FileText size={12}/> Permis
-        </a>
-        <a href={driver.cniUrl} target="_blank" className="flex items-center justify-center gap-2 py-2 bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-lg text-[10px] font-bold  hover:bg-blue-50 hover:text-[#0528d6] transition-all">
-          <FileText size={12}/> CNI
-=======
         <a href={driver.drivingLicenseUrl} target="_blank" className="flex items-center justify-center gap-2 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-[#0528d6] rounded-xl text-[9px] font-black uppercase transition-all italic tracking-tighter">
           <FileText size={12}/> {t.driverCard.licenseBtn}
         </a>
         <a href={driver.cniUrl} target="_blank" className="flex items-center justify-center gap-2 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-[#0528d6] rounded-xl text-[9px] font-black uppercase transition-all italic tracking-tighter">
           <FileText size={12}/> {t.driverCard.cniBtn}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </a>
       </div>
     </div>

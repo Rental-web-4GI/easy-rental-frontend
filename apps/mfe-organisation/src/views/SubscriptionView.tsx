@@ -65,11 +65,7 @@ export const SubscriptionView = ({ orgData, t }: any) => {
       <section className="space-y-6">
         <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
           <Shield className="text-[#0528d6]" size={20} />
-<<<<<<< HEAD
-          <h4 className="text-lg font-bold text-slate-800 dark:text-white  tracking-tight">État de la licence</h4>
-=======
           <h4 className="text-lg font-bold text-slate-800 dark:text-white uppercase tracking-tight">{t.subscription.licenceStatus}</h4>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -77,13 +73,8 @@ export const SubscriptionView = ({ orgData, t }: any) => {
           <div className="lg:col-span-1 bg-[#0528d6] rounded-[2rem] p-8 text-white relative overflow-hidden shadow-xl shadow-blue-600/20">
             <Zap size={180} className="absolute -bottom-10 -right-10 text-white/10 rotate-12" />
             <div className="relative z-10 space-y-4">
-<<<<<<< HEAD
-              <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold  tracking-widest border border-white/20">
-                Licence active
-=======
               <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/20">
                 {t.subscription.activeLicence}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </span>
               <h3 className="text-4xl font-black italic  tracking-tighter">
                 {currentSub?.planName || "---"}
@@ -120,13 +111,8 @@ export const SubscriptionView = ({ orgData, t }: any) => {
       {/* SECTION 2 : CATALOGUE */}
       <section className="space-y-8">
         <div className="text-center space-y-1">
-<<<<<<< HEAD
-          <h4 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none italic">Plans disponibles</h4>
-          <p className="text-[11px] font-bold text-slate-400  tracking-widest italic">Optimisez votre infrastructure réseau</p>
-=======
           <h4 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-none italic">{t.subscription.availablePlans}</h4>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest italic">{t.subscription.plansSubtitle}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">

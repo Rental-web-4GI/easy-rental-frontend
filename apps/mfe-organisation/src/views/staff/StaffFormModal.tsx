@@ -20,11 +20,7 @@ export const StaffFormModal = ({ editingStaff, agencies, postes, initialData, on
               <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
                 {editingStaff ? t.staff.modal.titleEdit : t.staff.modal.titleAdd}
               </h3>
-<<<<<<< HEAD
-              <p className="text-[10px] text-slate-400  font-bold tracking-widest mt-1 italic">Gestion des accès staff</p>
-=======
               <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1.5 italic">{t.staff.profile.agency}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
             </div>
             <button type="button" onClick={onClose} className="p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all shadow-sm"><X size={22}/></button>
           </div>
@@ -41,13 +37,8 @@ export const StaffFormModal = ({ editingStaff, agencies, postes, initialData, on
 
             <div className="space-y-6 pt-6 border-t border-slate-50 dark:border-slate-800">
               <div className="space-y-1.5">
-<<<<<<< HEAD
-                <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 italic flex items-center gap-2">
-                  <Store size={14} className="text-[#0528d6]"/> Affectation agence
-=======
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic flex items-center gap-2">
                   <Store size={14} className="text-[#0528d6]"/> {t.staff.modal.agencyLabel}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </label>
                 <select 
                   required value={formData.agencyId} 
@@ -61,13 +52,8 @@ export const StaffFormModal = ({ editingStaff, agencies, postes, initialData, on
               </div>
 
               <div className="space-y-1.5">
-<<<<<<< HEAD
-                <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 italic flex items-center gap-2">
-                  <Shield size={14} className="text-[#0528d6]"/> Poste & Permissions
-=======
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic flex items-center gap-2">
                   <Briefcase size={14} className="text-[#0528d6]"/> {t.staff.modal.posteLabel}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </label>
                 <select 
                   required value={formData.posteId} 
@@ -81,13 +67,8 @@ export const StaffFormModal = ({ editingStaff, agencies, postes, initialData, on
 
               {editingStaff && (
                 <div className="space-y-1.5">
-<<<<<<< HEAD
-                  <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 italic flex items-center gap-2">
-                    <UserCheck size={14} className="text-[#0528d6]"/> Statut du compte
-=======
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic flex items-center gap-2">
                     <UserCheck size={14} className="text-[#0528d6]"/> {t.staff.modal.statusLabel}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   </label>
                   <select 
                     value={formData.status} 
@@ -116,13 +97,8 @@ export const StaffFormModal = ({ editingStaff, agencies, postes, initialData, on
 };
 
 const Input = ({ label, value, onChange, type = "text", required = false, icon }: any) => (
-<<<<<<< HEAD
-  <div className="space-y-1.5">
-    <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 italic">{label}</label>
-=======
   <div className="space-y-1.5 w-full">
     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic">{label}</label>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
     <div className="relative group">
       {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#0528d6] transition-colors">{icon}</div>}
       <input type={type} required={required} value={value} onChange={e => onChange(e.target.value)} 

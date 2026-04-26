@@ -44,13 +44,8 @@ export const ResourceDetailsModal = ({ resourceId, type, onClose, t }: ResourceD
               <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
                 {t.resDetails.title}
               </h3>
-<<<<<<< HEAD
-              <p className="text-[10px] text-slate-400  font-bold tracking-widest mt-1 italic">
-                Consulter le planning et les avis
-=======
               <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mt-1 italic">
                 {titleName}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </p>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"><X size={22}/></button>
@@ -58,20 +53,6 @@ export const ResourceDetailsModal = ({ resourceId, type, onClose, t }: ResourceD
 
           <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar space-y-10">
               
-<<<<<<< HEAD
-              {/* HEADER INFO */}
-              <div className="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800">
-                <div className="size-16 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-[#0528d6] shadow-sm">
-                  {type === 'VEHICLE' ? <Car size={32}/> : <User size={32}/>}
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold">
-                    {type === 'VEHICLE' ? `${details.vehicle.brand} ${details.vehicle.model}` : `${details.driver.firstname} ${details.driver.lastname}`}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-orange-500 font-black text-sm">★ {details.rating?.toFixed(1) || 'N/A'}</span>
-                    <span className="text-[10px] text-slate-400  font-bold">({details.reviews?.length || 0} avis)</span>
-=======
               <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1 italic">{t.resDetails.globalRating}</p>
@@ -86,18 +67,13 @@ export const ResourceDetailsModal = ({ resourceId, type, onClose, t }: ResourceD
                           <MessageSquare size={16} />
                           <span className="text-xl font-black italic">{details.reviews?.length || 0}</span>
                       </div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   </div>
               </div>
 
               <section>
                 <div className="flex items-center gap-3 mb-6 border-b dark:border-slate-800 pb-2">
                   <Calendar className="text-[#0528d6]" size={18} />
-<<<<<<< HEAD
-                  <h5 className="text-sm font-black  tracking-tighter">Calendrier d&apos;indisponibilité</h5>
-=======
                   <h5 className="text-sm font-black uppercase tracking-tighter italic">{t.resDetails.unavailablePlanning}</h5>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </div>
                 
                 <div className="space-y-3">
@@ -111,48 +87,10 @@ export const ResourceDetailsModal = ({ resourceId, type, onClose, t }: ResourceD
                             {new Date(s.startDate).toLocaleDateString()} — {new Date(s.endDate).toLocaleDateString()}
                           </p>
                         </div>
-<<<<<<< HEAD
-                        <span className="px-3 py-1 bg-orange-50 text-orange-600 text-[10px] font-bold  rounded-lg">
-                          {s.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="py-8 text-center border-2 border-dashed border-slate-100 rounded-2xl">
-                    <p className="text-xs text-slate-400 italic">Aucune période d&apos;indisponibilité enregistrée.</p>
-                  </div>
-                )}
-              </section>
-
-              {/* REVIEWS SECTION */}
-              <section>
-                <div className="flex items-center gap-3 mb-6">
-                  <Star className="text-[#0528d6]" size={18} />
-                  <h5 className="text-sm font-black  tracking-tighter">Avis des clients</h5>
-                </div>
-
-                <div className="space-y-4">
-                  {details.reviews?.length > 0 ? details.reviews.map((r: any) => (
-                    <div key={r.id} className="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-xs font-bold">{r.authorName}</span>
-                        <div className="flex text-orange-500">
-                          {[...Array(r.rating)].map((_, i) => <Star key={i} size={10} fill="currentColor" />)}
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-500 italic leading-relaxed">
-                        &quot;{r.comment}&quot;
-                      </p>
-                      <p className="text-[9px] text-slate-400 mt-2  font-bold tracking-widest">
-                        Posté le {new Date(r.createdAt).toLocaleDateString()}
-                      </p>
-=======
                       </div>
                       <span className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase rounded-lg border dark:border-slate-700">
                         {s.status}
                       </span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     </div>
                   )) : (
                     <div className="py-12 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[2.5rem]">

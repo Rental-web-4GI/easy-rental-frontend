@@ -17,11 +17,7 @@ export const RentalCard = ({ rental, onView, t }: any) => {
   return (
     <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all group flex flex-col h-full text-left relative overflow-hidden">
       <div className="flex justify-between items-start mb-8">
-<<<<<<< HEAD
-        <div className={`px-3 py-1 rounded-full text-[8px] font-black  tracking-widest border ${getStatusStyle(rental.status)}`}>
-=======
         <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border italic ${getStatusStyle(rental.status)}`}>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           {rental.status}
         </div>
         <button onClick={() => onView(rental)} className="size-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-[#0528d6] transition-all shadow-inner">
@@ -57,11 +53,7 @@ export const RentalCard = ({ rental, onView, t }: any) => {
       <div className="mt-auto flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-slate-400">
           <MapPin size={12} className="text-orange-500"/>
-<<<<<<< HEAD
-          <span className="text-[9px] font-black  italic tracking-widest">Dossier #{rental.id.substring(0,8)}</span>
-=======
           <span className="text-[9px] font-black uppercase italic tracking-[0.1em]">{t.common.folder} #{rental.id.substring(0,8)}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         <div className="size-8 bg-slate-900 dark:bg-slate-700 text-white rounded-lg flex items-center justify-center group-hover:bg-[#0528d6] group-hover:scale-110 transition-all shadow-md">
             <ArrowUpRight size={14}/>

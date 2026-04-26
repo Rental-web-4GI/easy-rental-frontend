@@ -6,15 +6,9 @@ export const StatCard = ({ label, value, icon }: { label: string; value: string 
     <div className="size-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-[#0528d6] shadow-inner shrink-0 italic">
       {React.cloneElement(icon as React.ReactElement, { size: 24 })}
     </div>
-<<<<<<< HEAD
-    <div>
-      <p className="text-[11px] font-bold  text-slate-400 tracking-wider italic mb-0.5">{label}</p>
-      <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none">{value}</p>
-=======
     <div className="overflow-hidden">
       <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest italic mb-0.5 truncate">{label}</p>
       <p className="text-2xl font-black text-slate-900 dark:text-white leading-none tracking-tighter italic">{value}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
     </div>
   </div>
 );

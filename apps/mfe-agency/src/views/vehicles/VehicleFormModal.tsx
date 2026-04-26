@@ -50,61 +50,11 @@ export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSu
               <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tight">
                 {editingVehicle ? t.vehicleformdata.titleEdit : t.vehicleformdata.titleNew}
               </h3>
-<<<<<<< HEAD
-              <p className="text-[10px] text-slate-400  font-bold tracking-widest mt-1 italic">Assignation immédiate à l&apos;agence</p>
-=======
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 italic">{t.vehicleformdata.subtitle}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
             </div>
             <button type="button" onClick={onClose} className="p-2 bg-slate-50 dark:bg-slate-800 rounded-xl hover:text-red-500 transition-colors"><X size={22}/></button>
           </div>
 
-<<<<<<< HEAD
-          <div className="p-10 overflow-y-auto custom-scrollbar space-y-6">
-            {error && (
-              <div className="p-4 bg-red-50 border-2 border-red-100 rounded-xl text-red-600 text-xs font-bold  italic text-left">
-                {error}
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <Input label="Marque" value={formData.brand} onChange={(v:any) => setFormData({...formData, brand: v})} required placeholder="ex: Toyota" />
-              <Input label="Modèle" value={formData.model} onChange={(v:any) => setFormData({...formData, model: v})} required placeholder="ex: Hilux" />
-              <Input label="Immatriculation" value={formData.licencePlate} onChange={(v:any) => setFormData({...formData, licencePlate: v.to()})} required icon={<Hash size={16}/>} placeholder="LT-000-AA" />
-              <Input label="Numéro VIN (Châssis)" value={formData.vinNumber} onChange={(v:any) => setFormData({...formData, vinNumber: v.to()})} required icon={<Binary size={16}/>} placeholder="17 caractères" />
-              
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400  ml-1 italic flex items-center gap-2"><Layers size={12}/> Catégorie</label>
-                <select required value={formData.categoryId} onChange={e => setFormData({...formData, categoryId: e.target.value})}
-                        className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all">
-                  <option value="">Sélectionner...</option>
-                  {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="Kilométrage" type="number" value={formData.kilometrage} onChange={(v:any) => setFormData({...formData, kilometrage: v})} required />
-                <Input label="Nombre de places" type="number" value={formData.places} onChange={(v:any) => setFormData({...formData, places: v})} required />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400  ml-1 italic flex items-center gap-2">Transmission</label>
-                <select value={formData.transmission} onChange={e => setFormData({...formData, transmission: e.target.value})}
-                        className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all">
-                  <option value="MANUAL">Manuelle</option>
-                  <option value="AUTOMATIC">Automatique</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400  ml-1 italic flex items-center gap-2">Statut</label>
-                <select value={formData.statut} onChange={e => setFormData({...formData, statut: e.target.value})}
-                        className="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all">
-                  <option value="AVAILABLE">Disponible</option>
-                  <option value="MAINTENANCE">En maintenance</option>
-                </select>
-              </div>
-=======
           <div className="p-10 overflow-y-auto custom-scrollbar space-y-12 text-left">
             
             {/* SECTION 1 : IDENTITÉ ET LOCALISATION */}
@@ -132,7 +82,6 @@ export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSu
                         <option value="MAINTENANCE">{t.vehicleformdata.statusMaintenance}</option>
                     </select>
                 </div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
             </div>
 
             {/* SECTION 2 : TECHNIQUE & MOTEUR */}
@@ -228,15 +177,9 @@ export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSu
 
 const Input = ({ label, value, onChange, type = "text", icon, dark, placeholder, required }: any) => (
   <div className="space-y-1.5">
-<<<<<<< HEAD
-    <label className="text-[10px] font-bold text-slate-400  tracking-widest ml-1 italic">{label}</label>
-    <div className="relative group">
-      {icon && <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#0528d6] transition-colors">{icon}</div>}
-=======
     <label className={`text-[9px] font-black uppercase italic ml-1 tracking-widest ${dark ? 'text-slate-400' : 'text-slate-400'}`}>{label}</label>
     <div className="relative">
       {icon && <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300">{icon}</div>}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       <input type={type} required={required} value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} 
              className={`w-full ${icon ? 'pl-10' : 'px-4'} p-3 ${dark ? 'bg-white/10 border-white/10 text-white' : 'bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 text-slate-900 dark:text-white'} rounded-xl font-bold text-xs outline-none focus:border-[#0528d6] transition-all`} />
     </div>

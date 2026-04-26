@@ -13,11 +13,7 @@ interface AuthInputProps {
 
 export const AuthInput = ({ icon, type = "text", placeholder, value, onChange, label }: AuthInputProps) => (
   <div className="space-y-1.5 group w-full text-left">
-<<<<<<< HEAD
-    <label className="text-[11px] font-bold  text-slate-400 dark:text-slate-500 tracking-wider ml-1 italic transition-colors group-focus-within:text-[#0528d6]">
-=======
     <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest ml-1 italic transition-colors group-focus-within:text-[#0528d6]">
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       {label}
     </label>
     <div className="relative group">

@@ -36,12 +36,6 @@ export const BookingsView = ({ userData, t, staffPermissions }: any) => {
         <StatCard label={t.table.colRev} value={`${rentals.reduce((acc, r) => acc + (r.amountPaid || 0), 0).toLocaleString()} XAF`} icon={<CheckCircle2 className="text-green-500"/>} />
       </div>
 
-<<<<<<< HEAD
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {rentals.length === 0 ? (
-          <div className="col-span-full p-20 bg-white dark:bg-[#1a1d2d] rounded-[3rem] text-center border-2 border-dashed border-slate-100">
-             <p className="text-slate-400 font-bold  italic">Aucune réservation détectée pour cette agence</p>
-=======
       <div className="bg-white dark:bg-[#1a1d2d] p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0528d6]" size={18} />
@@ -61,7 +55,6 @@ export const BookingsView = ({ userData, t, staffPermissions }: any) => {
           <div className="col-span-full p-20 bg-white dark:bg-[#1a1d2d] rounded-[3rem] text-center border-2 border-dashed border-slate-100 dark:border-slate-800 shadow-inner">
              <Calendar className="size-16 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
              <p className="text-slate-400 font-black uppercase italic tracking-widest">{t.table.sub}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           </div>
         ) : (
           filtered.map(rental => (

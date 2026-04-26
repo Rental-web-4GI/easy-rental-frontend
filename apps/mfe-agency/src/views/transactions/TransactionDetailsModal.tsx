@@ -35,15 +35,9 @@ export const TransactionDetailsModal = ({ transactionId, onClose, t }: any) => {
         <div className="relative w-full max-w-2xl bg-white dark:bg-[#1a1d2d] rounded-[3rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-white/20 animate-in zoom-in">
           <div className="px-6 md:px-10 py-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
             <div>
-<<<<<<< HEAD
-              <div className="flex items-center gap-3 mb-1">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white  italic tracking-tighter">Détails Transaction</h3>
-                <span className={`px-3 py-1 rounded-full text-[9px] font-black  tracking-widest border ${isSuccess ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'}`}>{data.status}</span>
-=======
               <div className="flex flex-wrap items-center gap-3 mb-1">
                 <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">{t.transDetails.title}</h3>
                 <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${isSuccess ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'}`}>{data.status}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </div>
               <p className="text-[10px] text-slate-400 font-bold  tracking-widest italic">REF: {data.reference}</p>
             </div>
@@ -53,31 +47,15 @@ export const TransactionDetailsModal = ({ transactionId, onClose, t }: any) => {
           <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar space-y-8">
             <div className="flex items-center justify-center py-8 bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-inner">
                 <div className="text-center">
-<<<<<<< HEAD
-                    <p className="text-[10px] font-black text-slate-400  tracking-widest mb-2">Montant de la transaction</p>
-                    <p className={`text-4xl font-black italic tracking-tighter ${isIncome ? 'text-green-500' : 'text-red-500'}`}>
-                        {isIncome ? '+' : '-'}{absAmount.toLocaleString()} XAF
-=======
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t.transDetails.amount}</p>
                     <p className={`text-4xl md:text-5xl font-black italic tracking-tighter ${isIncome ? 'text-green-500' : 'text-red-500'}`}>
                         {isIncome ? '+' : '-'}{absAmount.toLocaleString()} {t.common.currency}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     </p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <section className="space-y-4">
-<<<<<<< HEAD
-                    <h4 className="text-[10px] font-black  text-[#0528d6] italic border-b pb-2 flex items-center gap-2"><Hash size={14}/> Informations</h4>
-                    <DataRow label="Type" value={isIncome ? 'Revenu de Location' : 'Remboursement / Autre'} />
-                    <DataRow label="Méthode" value={data.method || 'Automatique'} />
-                    <DataRow label="Date" value={new Date(data.date).toLocaleString()} />
-                </section>
-                <section className="space-y-4">
-                    <h4 className="text-[10px] font-black  text-[#0528d6] italic border-b pb-2 flex items-center gap-2"><Banknote size={14}/> Description</h4>
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{data.description}</p>
-=======
                     <h4 className="text-[10px] font-black uppercase text-[#0528d6] italic border-b dark:border-slate-800 pb-2 flex items-center gap-2"><Hash size={14}/> {t.transDetails.infoTitle}</h4>
                     <DataRow label="Type" value={isIncome ? t.transDetails.rentalIncome : t.transDetails.refund} />
                     <DataRow label={t.transDetails.method} value={data.method || 'Automatique'} />
@@ -86,24 +64,15 @@ export const TransactionDetailsModal = ({ transactionId, onClose, t }: any) => {
                 <section className="space-y-4">
                     <h4 className="text-[10px] font-black uppercase text-[#0528d6] italic border-b dark:border-slate-800 pb-2 flex items-center gap-2"><Banknote size={14}/> {t.transDetails.descLabel}</h4>
                     <p className="text-sm font-bold text-slate-700 dark:text-slate-200 leading-relaxed italic">{data.description}</p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 </section>
             </div>
 
             {data.rentalDetails && (
-<<<<<<< HEAD
-                <div className="p-6 bg-[#0528d6]/5 border-2 border-[#0528d6]/20 rounded-[2rem]">
-                    <h4 className="text-xs font-black  text-[#0528d6] italic mb-4">Liaison Location</h4>
-                    <div className="space-y-2">
-                        <DataRow label="Client" value={data.rentalDetails.rental?.clientName} dark />
-                        <DataRow label="Dossier ID" value={data.rentalDetails.rental?.id} dark />
-=======
                 <div className="p-6 bg-[#0528d6]/5 dark:bg-[#0528d6]/10 border-2 border-[#0528d6]/20 rounded-[2rem]">
                     <h4 className="text-xs font-black uppercase text-[#0528d6] italic mb-4 flex items-center gap-2"><Tag size={14}/> {t.transDetails.linkTitle}</h4>
                     <div className="space-y-3">
                         <DataRow label={t.table.customer} value={data.rentalDetails.rental?.clientName} dark />
                         <DataRow label={t.transDetails.folderId} value={data.rentalDetails.rental?.id.substring(0,12)} mono dark />
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     </div>
                 </div>
             )}
@@ -115,14 +84,8 @@ export const TransactionDetailsModal = ({ transactionId, onClose, t }: any) => {
 };
 
 const DataRow = ({ label, value, dark }: any) => (
-<<<<<<< HEAD
-    <div className="flex justify-between items-center">
-        <span className="text-[10px] font-black  italic tracking-widest text-slate-400">{label}</span>
-        <span className={`text-sm font-black italic ${dark ? 'text-slate-800 dark:text-slate-200' : 'text-slate-800 dark:text-white'}`}>{value || '---'}</span>
-=======
     <div className="flex justify-between items-center gap-4">
         <span className="text-[10px] font-black uppercase italic tracking-widest text-slate-400 whitespace-nowrap">{label}</span>
         <span className={`text-sm font-black italic truncate ${dark ? 'text-slate-800 dark:text-slate-200' : 'text-slate-800 dark:text-white'}`}>{value || '---'}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
     </div>
 );

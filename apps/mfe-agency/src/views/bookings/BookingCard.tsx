@@ -28,12 +28,6 @@ export const BookingCard = ({ rental, userData, onStart, staffPermissions, onVie
   };
 
   return (
-<<<<<<< HEAD
-    <div className="bg-white dark:bg-[#1a1d2d] rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-left flex flex-col h-full">
-      <div className="flex justify-between items-center mb-8">
-        <div className={`px-3 py-1 rounded-full text-[9px] font-black  tracking-widest border ${getStatusStyle(rental.status)}`}>{rental.status}</div>
-        <span className="text-[10px] font-mono font-bold text-slate-300">#REF-{rental.id.substring(0,6).to()}</span>
-=======
     <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-left flex flex-col h-full relative overflow-hidden group">
       
       <div className="flex justify-between items-start mb-8">
@@ -43,7 +37,6 @@ export const BookingCard = ({ rental, userData, onStart, staffPermissions, onVie
         <button onClick={onView} className="size-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-[#0528d6] transition-all">
             <Info size={18}/>
         </button>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       </div>
 
       <div className="flex items-center gap-4 mb-8">
@@ -51,29 +44,14 @@ export const BookingCard = ({ rental, userData, onStart, staffPermissions, onVie
             <User size={24} />
         </div>
         <div className="overflow-hidden">
-<<<<<<< HEAD
-          <h4 className="font-bold text-slate-900 dark:text-white leading-tight truncate">{rental.clientName || 'Walk-in Client'}</h4>
-          <div className="flex items-center gap-2 mt-1 text-slate-400 font-bold text-[10px]  italic"><Phone size={10} className="text-[#0528d6]"/> {rental.clientPhone}</div>
-=======
           <h4 className="font-black text-slate-800 dark:text-white leading-tight truncate uppercase italic tracking-tighter leading-none">{rental.clientName || 'Walk-in'}</h4>
           <p className="flex items-center gap-2 mt-1 text-slate-400 font-bold text-[10px] uppercase italic">
             <Phone size={10} className="text-[#0528d6]"/> {rental.clientPhone}
           </p>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
       </div>
 
       <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 mb-8 grid grid-cols-2 gap-4 border border-slate-100 dark:border-slate-800">
-<<<<<<< HEAD
-        <div className="space-y-0.5"><p className="text-[9px] font-black text-slate-400  italic">Prise en charge</p><p className="text-xs font-bold truncate">{new Date(rental.startDate).toLocaleDateString()}</p></div>
-        <div className="space-y-0.5"><p className="text-[9px] font-black text-slate-400  italic">Restitution</p><p className="text-xs font-bold truncate">{new Date(rental.endDate).toLocaleDateString()}</p></div>
-      </div>
-
-      <div className="flex items-center justify-between gap-4 mt-auto">
-        <div>
-          <p className="text-[9px] font-black text-slate-400  italic mb-0.5">Montant</p>
-          <p className="text-lg font-black text-[#0528d6] leading-none">{rental.totalAmount?.toLocaleString()} XAF</p>
-=======
         <div className="space-y-0.5">
             <p className="text-[9px] font-black text-slate-400 uppercase italic">{t.table.start}</p>
             <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{new Date(rental.startDate).toLocaleDateString()}</p>
@@ -100,7 +78,6 @@ export const BookingCard = ({ rental, userData, onStart, staffPermissions, onVie
                     Reste: {remaining.toLocaleString()}
                 </div>
             )}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
 
         <div className="flex gap-2">

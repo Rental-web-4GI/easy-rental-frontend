@@ -42,11 +42,7 @@ export const DashboardView = ({ orgData, t }: any) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-<<<<<<< HEAD
-          <h3 className="text-sm font-black  italic tracking-tighter flex items-center gap-2 mb-8"><TrendingUp size={16} className="text-[#0528d6]"/> Évolution des Revenus</h3>
-=======
           <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-8"><TrendingUp size={16} className="text-[#0528d6]"/> {t.dashboard.revenueEvolution}</h3>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="flex items-end gap-2 h-48">
             {revenueEvolution.values.map((v: number, i: number) => (
               <div key={i} className="flex-1 bg-[#0528d6]/10 hover:bg-[#0528d6] rounded-t-lg transition-all relative group" style={{ height: `${(v / Math.max(...revenueEvolution.values)) * 100}%` }}>
@@ -61,11 +57,7 @@ export const DashboardView = ({ orgData, t }: any) => {
         </div>
 
         <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-<<<<<<< HEAD
-          <h3 className="text-sm font-black  italic tracking-tighter flex items-center gap-2 mb-8"><CalendarCheck size={16} className="text-[#0528d6]"/> Volume de Locations</h3>
-=======
           <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-8"><CalendarCheck size={16} className="text-[#0528d6]"/> {t.dashboard.rentalVolume}</h3>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="flex items-end gap-2 h-48">
             {rentalEvolution.values.map((v: number, i: number) => (
               <div key={i} className="flex-1 bg-orange-500/10 hover:bg-orange-500 rounded-t-lg transition-all relative group" style={{ height: `${(v / Math.max(...rentalEvolution.values)) * 100}%` }}>
@@ -83,11 +75,7 @@ export const DashboardView = ({ orgData, t }: any) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
         <div className="space-y-8">
             <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-<<<<<<< HEAD
-                <h3 className="text-[10px] font-black  tracking-widest flex items-center gap-2 mb-6"><PieChart size={14} className="text-[#0528d6]"/> État du Parc</h3>
-=======
                 <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mb-6"><PieChart size={14} className="text-[#0528d6]"/> {t.dashboard.fleetStatus}</h3>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 <div className="space-y-4">
                     {Object.entries(vehicleStatusDistribution.distribution).map(([key, val]: any) => (
                         <div key={key} className="space-y-1.5">
@@ -98,11 +86,7 @@ export const DashboardView = ({ orgData, t }: any) => {
                 </div>
             </div>
             <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-<<<<<<< HEAD
-                <h3 className="text-[10px] font-black  tracking-widest flex items-center gap-2 mb-6"><Activity size={14} className="text-orange-500"/> Statuts Locations</h3>
-=======
                 <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mb-6"><Activity size={14} className="text-orange-500"/> {t.dashboard.rentalStatus}</h3>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 <div className="space-y-4">
                     {Object.entries(rentalStatusDistribution.distribution).map(([key, val]: any) => (
                         <div key={key} className="space-y-1.5">
@@ -115,24 +99,12 @@ export const DashboardView = ({ orgData, t }: any) => {
         </div>
 
         <div className="lg:col-span-2 bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
-<<<<<<< HEAD
-          <h3 className="text-sm font-black  italic tracking-tighter flex items-center gap-2 mb-10"><Target size={18} className="text-[#0528d6]"/> Performance Comparative des Agences</h3>
-=======
           <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-10"><Target size={18} className="text-[#0528d6]"/> {t.dashboard.agencyComparison}</h3>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           <div className="space-y-8">
             {agencyComparison.map((agency: any, idx: number) => (
               <div key={idx} className="group">
                 <div className="flex justify-between items-end mb-3">
                   <div>
-<<<<<<< HEAD
-                    <h4 className="text-base font-black text-slate-900 dark:text-white  italic">{agency.agencyName}</h4>
-                    <p className="text-[9px] font-bold text-slate-400  tracking-widest mt-1">Flotte: {agency.totalVehicles} — Activité: {agency.totalRentals} locations</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-black text-[#0528d6]">{agency.revenue?.toLocaleString()} XAF</p>
-                    <div className="flex items-center justify-end gap-1 text-[8px] font-black text-green-500  italic"><ArrowUpRight size={10}/> Part de marché</div>
-=======
                     <h4 className="text-base font-black text-slate-900 dark:text-white uppercase italic">{agency.agencyName}</h4>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
                       {t.dashboard.agencyFleet}: {agency.totalVehicles} — {t.dashboard.agencyActivity}: {agency.totalRentals} {t.dashboard.rentalsCount}
@@ -141,7 +113,6 @@ export const DashboardView = ({ orgData, t }: any) => {
                   <div className="text-right">
                     <p className="text-lg font-black text-[#0528d6]">{agency.revenue?.toLocaleString()} XAF</p>
                     <div className="flex items-center justify-end gap-1 text-[8px] font-black text-green-500 uppercase italic"><ArrowUpRight size={10}/> {t.dashboard.marketShare}</div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                   </div>
                 </div>
                 <div className="h-3 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-[#0528d6] transition-all duration-1000" style={{ width: `${(agency.revenue / summary.totalRevenue) * 100}%` }}/></div>

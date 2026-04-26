@@ -46,13 +46,8 @@ export const Header = ({
           <h2 className="text-lg md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-none uppercase italic">
             {title}
           </h2>
-<<<<<<< HEAD
-          <div className="hidden md:flex items-center gap-2 mt-1.5 text-[11px] font-bold text-slate-400  tracking-widest italic">
-            <MapPin size={12} className="text-[#0528d6]" /> {agencyData?.name || 'Localisation...'}
-=======
           <div className="hidden sm:flex items-center gap-2 mt-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">
             <MapPin size={10} className="text-[#0528d6]" /> {agencyData?.name || 'Agence...'}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           </div>
         </div>
       </div>
@@ -93,15 +88,9 @@ export const Header = ({
             onClick={() => setCurrentView('PROFILE')}
             className="flex items-center gap-3 ml-2 pl-4 border-l border-slate-200 dark:border-slate-800 cursor-pointer group"
         >
-<<<<<<< HEAD
-           <div className="text-right hidden sm:block text-slate-900 dark:text-white">
-              <p className="text-[10px] font-bold text-slate-400  tracking-tighter leading-none mb-1 group-hover:text-[#0528d6] transition-colors">
-                Personnel Agency
-=======
            <div className="text-right hidden sm:block">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 group-hover:text-[#0528d6] transition-colors">
                 {userData?.poste?.name || "Personnel"}
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               </p>
               <p className="text-xs font-black text-slate-700 dark:text-slate-200 max-w-[120px] truncate italic">
                 {userData?.fullname}

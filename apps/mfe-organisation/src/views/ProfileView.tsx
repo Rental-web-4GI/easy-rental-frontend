@@ -124,19 +124,11 @@ export const ProfileView = ({ userData, orgData, onUpdate, t }: ProfileViewProps
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
-<<<<<<< HEAD
-                    <label className="text-[10px] font-bold text-slate-400  tracking-widest italic">Prénom</label>
-                    <input required value={profileForm.firstname} onChange={e => setProfileForm({...profileForm, firstname: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400  tracking-widest italic">Nom</label>
-=======
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">{t.profile.firstname}</label>
                     <input required value={profileForm.firstname} onChange={e => setProfileForm({...profileForm, firstname: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">{t.profile.lastname}</label>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     <input required value={profileForm.lastname} onChange={e => setProfileForm({...profileForm, lastname: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all" />
                   </div>
                 </div>
@@ -162,11 +154,7 @@ export const ProfileView = ({ userData, orgData, onUpdate, t }: ProfileViewProps
             <div className="flex justify-between items-center border-b border-slate-50 dark:border-slate-800 pb-4 mb-6">
               <SectionTitle icon={<ShieldCheck />} title={t.profile.security} />
               {!editPasswordMode && (
-<<<<<<< HEAD
-                <button onClick={() => setEditPasswordMode(true)} className="text-xs font-bold  text-[#0528d6] hover:underline italic tracking-widest">Modifier le mot de passe</button>
-=======
                 <button onClick={() => setEditPasswordMode(true)} className="text-xs font-bold uppercase text-[#0528d6] hover:underline italic tracking-widest">{t.profile.btnUpdatePassword}</button>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
               )}
             </div>
 
@@ -174,19 +162,11 @@ export const ProfileView = ({ userData, orgData, onUpdate, t }: ProfileViewProps
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
-<<<<<<< HEAD
-                    <label className="text-[10px] font-bold text-slate-400  tracking-widest italic">Ancien mot de passe</label>
-                    <input required type="password" value={passwordForm.oldPassword} onChange={e => setPasswordForm({...passwordForm, oldPassword: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400  tracking-widest italic">Nouveau mot de passe</label>
-=======
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">{t.profile.oldPassword}</label>
                     <input required type="password" value={passwordForm.oldPassword} onChange={e => setPasswordForm({...passwordForm, oldPassword: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">{t.profile.newPassword}</label>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                     <input required type="password" value={passwordForm.newPassword} onChange={e => setPasswordForm({...passwordForm, newPassword: e.target.value})} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all" />
                   </div>
                 </div>
@@ -214,11 +194,7 @@ export const ProfileView = ({ userData, orgData, onUpdate, t }: ProfileViewProps
               <DataField label={t.profile.orgName} value={orgData.name} />
               <DataField label={t.profile.website} value={orgData.website} isLink />
               <div className="md:col-span-2">
-<<<<<<< HEAD
-                <label className="text-[10px] font-bold text-slate-400  tracking-widest italic">Description / Vision</label>
-=======
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">{t.profile.description}</label>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                   {orgData.description || t.profile.noDescription}
                 </p>

@@ -17,11 +17,7 @@ export const VehicleCard = ({ vehicle, categoryName, onEdit, staffPermissions, o
   return (
     <div className="bg-white dark:bg-[#1a1d2d] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group text-left h-full flex flex-col">
       <div className="flex justify-between items-start mb-4">
-<<<<<<< HEAD
-        <div className={`px-2.5 py-1 rounded-lg text-[10px] font-bold  tracking-wider border ${getStatusStyle(vehicle.statut)}`}>
-=======
         <div className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border ${getStatusStyle(vehicle.statut)}`}>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           {vehicle.statut}
         </div>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -64,31 +60,10 @@ export const VehicleCard = ({ vehicle, categoryName, onEdit, staffPermissions, o
         </div>
       </div>
 
-<<<<<<< HEAD
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between text-[10px] font-bold text-slate-400  italic">
-          <span>Catégorie</span>
-          <span className="text-[#0528d6]">{categoryName || 'Standard'}</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2 pt-2">
-           <button 
-            onClick={() => onStatusUpdate(vehicle.id, 'AVAILABLE')}
-            className="flex items-center justify-center gap-1.5 py-2 bg-green-50 text-green-700 rounded-lg text-[9px] font-black  tracking-tighter hover:bg-green-100 transition-colors"
-           >
-             <CheckCircle2 size={12}/> Dispo
-           </button>
-           <button 
-            onClick={() => onStatusUpdate(vehicle.id, 'MAINTENANCE')}
-            className="flex items-center justify-center gap-1.5 py-2 bg-orange-50 text-orange-700 rounded-lg text-[9px] font-black  tracking-tighter hover:bg-orange-100 transition-colors"
-           >
-             <Clock size={12}/> Atelier
-           </button>
-=======
       <div className="mt-auto flex flex-col gap-3">
         <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase italic">
           <span>{t.vehicles.modal.category}</span>
           <span className="text-[#0528d6] dark:text-blue-400 font-black">{categoryName || 'Standard'}</span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
         
         {hasPermission(userData, staffPermissions, 'vehicle:update') && (

@@ -33,13 +33,8 @@ export const QuotaAlertModal = ({ onClose, onUpgrade, type, limit, t }: any) => 
           </button>
           
           <button 
-<<<<<<< HEAD
-            onClick={onClose}
-            className="w-full py-4 text-slate-400 font-bold text-xs  tracking-widest hover:text-slate-600 transition-colors"
-=======
             onClick={onClose} 
             className="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-slate-600 transition-colors italic"
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
           >
             {t.common.cancel}
           </button>
@@ -47,13 +42,9 @@ export const QuotaAlertModal = ({ onClose, onUpgrade, type, limit, t }: any) => 
 
         <div className="mt-8 pt-6 border-t dark:border-slate-800 flex items-center justify-center gap-2">
            <ShieldCheck size={14} className="text-blue-500" />
-<<<<<<< HEAD
-           <span className="text-[10px] font-bold text-slate-400  tracking-tight">EasyRental Secure Billing</span>
-=======
            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
              {t.quota.secureBilling}
            </span>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
         </div>
       </div>
     </div>

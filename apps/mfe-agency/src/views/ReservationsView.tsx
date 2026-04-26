@@ -94,52 +94,6 @@ export const ReservationsView = ({ userData, t, staffPermissions }: any) => {
   if (loading && reservations.length === 0) return <div className="h-screen flex items-center justify-center bg-[#f4f7fe] dark:bg-[#080b14]"><Loader2 className="animate-spin text-[#0528d6] size-12" /></div>;
 
   return (
-<<<<<<< HEAD
-    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard label="Réservations Actives" value={reservations.length} icon={<Zap />} />
-        <StatCard label="En Attente Paiement" value={reservations.filter(r => r.status === 'PENDING' || r.status === 'RESERVED').length} icon={<Activity className="text-orange-500"/>} />
-        <StatCard label="Prêtes au Départ" value={reservations.filter(r => r.status === 'PAID').length} icon={<Calendar className="text-green-500"/>} />
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#1a1d2d] p-4 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="relative w-full md:w-96 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0528d6]" size={18} />
-          <input placeholder="Rechercher par nom ou ID..." className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
-                 value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
-        </div>
-        {hasPermission(userData, 'rental:create') && (
-          <button onClick={() => { loadResources(); setIsFormOpen(true); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs  shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
-            <Plus size={18} /> Walk-in (Comptoir)
-          </button>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-        {paginated.map(rental => (
-          <BookingCard 
-            key={rental.id} 
-            rental={rental} 
-            onPay={['PENDING', 'RESERVED'].includes(rental.status) ? () => setPaymentRental(rental) : undefined}
-            onStart={rental.status === 'PAID' && hasPermission(userData, 'rental:start') ? () => handleStart(rental.id) : undefined}
-            onCancel={hasPermission(userData, 'rental:cancel') ? () => handleCancel(rental.id) : undefined}
-          />
-        ))}
-        {paginated.length === 0 && (
-            <div className="col-span-full py-20 text-center bg-white dark:bg-[#1a1d2d] rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-slate-800">
-                <Calendar className="mx-auto text-slate-200 mb-4" size={48} />
-                <p className="text-slate-400 font-black  italic tracking-widest">Aucune réservation trouvée</p>
-            </div>
-        )}
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 pt-8">
-          <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 shadow-sm transition-all"><ChevronLeft size={18}/></button>
-          <span className="text-[10px] font-black text-slate-500  italic px-4 tracking-widest">Page {currentPage} / {totalPages}</span>
-          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="size-12 bg-white dark:bg-slate-800 border border-slate-200 rounded-2xl flex items-center justify-center disabled:opacity-30 hover:bg-slate-50 shadow-sm transition-all"><ChevronRight size={18}/></button>
-        </div>
-=======
     <div className="space-y-8 animate-in fade-in duration-500 pb-10 text-left relative">
       
       {/* OVERLAY CHARGEMENT CASCADE */}
@@ -151,7 +105,6 @@ export const ReservationsView = ({ userData, t, staffPermissions }: any) => {
                   <p className="text-[10px] text-slate-400 uppercase font-bold mt-3 italic">{t.reservations.stepPay} & {t.reservations.stepStart}</p>
               </div>
           </div>
->>>>>>> f89e8e59f63bc1dfac2a96703e19a8ccc0658d21
       )}
 
       {/* KPI SECTION */}
