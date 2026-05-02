@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 
-const ORG_URL = process.env.NEXT_PUBLIC_ORG_URL || 'http://localhost:3003' || 'https://pwa-easy-rental-org.vercel.app';
-const CLIENT_URL = process.env.NEXT_PUBLIC_ORG_URL|| 'http://localhost:3001' || 'https://pwa-easy-rental-mfe-client.vercel.app';
-const AGENCY_URL = process.env.NEXT_PUBLIC_ORG_URL || 'http://localhost:3002' || 'https://pwa-easy-rental-agency.vercel.app';
+const ORG_URL = process.env.NEXT_PUBLIC_ORG_URL;
+const CLIENT_URL = process.env.NEXT_PUBLIC_CLIENT_URL;
+const AGENCY_URL = process.env.NEXT_PUBLIC_AGENCY_URL;
 // const APP_URL = process.env.NEXT_PUBLIC_ORG_URL || 'https://pwa-easy-rental-app.vercel.app';
 
 const nextConfig = {
