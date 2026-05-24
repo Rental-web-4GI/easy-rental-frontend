@@ -21,7 +21,7 @@ const nextConfig = {
       {
         // On redirige tous les appels /api-rental vers le vrai serveur Render
         source: '/api-rental/:path*',
-        destination: 'https://apirental5gi-v2.onrender.com/:path*',
+        destination: 'http://localhost:8081/:path*',
       },
     ];
   },

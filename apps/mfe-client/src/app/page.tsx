@@ -122,8 +122,8 @@ export default function ClientDashboard() {
           {currentView === 'HOME' && <HomeView onSearch={() => setCurrentView('CATALOG')} setViewAll={() => setCurrentView('CATALOG')} onSelectVehicle={(id: string) => { setSelectedVehicleId(id); setCurrentView('DETAILS'); }} />}
           {currentView === 'CATALOG' && <CatalogView userData={userData} />}
           {currentView === 'DETAILS' && selectedVehicleId && <VehicleDetailsView vehicleId={selectedVehicleId} isAuth={isAuth} onBack={() => setCurrentView('CATALOG')} onAuthRequired={() => setCurrentView('AUTH')} onStartBooking={() => setCurrentView('CATALOG')} />}
-          {currentView === 'MY_BOOKINGS' && <MyBookingsView userData={userData} />}
-          {currentView === 'MY_RESERVATIONS' && <MyReservationsView userData={userData} />}
+          {currentView === 'MY_BOOKINGS' && <MyBookingsView userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
+          {currentView === 'MY_RESERVATIONS' && <MyReservationsView userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
           {currentView === 'PROFILE' && <ProfileView userData={userData} onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} />}
 
           {/* Utilisation de clientId au lieu de userData pour correspondre au composant */}

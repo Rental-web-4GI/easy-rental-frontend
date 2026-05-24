@@ -61,7 +61,7 @@ export const RolesView = ({ orgData, t }: { orgData: any, t: any }) => {
     }
   };
 
-  const isSystemRole = (poste: any) => poste.isSystem || poste.name.to().includes('OWNER');
+  const isSystemRole = (poste: any) => poste.isSystem || poste.name.toLowerCase().includes('owner');
 
   if (loading) return (
     <div className="h-96 flex items-center justify-center">

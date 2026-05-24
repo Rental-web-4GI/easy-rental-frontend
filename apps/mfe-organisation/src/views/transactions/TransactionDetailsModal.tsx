@@ -10,10 +10,16 @@ export const TransactionDetailsModal = ({ transactionId, onClose, t }: any) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     transactionService.getTransactionDetails(transactionId).then(res => {
-      if (res.ok) setData(res.data);
-      setLoading(false);
+      if (isMounted) {
+        if (res.ok) setData(res.data);
+        setLoading(false);
+      }
     });
+    return () => {
+      isMounted = false;
+    };
   }, [transactionId]);
 
   if (loading) return <Portal><div className="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md"><Loader2 className="animate-spin text-white size-12" /></div></Portal>;

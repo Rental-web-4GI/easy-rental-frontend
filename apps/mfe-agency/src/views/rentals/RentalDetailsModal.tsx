@@ -1,19 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useEffect, useState } from 'react';
-import { X, User, Phone, Banknote, MapPin, Loader2, Clock, ShieldCheck, History } from 'lucide-react';
+import { X, User, Phone, Banknote, MapPin, Loader2, Clock, ShieldCheck, History, AlertTriangle, Car } from 'lucide-react';
 import { Portal } from '../../components/Portal';
 import { rentalService } from '@pwa-easy-rental/shared-services';
 
 export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    rentalService.getRentalDetails(rentalId).then(res => {
-      if (res.ok) setData(res.data);
-      setLoading(false);
-    });
+    let ignore = false;
+
+    const loadDetails = async () => {
+      if (!rentalId) {
+        setData(null);
+        setHasError(true);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setHasError(false);
+      setData(null);
+
+      try {
+        const res = await rentalService.getRentalDetails(rentalId);
+        if (ignore) return;
+
+        if (res.ok && res.data?.rental) {
+          setData(res.data);
+        } else {
+          setHasError(true);
+        }
+      } catch {
+        if (!ignore) setHasError(true);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    loadDetails();
+
+    return () => {
+      ignore = true;
+    };
   }, [rentalId]);
 
   const getStatusColor = (status: string) => {
@@ -28,7 +60,30 @@ export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
 
   if (loading) return <Portal><div className="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md"><Loader2 className="animate-spin text-white size-12" /></div></Portal>;
 
+  if (hasError || !data?.rental) {
+    return (
+      <Portal>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 text-left">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" onClick={onClose} />
+          <div className="relative w-full max-w-md bg-white dark:bg-[#1a1d2d] rounded-[2rem] shadow-2xl p-8 border border-white/20 text-center">
+            <div className="mx-auto mb-5 size-14 rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center">
+              <AlertTriangle size={28} />
+            </div>
+            <h3 className="text-lg font-black uppercase italic text-slate-900 dark:text-white">{t.common?.error || 'Une erreur est survenue'}</h3>
+            <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">{t.common?.noData || 'Aucune donnée disponible'}</p>
+            <button onClick={onClose} className="mt-6 px-6 py-3 rounded-2xl bg-[#0528d6] text-white text-xs font-black uppercase italic hover:bg-blue-700 transition-all">
+              {t.common?.close || 'Fermer'}
+            </button>
+          </div>
+        </div>
+      </Portal>
+    );
+  }
+
   const { rental, vehicle, driver, agency } = data;
+  const rentalRef = (rental.id || rentalId || '').substring(0, 8).toUpperCase();
+  const vehicleImage = vehicle?.images?.[0];
+  const remainingAmount = (rental.totalAmount || 0) - (rental.amountPaid || 0);
 
   return (
     <Portal>
@@ -39,10 +94,10 @@ export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
           <div className="px-6 md:px-10 py-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
             <div>
               <div className="flex flex-wrap items-center gap-4 mb-2">
-                <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter leading-none">{t.rentalDetails.title} #RT-{rental.id.substring(0,8).toUpperCase()}</h3>
+                <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter leading-none">{t.rentalDetails.title} #RT-{rentalRef}</h3>
                 <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border ${getStatusColor(rental.status)}`}>{rental.status}</span>
               </div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic flex items-center gap-2"><MapPin size={10} className="text-[#0528d6]"/> {agency.name} — {agency.city}</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic flex items-center gap-2"><MapPin size={10} className="text-[#0528d6]"/> {agency?.name || '---'} - {agency?.city || '---'}</p>
             </div>
             <button onClick={onClose} className="size-12 bg-white dark:bg-slate-800 flex items-center justify-center rounded-2xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm"><X size={24}/></button>
           </div>
@@ -70,20 +125,20 @@ export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
                     <div className="space-y-3">
                         <div className="flex justify-between items-center"><span className="text-[10px] font-bold opacity-60 uppercase">{t.rentalDetails.totalAmount}</span><span className="text-xl font-black">{rental.totalAmount?.toLocaleString()} {t.common.currency}</span></div>
                         <div className="flex justify-between items-center"><span className="text-[10px] font-bold opacity-60 uppercase">{t.rentalDetails.paidAmount}</span><span className="text-xl font-black text-green-400">{rental.amountPaid?.toLocaleString()} {t.common.currency}</span></div>
-                        <div className="flex justify-between items-center pt-2 border-t border-white/10"><span className="text-[10px] font-bold opacity-60 uppercase">{t.rentalDetails.remainingAmount}</span><span className="text-xl font-black text-orange-400">{(rental.totalAmount - rental.amountPaid).toLocaleString()} {t.common.currency}</span></div>
+	                        <div className="flex justify-between items-center pt-2 border-t border-white/10"><span className="text-[10px] font-bold opacity-60 uppercase">{t.rentalDetails.remainingAmount}</span><span className="text-xl font-black text-orange-400">{remainingAmount.toLocaleString()} {t.common.currency}</span></div>
                     </div>
                 </section>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-8 group text-center sm:text-left">
-                    <div className="size-28 rounded-[2.5rem] overflow-hidden shadow-lg shrink-0 border-2 border-white dark:border-slate-800 bg-slate-50">
-                        <img src={vehicle.images?.[0]} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" alt=""/>
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-black text-[#0528d6] uppercase tracking-widest italic mb-1">{t.rentalDetails.assignedVehicle}</p>
-                        <h4 className="text-2xl font-black italic uppercase text-slate-800 dark:text-white leading-none">{vehicle.brand} {vehicle.model}</h4>
-                        <p className="mt-3 text-sm font-mono font-bold text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-lg inline-block uppercase">{vehicle.licencePlate}</p>
+	                    <div className="size-28 rounded-[2.5rem] overflow-hidden shadow-lg shrink-0 border-2 border-white dark:border-slate-800 bg-slate-50">
+	                        {vehicleImage ? <img src={vehicleImage} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" alt=""/> : <div className="w-full h-full flex items-center justify-center text-slate-300"><Car size={40}/></div>}
+	                    </div>
+	                    <div>
+	                        <p className="text-[10px] font-black text-[#0528d6] uppercase tracking-widest italic mb-1">{t.rentalDetails.assignedVehicle}</p>
+	                        <h4 className="text-2xl font-black italic uppercase text-slate-800 dark:text-white leading-none">{vehicle?.brand || '---'} {vehicle?.model || ''}</h4>
+	                        <p className="mt-3 text-sm font-mono font-bold text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-lg inline-block uppercase">{vehicle?.licencePlate || '---'}</p>
                     </div>
                 </div>
 

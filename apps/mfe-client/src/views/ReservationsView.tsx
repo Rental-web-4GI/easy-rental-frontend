@@ -15,7 +15,7 @@ import { fr } from 'date-fns/locale';
 import { rentalService } from '@shared-services/api/rental.service';
 import ReservationDetail from './reservation/ReservationDetail';
 
-export const MyReservationsView = ({ userData }: any) => {
+export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
   const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRes, setSelectedRes] = useState<any>(null);
@@ -150,7 +150,7 @@ export const MyReservationsView = ({ userData }: any) => {
               </div>
             ))
           ) : (
-             <EmptyState />
+             <EmptyState onNavigateToCatalog={onNavigateToCatalog} />
           )}
         </div>
 
@@ -188,7 +188,7 @@ export const MyReservationsView = ({ userData }: any) => {
 
 // --- SOUS-COMPOSANTS INTERNES ---
 
-const EmptyState = () => (
+const EmptyState = ({ onNavigateToCatalog }: { onNavigateToCatalog?: () => void }) => (
   <div className="bg-white rounded-[3rem] p-12 border border-slate-100 shadow-sm text-center col-span-full">
     <div className="size-24 bg-orange-50 text-orange-500 rounded-[2.8rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
       <Clock size={48} />
@@ -197,7 +197,10 @@ const EmptyState = () => (
     <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto italic mt-3 leading-relaxed">
       {"Vous n'avez aucune réservation active. Vos réservations s'afficheront ici."}
     </p>
-    <button className="mt-10 bg-[#0528d6] text-white px-12 py-5 rounded-full font-black text-xs  tracking-[0.2em] shadow-2xl hover:scale-105 transition-all">
+    <button 
+      onClick={onNavigateToCatalog}
+      className="mt-10 bg-[#0528d6] text-white px-12 py-5 rounded-full font-black text-xs  tracking-[0.2em] shadow-2xl hover:scale-105 transition-all"
+    >
       Louer un véhicule
     </button>
   </div>

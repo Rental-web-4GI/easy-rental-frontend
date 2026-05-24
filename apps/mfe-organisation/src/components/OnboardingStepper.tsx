@@ -101,7 +101,18 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
                     </div>
                     <StepperInput label={t.onboarding.form.address} name="address" value={formData.address} onChange={handleChange} icon={MapPin} />
                     <div className="grid grid-cols-2 gap-4">
-                        <StepperInput label={t.onboarding.form.phone} name="phone" value={formData.phone} onChange={handleChange} icon={Phone} />
+                        <StepperInput
+                          label={t.onboarding.form.phone}
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          icon={Phone}
+                          placeholder="678123456"
+                          pattern="^[0-9]{9}$"
+                          title="Exactement 9 chiffres (ex: 678123456)"
+                          inputMode="numeric"
+                          maxLength={9}
+                        />
                         <StepperInput label={t.onboarding.form.email} name="email" type="email" value={formData.email} onChange={handleChange} icon={Mail} />
                     </div>
                 </div>
@@ -110,8 +121,27 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
                 {step === 3 && (
                 <div className="space-y-6 animate-in slide-in-from-right-4">
                     <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6 uppercase italic tracking-tighter">{t.onboarding.form.legal}</h2>
-                    <StepperInput label={t.onboarding.form.rccm} name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} icon={Hash} />
-                    <StepperInput label={t.onboarding.form.niu} name="taxNumber" value={formData.taxNumber} onChange={handleChange} icon={ShieldCheck} />
+                    <StepperInput
+                      label={t.onboarding.form.rccm}
+                      name="registrationNumber"
+                      value={formData.registrationNumber}
+                      onChange={handleChange}
+                      icon={Hash}
+                      placeholder="RC/DLA/2020/B/1234"
+                      pattern="^RC/[A-Z]{2,3}/[0-9]{4}/[A-Z]/[0-9]+$"
+                      title="Format RCCM : RC/DLA/2020/B/1234"
+                    />
+                    <StepperInput
+                      label={t.onboarding.form.niu}
+                      name="taxNumber"
+                      value={formData.taxNumber}
+                      onChange={handleChange}
+                      icon={ShieldCheck}
+                      placeholder="M000123456789A"
+                      pattern="^[MP][0-9]{12}[A-Z]$"
+                      title="Format NIU : M ou P + 12 chiffres + 1 lettre (ex: M000123456789A)"
+                      maxLength={14}
+                    />
                     <div className="grid grid-cols-2 gap-4">
                         <StepperInput label={t.onboarding.form.timezone} name="timezone" value={formData.timezone} onChange={handleChange} icon={Clock} />
                         <StepperInput label={t.onboarding.form.zip} name="postalCode" value={formData.postalCode} onChange={handleChange} />

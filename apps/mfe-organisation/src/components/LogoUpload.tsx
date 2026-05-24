@@ -30,10 +30,7 @@ export const LogoUpload = ({ value, onUploadSuccess, t }: { value: string, onUpl
       const res = await extraService.uploadMedia(formData);
 
       if (res.ok && res.data?.url) {
-        let finalUrl = res.data.url;
-        if (!finalUrl.startsWith('http')) {
-            finalUrl = `https://apirental5gi-v2.onrender.com${finalUrl.startsWith('/') ? '' : '/'}${finalUrl}`;
-        }
+        const finalUrl = res.data.url;
         onUploadSuccess(finalUrl);
       } else {
         throw new Error(res.data?.message || "Erreur serveur");

@@ -117,7 +117,7 @@ export const TransactionsView = ({ orgData , t }: { orgData: any, t: any }) => {
         </div>
       )}
 
-      {selectedTx && <TransactionDetailsModal transactionId={selectedTx} onClose={() => setSelectedTx(null)} />}
+      {selectedTx && <TransactionDetailsModal transactionId={selectedTx} onClose={() => setSelectedTx(null)} t={t} />}
     </div>
   );
 };
