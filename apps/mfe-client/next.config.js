@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   basePath: '/client',
   trailingSlash: false,
-  transpilePackages: ['@pwa-easy-rental/shared-ui', '@pwa-easy-rental/shared-services'],
+  transpilePackages: ['@pwa-easy-rental/shared-ui', '@pwa-easy-rental/shared-services', '@pwa-easy-rental/shared-maps'],
   images: {
     remotePatterns: [
       {

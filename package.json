@@ -21,8 +21,11 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@duckdb/duckdb-wasm": "^1.29.0",
     "date-fns": "^4.1.0",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.556.0",
+    "maplibre-gl": "^4.0.0",
     "react-router-dom": "^7.10.1"
   }
 }

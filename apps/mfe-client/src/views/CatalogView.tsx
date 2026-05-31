@@ -2,7 +2,8 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Loader2, Store, Car } from 'lucide-react';
-import { agencyService, vehicleService } from '@pwa-easy-rental/shared-services';
+import { agencyService, vehicleService, useLocalFirst } from '@pwa-easy-rental/shared-services';
+import { MapView } from '@pwa-easy-rental/shared-maps';
 import { VehicleCard } from './catalog/VehicleCard';
 import { VehicleDetailsView } from './VehicleDetailsView';
 import { AgencyDetailsView } from './AgencyDetailsView';
@@ -19,6 +20,8 @@ export const CatalogView = ({ userData }: { userData: any }) => {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [selectedAgencyId, setSelectedAgencyId] = useState<string | null>(null);
   const [itemsToShow, setItemsToShow] = useState(8);
+
+  const { isOnline, isSyncing } = useLocalFirst();
 
   useEffect(() => {
     const load = async () => {
@@ -116,9 +119,22 @@ export const CatalogView = ({ userData }: { userData: any }) => {
               />
             ))}
           </div>
-        </div>) : (
+        </div>        ) : (
           <div className="space-y-10">
-            <div className="p-6 gap-6 bg-white dark:bg-[#1a1d2d] p-6 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            {!isOnline && (
+              <p className="text-xs font-bold text-amber-600">Offline mode — showing cached data{isSyncing ? ' (syncing...)' : ''}</p>
+            )}
+            <MapView
+              markers={agencies
+                .filter((a) => a.latitude && a.longitude)
+                .map((a) => ({
+                  id: a.id,
+                  latitude: a.latitude,
+                  longitude: a.longitude,
+                  label: a.name,
+                }))}
+            />
+            <div className="p-6 gap-6 bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
               <p className="text-[10px] font-black  text-slate-400 mb-4">Recherche Rapide</p>
               <div className="relative">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0528d6]" size={18} />
