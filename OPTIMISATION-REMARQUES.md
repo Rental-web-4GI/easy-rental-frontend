@@ -1,7 +1,7 @@
 # Easy Rental — Remarques d'optimisation UX / produit
 
 Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par priorité.  
-**Dernière mise à jour :** 2026-06-26
+**Dernière mise à jour :** 2026-06-30
 
 ---
 
@@ -56,9 +56,11 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 | MFE | Port | Remarques ouvertes |
 |-----|------|-------------------|
 | **mfe-client** | 3001 | 4 |
-| **mfe-agency** | 3002 | 2 |
+| **mfe-agency** | 3002 | 1 |
 | **mfe-organisation** | 3003 | 2 |
-| **Transversal** | — | 2 |
+| **Transversal** | — | 1 |
+
+**Captures rapport :** `rapport/captures-ecran-optimisation/` (73 PNG, juin 2026).
 
 ---
 
@@ -287,3 +289,69 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 - **Priorité :** P1 | **Statut :** Corrigé
 - **Apps :** mfe-agency, mfe-organisation
 - **Piste résolue :** `normalizeVehicleDetails` + composant partagé `VehicleDetailsBody` (tarifs heure/jour/mois, moteur, équipements, assurance, planning, avis).
+
+#### UX-031 — Notifications : dates invalides, « client null », badge non rafraîchi
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-agency, mfe-organisation
+- **Symptômes :** `Invalid Date` ; libellé « client null » ; compteur cloche inchangé après marquer lu.
+- **Piste résolue :** `notif.mapper.ts`, `formatNotificationDate`, `RentalClientLabelResolver` (backend), `notification-events.ts` + refresh Header.
+
+#### UX-032 — Lecture notifications indépendante agence / organisation
+- **Priorité :** P1 | **Statut :** Corrigé
+- **Apps :** mfe-agency, mfe-organisation
+- **Symptômes :** marquer lu en agence marquait aussi en organisation (même enregistrement BDD).
+- **Piste résolue :** colonnes `is_read` / `is_read_org` ; endpoints `/read/agency` et `/read/organization` ; historique conservé en PostgreSQL après déconnexion.
+
+#### UX-033 — Agences organisation : coordonnées vides, revenus, téléphone
+- **Priorité :** P1 | **Statut :** Corrigé
+- **App :** mfe-organisation — `AgenciesView`, `AgencyForm`, `AgencyDetailsModal`, `AgencyCard`
+- **Symptômes :** section légale/coordonnées vides ; pas de revenu mensuel ; téléphone acceptait trop de chiffres (`6977777777777`).
+- **Piste résolue :** `agency.mapper.ts`, `resolveAgencyContact`, `monthlyRevenue` API, `normalizeCmPhone` (9 chiffres CM), fix URL stats `year=undefined`.
+
+#### UX-034 — Réservations agence : historique après démarrage location
+- **Priorité :** P1 | **Statut :** Corrigé
+- **App :** mfe-agency — `ReservationsView`
+- **Symptômes :** dossiers disparaissaient de la liste quand la location passait `ONGOING`.
+- **Piste résolue :** onglets **En cours** / **Historique** ; `getAgencyReservationHistory()` ; `BookingCard` variant `active` | `history`.
+
+#### UX-035 — Walk-in : paiement acompte 60 % à la création
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-agency, backend `RentalUseCaseImpl`
+- **Symptômes :** réservation walk-in restait `PENDING` sans encaissement ; flux create + pay séparé fragile.
+- **Piste résolue :** `initial_payment_amount` + `payment_method` dans `AgencyRentalRequest` ; paiement CASH 60 % intégré à `createAgencyRental` ; bouton « Encaisser acompte 60 % » pour dossiers restants.
+
+#### UX-036 — Conflit dates réservation + planning véhicule
+- **Priorité :** P1 | **Statut :** Corrigé
+- **Apps :** backend rental, `VehicleDetailsBody`
+- **Symptômes :** double réservation sur même période ; planning peu visible.
+- **Piste résolue :** `countConflictingRentals` à la création ; section « Planning & réservations » sur fiche véhicule.
+
+#### UX-037 — Maintenance véhicule : tarifs non requis
+- **Priorité :** P2 | **Statut :** Corrigé
+- **Apps :** mfe-agency, mfe-organisation — `QuickStatusModal`
+- **Symptômes :** passage en maintenance exigeait prix/heure et prix/jour alors que le véhicule n'est pas louable.
+- **Piste résolue :** masquage champs tarifs en mode MAINTENANCE ; seuls durée + motif obligatoires ; `skipPricing` à la soumission.
+
+#### UX-038 — Clarification montants (total dossier vs acompte 60 %)
+- **Priorité :** P2 | **Statut :** Corrigé
+- **App :** mfe-agency — `BookingCard`, formulaires réservation
+- **Remarque :** confusion entre total (~13,6 M) et montant perçu (~8 M acompte).
+- **Piste résolue :** libellés UI (acompte / solde / caution / commission) ; explication métier dans les cartes dossier.
+
+#### UX-039 — Erreur SQL notifications (`resource_id` NULL)
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Scope :** backend — création notifications location
+- **Piste résolue :** `resource_id` renseigné (agence) à la création des notifications liées aux rentals.
+
+#### UX-040 — VIN / formulaire véhicule (chevauchement champs)
+- **Priorité :** P2 | **Statut :** Corrigé
+- **App :** `VehicleDetailsBody` — champ VIN pleine largeur, layout fiche.
+
+---
+
+## Journal des ajouts (suite)
+
+| Date | Auteur | Action |
+|------|--------|--------|
+| 2026-06-30 | Agent | UX-031..040 : notifications, agences, réservations walk-in, maintenance, montants, planning |
+| 2026-06-30 | Agent | Export 73 captures → `rapport/captures-ecran-optimisation/` |
