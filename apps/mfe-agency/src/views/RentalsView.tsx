@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Loader2, Activity, Plus, CheckCircle2, History } from 'lucide-react';
-import { rentalService, vehicleService, driverService, orgService } from '@pwa-easy-rental/shared-services';
+import { rentalService, vehicleService, orgService } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { BookingCard } from './bookings/BookingCard';
 import { BookingFormModal } from './bookings/BookingFormModal';
@@ -36,31 +36,39 @@ export const RentalsView = ({ userData, t, staffPermissions }: { userData: any, 
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const [formError, setFormError] = useState<string | null>(null);
+
   const handleCreateLocation = async (formData: any) => {
     setActionLoading(true);
+    setFormError(null);
     try {
-      // Formatage du DTO strict
       const payload = {
         ...formData,
         startDate: new Date(formData.startDate).toISOString(),
         endDate: new Date(formData.endDate).toISOString(),
-        driverId: formData.driverId === "" ? null : formData.driverId,
+        driverId: formData.driverId || null,
       };
 
       const res = await rentalService.createAgencyRental(userData.agencyId, payload);
-      
-      if (res.ok && (res.data?.rentalId || res.data?.id)) {
-        const id = res.data.rentalId || res.data.id;
-        // Déclenchement automatique du départ pour les Walk-ins
-        await rentalService.startRental(id);
-        setActiveModal(null);
-        await loadData();
-      } else {
-        alert(res.data?.message || "Erreur lors de la création.");
+
+      if (!res.ok) {
+        setFormError(res.data?.message || t.reservations?.errorProcess || 'Erreur lors de la création.');
+        return;
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      alert("Erreur de connexion au serveur.");
+
+      const id = res.data?.rentalId;
+      if (id) {
+        const startRes = await rentalService.startRental(id);
+        if (!startRes.ok) {
+          setFormError(startRes.data?.message || 'Impossible de démarrer la location.');
+          return;
+        }
+      }
+
+      setActiveModal(null);
+      await loadData();
+    } catch {
+      setFormError(t.reservations?.errorProcess || 'Erreur de connexion au serveur.');
     } finally {
       setActionLoading(false);
     }
@@ -89,11 +97,7 @@ export const RentalsView = ({ userData, t, staffPermissions }: { userData: any, 
               <input placeholder={t.header.search} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900 rounded-2xl text-sm font-black italic border-none outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
           {hasPermission(userData, staffPermissions, 'rental:create') && (
-            <button onClick={async () => {
-                const [vRes, dRes] = await Promise.all([vehicleService.getVehiclesByAgency(userData.agencyId), driverService.getDriversByAgency(userData.agencyId)]);
-                setResources({ vehicles: vRes.data?.filter((v:any) => v.statut === 'AVAILABLE') || [], drivers: dRes.data || [] });
-                setActiveModal('FORM');
-            }} className="w-full md:w-auto px-8 py-3.5 bg-[#0528d6] text-white rounded-2xl font-black text-xs uppercase shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 italic tracking-widest">
+            <button onClick={() => { setFormError(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-8 py-3.5 bg-[#0528d6] text-white rounded-2xl font-black text-xs uppercase shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 italic tracking-widest">
                 <Plus size={16}/> {t.table.add}
             </button>
           )}
@@ -115,16 +119,17 @@ export const RentalsView = ({ userData, t, staffPermissions }: { userData: any, 
           mode="RENTAL" 
           t={t} 
           vehicles={resources.vehicles} 
-          drivers={resources.drivers} 
-          isDriverRequired={orgInfo?.isDriverBookingRequired} 
+          agencyId={userData.agencyId}
+          isDriverRequired={true} 
           onClose={() => setActiveModal(null)} 
           onSubmit={handleCreateLocation} 
-          loading={actionLoading} 
+          loading={actionLoading}
+          submitError={formError}
         />
       )}
       
       {selectedRentalId && (
-        <RentalDetailsModal t={t} rentalId={selectedRentalId} onClose={() => setSelectedRentalId(null)} />
+        <RentalDetailsModal t={t} rentalId={selectedRentalId} onClose={() => setSelectedRentalId(null)} onValidated={loadData} />
       )}
     </div>
   );

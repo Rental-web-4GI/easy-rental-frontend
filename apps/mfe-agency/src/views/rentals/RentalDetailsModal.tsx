@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useEffect, useState } from 'react';
-import { X, User, Phone, Banknote, MapPin, Loader2, Clock, ShieldCheck, History, AlertTriangle, Car } from 'lucide-react';
+import { X, User, Phone, Banknote, MapPin, Loader2, Clock, ShieldCheck, History, AlertTriangle, Car, CheckCircle2 } from 'lucide-react';
 import { Portal } from '../../components/Portal';
-import { rentalService } from '@pwa-easy-rental/shared-services';
+import { rentalService, resolveMediaDisplayUrl } from '@pwa-easy-rental/shared-services';
 
-export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
+export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t }: any) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [validating, setValidating] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -82,8 +83,21 @@ export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
 
   const { rental, vehicle, driver, agency } = data;
   const rentalRef = (rental.id || rentalId || '').substring(0, 8).toUpperCase();
-  const vehicleImage = vehicle?.images?.[0];
+  const vehicleImage = vehicle?.images?.[0] ? resolveMediaDisplayUrl(vehicle.images[0]) : null;
   const remainingAmount = (rental.totalAmount || 0) - (rental.amountPaid || 0);
+
+  const handleValidateReturn = async () => {
+    setValidating(true);
+    try {
+      const res = await rentalService.validateReturn(rentalId);
+      if (res.ok) {
+        onValidated?.();
+        onClose();
+      }
+    } finally {
+      setValidating(false);
+    }
+  };
 
   return (
     <Portal>
@@ -166,9 +180,22 @@ export const RentalDetailsModal = ({ rentalId, onClose, t }: any) => {
                         <p className="text-[10px] text-slate-400 font-medium mt-2">{t.rentalDetails.openedOn} {new Date(rental.createdAt).toLocaleString()} • {t.rentalDetails.lastActivity} {new Date(rental.updatedAt).toLocaleString()}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3 px-6 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  {rental.status === 'UNDER_REVIEW' && (
+                    <button
+                      type="button"
+                      onClick={handleValidateReturn}
+                      disabled={validating}
+                      className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-2xl text-[10px] font-black uppercase italic disabled:opacity-50"
+                    >
+                      {validating ? <Loader2 className="animate-spin size-4" /> : <CheckCircle2 size={16} />}
+                      {t.rentals?.validateReturn || 'Valider retour'}
+                    </button>
+                  )}
+                  <div className="flex items-center gap-3 px-6 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl">
                     <ShieldCheck className="text-green-500" size={20}/>
                     <span className="text-[10px] font-black uppercase italic text-green-500 tracking-tighter">{t.rentalDetails.certified}</span>
+                  </div>
                 </div>
             </div>
           </div>

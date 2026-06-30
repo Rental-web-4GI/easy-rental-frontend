@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, ShieldCheck, ArrowRight, Loader2, Languages, Sun, Moon } from 'lucide-react';
 import { AuthInput } from '../components/AuthInput';
+import { HeaderIconButton } from '../components/HeaderIconButton';
 
 export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t, initError }: any) => {
   const [loading, setLoading] = useState(false);
@@ -104,13 +105,26 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t, init
                 </button>
               </form>
 
-              <div className="mt-12 flex items-center gap-6 pt-6 border-t border-slate-50 dark:border-slate-800 w-full justify-center shrink-0">
-                <button onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} className="flex items-center gap-2 text-[10px] font-black text-slate-300 hover:text-[#0528d6] uppercase transition-colors italic">
-                  <Languages size={14} /> {lang}
-                </button>
-                <button onClick={toggleTheme} className="p-2 text-slate-300 hover:text-orange-500 transition-colors">
-                  {darkMode ? <Sun size={18}/> : <Moon size={18}/>}
-                </button>
+              <div className="mt-12 flex items-center gap-2 pt-6 border-t border-slate-50 dark:border-slate-800 w-full justify-center shrink-0 px-1 py-1 rounded-xl">
+                <HeaderIconButton
+                  onClick={() => {
+                    const next = lang === 'FR' ? 'EN' : 'FR';
+                    setLang(next);
+                    localStorage.setItem('lang', next);
+                  }}
+                  aria-label={t.header.switchLanguage}
+                  title={t.header.switchLanguage}
+                >
+                  <Languages size={18} className="text-[#0528d6] shrink-0" />
+                  <span className="text-[10px] font-black italic">{lang}</span>
+                </HeaderIconButton>
+                <HeaderIconButton
+                  onClick={toggleTheme}
+                  aria-label={t.header.toggleTheme}
+                  title={t.header.toggleTheme}
+                >
+                  {darkMode ? <Sun size={18} className="text-[#0528d6]" /> : <Moon size={18} className="text-[#0528d6]" />}
+                </HeaderIconButton>
               </div>
             </div>
           </div>

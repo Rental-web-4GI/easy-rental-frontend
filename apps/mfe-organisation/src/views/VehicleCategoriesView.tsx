@@ -16,13 +16,22 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<any>(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [pageError, setPageError] = useState('');
 
   const loadData = useCallback(async () => {
     if (!orgData?.id) return;
     setLoading(true);
+    setPageError('');
     try {
       const res = await vehicleService.getVehicleCategories(orgData.id);
-      if (res.ok) setCategories(res.data || []);
+      if (res.ok) {
+        setCategories(res.data || []);
+      } else {
+        setPageError('Impossible de charger les catégories.');
+      }
+    } catch {
+      setPageError('Erreur réseau ou serveur indisponible.');
     } finally {
       setLoading(false);
     }
@@ -42,8 +51,21 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
     });
   }, [categories, searchTerm, filterTab]);
 
+  const openCreateModal = () => {
+    setEditingCat(null);
+    setFormError('');
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (cat: any) => {
+    setEditingCat(cat);
+    setFormError('');
+    setIsModalOpen(true);
+  };
+
   const handleSubmit = async (formData: any) => {
     setModalLoading(true);
+    setFormError('');
     try {
       const res = editingCat 
         ? await vehicleService.updateCategory(editingCat.id, formData)
@@ -51,17 +73,30 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
       
       if (res.ok) {
         setIsModalOpen(false);
+        setFormError('');
         loadData();
+        return;
       }
+      setFormError((res.data as { message?: string })?.message || 'Impossible d\'enregistrer la catégorie.');
+    } catch {
+      setFormError('Erreur réseau ou serveur indisponible.');
     } finally {
       setModalLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm(t.vehicleCategories.deleteConfirm)) {
-      await vehicleService.deleteCategory(id);
-      loadData();
+    if (!window.confirm(t.vehicleCategories.deleteConfirm)) return;
+    setPageError('');
+    try {
+      const res = await vehicleService.deleteCategory(id);
+      if (res.ok) {
+        loadData();
+        return;
+      }
+      setPageError((res.data as { message?: string })?.message || 'Impossible de supprimer la catégorie.');
+    } catch {
+      setPageError('Erreur réseau ou serveur indisponible.');
     }
   };
 
@@ -69,6 +104,11 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+      {pageError && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-200 px-6 py-4 rounded-2xl text-sm font-bold italic">
+          {pageError}
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard label={t.vehicleCategories.statTotal} value={categories.length} icon={<LayoutGrid />} />
@@ -108,7 +148,7 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
         </div>
 
         <button 
-          onClick={() => { setEditingCat(null); setIsModalOpen(true); }}
+          onClick={openCreateModal}
           className="w-full lg:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-lg font-bold text-sm shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shrink-0"
         >
           <Plus size={18} /> {t.vehicleCategories.addBtn}
@@ -120,7 +160,7 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
           <CategoryCard 
             key={cat.id} 
             category={cat} 
-            onEdit={(c: any) => { setEditingCat(c); setIsModalOpen(true); }}
+            onEdit={openEditModal}
             onDelete={handleDelete}
             t={t}
           />
@@ -132,9 +172,10 @@ export const VehicleCategoriesView = ({ orgData, t }: { orgData: any, t: any }) 
           t={t}
           editingCat={editingCat}
           initialData={editingCat ? { name: editingCat.name, description: editingCat.description } : { name: '', description: '' }}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => { setIsModalOpen(false); setFormError(''); }}
           onSubmit={handleSubmit}
           modalLoading={modalLoading}
+          formError={formError}
         />
       )}
     </div>

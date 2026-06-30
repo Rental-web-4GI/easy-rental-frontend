@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { Phone, User, Trash2, Edit3, ShieldCheck, FileText, BadgeCheck } from 'lucide-react';
+import { Phone, User, Trash2, Edit3, ShieldCheck, FileText, BadgeCheck, Info } from 'lucide-react';
 import { hasPermission } from '../../utils/permissions';
 
-export const DriverCard = ({ driver, onEdit, onDelete, staffPermissions, t, userData }: any) => {
+export const DriverCard = ({ driver, onEdit, onViewDetails, onDelete, staffPermissions, t, userData }: any) => {
   return (
     <div className="bg-white dark:bg-[#1a1d2d] rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group text-left">
       <div className="flex justify-between items-start mb-6">
@@ -23,6 +23,14 @@ export const DriverCard = ({ driver, onEdit, onDelete, staffPermissions, t, user
           </div>
         </div>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={() => onViewDetails(driver)}
+            title={t.common.view}
+            className="p-2 text-slate-400 hover:text-[#0528d6] hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+          >
+            <Info size={16} />
+          </button>
           {hasPermission(userData, staffPermissions, 'driver:update') && (
               <button onClick={() => onEdit(driver)} className="p-2 text-slate-400 hover:text-[#0528d6] hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"><Edit3 size={16}/></button>
           )}

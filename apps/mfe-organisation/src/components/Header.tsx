@@ -2,22 +2,30 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Menu, Sun, Moon, Languages, Download, Bell } from 'lucide-react';
-import { notifService } from '@pwa-easy-rental/shared-services';
+import { notifService, NOTIFICATIONS_REFRESH_EVENT } from '@pwa-easy-rental/shared-services';
+import { HeaderIconButton } from './HeaderIconButton';
 
 export const Header = ({ title, orgData, lang, setLang, darkMode, toggleTheme, setSidebarOpen, onInstall, hasPrompt, setCurrentView, t }: any) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (orgData?.id) {
-      const fetchNotifs = () => {
-        notifService.countUnreadOrg(orgData.id).then(res => {
-          if (res.ok) setUnreadCount(res.data);
-        });
-      };
-      fetchNotifs();
-      const interval = setInterval(fetchNotifs, 15000);
-      return () => clearInterval(interval);
-    }
+    if (!orgData?.id) return;
+
+    const fetchNotifs = (event?: Event) => {
+      const ctx = (event as CustomEvent<{ context?: string }> | undefined)?.detail?.context;
+      if (ctx && ctx !== 'ORGANIZATION') return;
+      notifService.countUnreadOrg(orgData.id).then((res) => {
+        if (res.ok) setUnreadCount(Number(res.data) || 0);
+      });
+    };
+
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 15000);
+    window.addEventListener(NOTIFICATIONS_REFRESH_EVENT, fetchNotifs);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener(NOTIFICATIONS_REFRESH_EVENT, fetchNotifs);
+    };
   }, [orgData?.id]);
 
   return (
@@ -44,19 +52,37 @@ export const Header = ({ title, orgData, lang, setLang, darkMode, toggleTheme, s
           )}
         </button>
 
-        <button onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs font-black border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#0528d6] transition-all italic">
-          <Languages size={16} className="text-[#0528d6]" />
-          <span className="hidden sm:inline">{lang}</span>
-        </button>
+        <div className="flex items-center gap-1 px-1 py-1 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+          <HeaderIconButton
+            onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')}
+            aria-label={t.header.switchLanguage}
+            title={t.header.switchLanguage}
+          >
+            <Languages size={18} className="text-[#0528d6] shrink-0" />
+            <span className="text-[10px] font-black italic min-w-[1.25rem]">{lang}</span>
+          </HeaderIconButton>
 
-        <button onClick={toggleTheme} className="p-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:text-orange-500 transition-all shadow-sm">
-          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+          <HeaderIconButton
+            onClick={toggleTheme}
+            aria-label={t.header.toggleTheme}
+            title={t.header.toggleTheme}
+          >
+            {darkMode ? <Sun size={18} className="text-[#0528d6]" /> : <Moon size={18} className="text-[#0528d6]" />}
+          </HeaderIconButton>
+        </div>
 
         <div onClick={() => setCurrentView('PROFILE')} className="flex items-center gap-3 ml-2 pl-4 border-l border-slate-200 dark:border-slate-800 cursor-pointer group">
            <div className="text-right hidden sm:block">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1 group-hover:text-[#0528d6] transition-colors italic">{t.header.adminRole}</p>
               <p className="text-xs font-black text-slate-700 dark:text-slate-200 max-w-[120px] truncate italic uppercase tracking-tighter">{orgData?.name}</p>
+              {(orgData?.governanceStatus ?? orgData?.governance_status) &&
+                (orgData?.governanceStatus ?? orgData?.governance_status) !== 'APPROVED' && (
+                <p className="text-[8px] font-black uppercase tracking-widest mt-1 text-amber-600 dark:text-amber-400">
+                  {(orgData?.governanceStatus ?? orgData?.governance_status) === 'PENDING_APPROVAL'
+                    ? (t.header.pendingApproval ?? 'En attente d\'approbation')
+                    : (orgData?.governanceStatus ?? orgData?.governance_status)}
+                </p>
+              )}
            </div>
            <div className="size-10 rounded-xl bg-gradient-to-br from-[#0528d6] to-blue-400 p-[2px] shadow-lg group-hover:scale-110 transition-all">
               <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[10px] overflow-hidden">

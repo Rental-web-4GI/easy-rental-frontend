@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { X, Loader2, MapPin, Clock, ShieldCheck, Globe, Target, BarChart3, Zap } from 'lucide-react';
 import { Portal } from '../../components/Portal';
-import { agencyService, statsService } from '@pwa-easy-rental/shared-services';
+import { agencyService, statsService, formatGeofenceRadius, resolveAgencyContact, orgService } from '@pwa-easy-rental/shared-services';
 
 export const AgencyDetailsModal = ({ agencyId, onClose, t, userData }: any) => {
   const [data, setData] = useState<any>(null);
+  const [orgData, setOrgData] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -18,18 +19,25 @@ export const AgencyDetailsModal = ({ agencyId, onClose, t, userData }: any) => {
         ]);
       if (res.ok) setData(res.data);
       if (statRes.ok) setStats(statRes.data);
+      if (userData?.organizationId) {
+        const orgRes = await orgService.getOrgDetails(userData.organizationId);
+        if (orgRes.ok) setOrgData(orgRes.data);
+      }
       setLoading(false);
     };
     fetch();
   }, [agencyId, userData]);
 
-  if (loading) return (
+  if (loading || !data) return (
     <Portal>
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-md">
             <Loader2 className="animate-spin text-white size-12" />
         </div>
     </Portal>
   );
+
+  const contact = resolveAgencyContact(data, orgData);
+  const missingContact = !contact.address && !contact.email && !contact.phone;
 
   return (
     <Portal>
@@ -44,7 +52,7 @@ export const AgencyDetailsModal = ({ agencyId, onClose, t, userData }: any) => {
                 </div>
                 <div>
                     <h3 className="text-xl md:text-3xl font-black italic tracking-tighter uppercase leading-none">{data.name}</h3>
-                    <p className="text-[10px] md:text-xs font-bold opacity-70 uppercase tracking-[0.2em] mt-2 italic flex items-center gap-2"><MapPin size={12}/> {data.city}, {data.region}</p>
+                    <p className="text-[10px] md:text-xs font-bold opacity-70 uppercase tracking-[0.2em] mt-2 italic flex items-center gap-2"><MapPin size={12}/> {[contact.city, contact.region].filter(Boolean).join(', ') || '—'}</p>
                 </div>
             </div>
             <button onClick={onClose} className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all"><X size={24}/></button>
@@ -64,9 +72,14 @@ export const AgencyDetailsModal = ({ agencyId, onClose, t, userData }: any) => {
                 <section className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800">
                     <h4 className="text-xs font-black uppercase text-[#0528d6] italic mb-8 flex items-center gap-3 border-b dark:border-slate-800 pb-4"><Globe size={18}/> {t.onboarding.step2Title}</h4>
                     <div className="space-y-6">
-                        <DataRow label={t.onboarding.form.address} value={data.address} />
-                        <DataRow label={t.onboarding.form.email} value={data.email} />
-                        <DataRow label={t.onboarding.form.phone} value={data.phone} />
+                        {missingContact && (
+                          <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 italic p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800">
+                            {t.agencies?.details?.missingContact ?? 'Coordonnées incomplètes — modifiez l\'agence pour renseigner adresse, e-mail et téléphone.'}
+                          </p>
+                        )}
+                        <DataRow label={t.onboarding.form.address} value={contact.address} />
+                        <DataRow label={t.onboarding.form.email} value={contact.email} />
+                        <DataRow label={t.onboarding.form.phone} value={contact.phone} />
                         <div className="pt-6 grid grid-cols-2 gap-4">
                             <DataRow label="Latitude" value={data.latitude} mono />
                             <DataRow label="Longitude" value={data.longitude} mono />
@@ -75,11 +88,11 @@ export const AgencyDetailsModal = ({ agencyId, onClose, t, userData }: any) => {
                 </section>
 
                 <section className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800">
-                    <h4 className="text-xs font-black uppercase text-[#0528d6] italic mb-8 flex items-center gap-3 border-b dark:border-slate-800 pb-4"><Target size={18}/> {t.onboarding.step3Title}</h4>
+                    <h4 className="text-xs font-black uppercase text-[#0528d6] italic mb-8 flex items-center gap-3 border-b dark:border-slate-800 pb-4"><Target size={18}/> {t.agencies.modal?.operationalSettings ?? 'Paramètres opérationnels'}</h4>
                     <div className="space-y-6">
-                        <DataRow label={t.sidebar.status} value={data.is24Hours ? t.agencies.modal.hours24 : data.workingHours} />
-                        <DataRow label="Geofencing" value={`${data.geofenceRadius} KM`} />
-                        <DataRow label={t.agencies.modal.deposit} value={`${data.depositPercentage} %`} />
+                        <DataRow label={t.sidebar.status} value={data.is24Hours ? t.agencies.modal.hours24 : (data.workingHours || '—')} />
+                        <DataRow label="Geofencing" value={formatGeofenceRadius(data.geofenceRadius)} />
+                        <DataRow label={t.agencies.modal.deposit} value={data.depositPercentage != null ? `${data.depositPercentage} %` : '—'} />
                         <div className="pt-6 flex items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                             <ShieldCheck className="text-green-500" size={24}/>
                             <p className="text-[10px] font-black uppercase text-slate-800 dark:text-white italic">{t.agencies.modal.submit}</p>

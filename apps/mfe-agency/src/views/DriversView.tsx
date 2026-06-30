@@ -6,7 +6,8 @@ import { driverService } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { DriverCard } from './drivers/DriverCard';
 import { DriverFormModal } from './drivers/DriverFormModal';
-import { DriverStatusPricingModal } from './drivers/DriverStatusPricingModal'; // Assurez-vous que ce fichier existe
+import { DriverStatusPricingModal } from './drivers/DriverStatusPricingModal';
+import { ResourceDetailsModal } from './vehicles/ResourceDetailsModal';
 import { hasPermission } from '../utils/permissions';
 
 export const DriversView = ({ userData, t, staffPermissions }: any) => {
@@ -20,6 +21,8 @@ export const DriversView = ({ userData, t, staffPermissions }: any) => {
   // États pour l'édition (Prix / Statut / Planning)
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<any>(null);
+  const [viewingDriverId, setViewingDriverId] = useState<string | null>(null);
+  const [detailsRefreshKey, setDetailsRefreshKey] = useState(0);
   
   const [modalLoading, setModalLoading] = useState(false);
   const [backendError, setBackendError] = useState<string | null>(null);
@@ -40,6 +43,7 @@ export const DriversView = ({ userData, t, staffPermissions }: any) => {
     setModalLoading(true);
     setBackendError(null);
     try {
+      formData.append('agencyId', userData.agencyId);
       const res = await driverService.createDriver(userData.organizationId, formData);
       if (res.ok) { 
         setIsCreateModalOpen(false); 
@@ -50,21 +54,46 @@ export const DriversView = ({ userData, t, staffPermissions }: any) => {
     } finally { setModalLoading(false); }
   };
 
-  // Handler pour l'édition (Prix et Statut)
-  const handleStatusPricingSubmit = async (driverId: string, payload: any) => {
+  // Handler pour l'édition (Prix, Statut, Planning optionnel)
+  const handleStatusPricingSubmit = async (driverId: string, pricing: any, formData: any) => {
     setModalLoading(true);
     setBackendError(null);
     try {
-      // Selon le Swagger, on met à jour le pricing
-      const res = await driverService.updateDriverStatusAndPricing(driverId, payload);
-      
-      if (res.ok) {
-        setIsStatusModalOpen(false);
-        setSelectedDriver(null);
-        loadData();
-      } else {
-        setBackendError(res.data?.message || t.staff.errorSave);
+      const pricingRes = await driverService.updateDriverPricing(driverId, pricing);
+      if (!pricingRes.ok) {
+        setBackendError(pricingRes.data?.message || t.staff.errorSave);
+        return;
       }
+
+      if (formData.globalStatus && formData.globalStatus !== selectedDriver?.status) {
+        const statusRes = await driverService.updateDriverStatus(driverId, formData.globalStatus);
+        if (!statusRes.ok) {
+          setBackendError(statusRes.data?.message || t.staff.errorSave);
+          return;
+        }
+      }
+
+      if (formData.addUnavailability && formData.schedule?.reason?.trim()) {
+        const scheduleRes = await driverService.updateDriverSchedule(driverId, {
+          schedules: [
+            {
+              startDate: new Date(formData.schedule.startDate).toISOString(),
+              endDate: new Date(formData.schedule.endDate).toISOString(),
+              status: 'UNAVAILABLE',
+              reason: formData.schedule.reason.trim(),
+            },
+          ],
+        });
+        if (!scheduleRes.ok) {
+          setBackendError(scheduleRes.data?.message || t.staff.errorSave);
+          return;
+        }
+      }
+
+      setIsStatusModalOpen(false);
+      setSelectedDriver(null);
+      setDetailsRefreshKey((k) => k + 1);
+      loadData();
     } finally {
       setModalLoading(false);
     }
@@ -123,6 +152,7 @@ export const DriversView = ({ userData, t, staffPermissions }: any) => {
                 setBackendError(null); 
                 setIsStatusModalOpen(true); 
             }}
+            onViewDetails={(driver: any) => setViewingDriverId(driver.id)}
             onDelete={async (id: string) => { 
                 if(confirm(t.staff.deleteConfirm)) { 
                     await driverService.deleteDriver(id); 
@@ -157,6 +187,16 @@ export const DriversView = ({ userData, t, staffPermissions }: any) => {
             modalLoading={modalLoading}
             error={backendError}
           />
+      )}
+
+      {viewingDriverId && (
+        <ResourceDetailsModal
+          key={`${viewingDriverId}-${detailsRefreshKey}`}
+          t={t}
+          resourceId={viewingDriverId}
+          type="DRIVER"
+          onClose={() => setViewingDriverId(null)}
+        />
       )}
     </div>
   );

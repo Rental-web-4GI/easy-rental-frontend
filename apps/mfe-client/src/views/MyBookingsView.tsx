@@ -5,6 +5,7 @@ import { Clock, Bell, Loader2, Calendar, CreditCard, ChevronRight, X, MapPin, Ca
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { rentalService } from '@shared-services/api/rental.service';
+import { ReviewModal } from './ReviewModal';
 
 
 export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: any; onNavigateToCatalog?: () => void }) => {
@@ -12,6 +13,7 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
   const [loading, setLoading] = useState(true);
   const [selectedRental, setSelectedRental] = useState<any>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [reviewTarget, setReviewTarget] = useState<any>(null);
 
   useEffect(() => {
     const fetchRentals = async () => {
@@ -145,6 +147,18 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
                     >
                       Détails du trajet <ChevronRight size={16} />
                     </button>
+                    {rental.status === 'COMPLETED' && rental.vehicleId && rental.driverId && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const res = await rentalService.getRentalDetails(rental.id);
+                          if (res.ok && res.data) setReviewTarget(res.data);
+                        }}
+                        className="w-full md:w-auto border-2 border-[#0528d6] text-[#0528d6] px-6 py-2.5 rounded-2xl text-xs font-black uppercase"
+                      >
+                        Noter le trajet
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -183,6 +197,17 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
           </div>
         )}
       </div>
+
+      {reviewTarget && (
+        <ReviewModal
+          rental={reviewTarget.rental}
+          vehicle={reviewTarget.vehicle}
+          driver={reviewTarget.driver}
+          authorName={userData?.fullname}
+          onClose={() => setReviewTarget(null)}
+          onSubmitted={() => setReviewTarget(null)}
+        />
+      )}
     </div>
   );
 };

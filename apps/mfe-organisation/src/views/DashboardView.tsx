@@ -14,17 +14,37 @@ export const DashboardView = ({ orgData, t }: any) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (orgData?.id) {
-      statsService.getOrgDashboard(orgData.id).then(res => {
-        if (res.ok) setData(res.data);
-        setLoading(false);
-      });
+    if (!orgData?.id) {
+      setLoading(false);
+      return;
     }
+    setLoading(true);
+    statsService.getOrgDashboard(orgData.id).then((res) => {
+      if (res.ok && res.data) setData(res.data);
+      else setData(null);
+      setLoading(false);
+    });
   }, [orgData?.id]);
 
-  if (loading || !data) return <div className="h-96 flex items-center justify-center"><Activity className="animate-spin text-[#0528d6]" size={40}/></div>;
+  if (loading) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <Activity className="animate-spin text-[#0528d6]" size={40} />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="h-96 flex items-center justify-center text-slate-400 text-sm font-medium italic">
+        {t.dashboard?.loadError ?? 'Impossible de charger le tableau de bord.'}
+      </div>
+    );
+  }
 
   const { summary, revenueEvolution, rentalEvolution, vehicleStatusDistribution, rentalStatusDistribution, agencyComparison } = data;
+  const revenueMax = Math.max(...revenueEvolution.values, 1);
+  const rentalMax = Math.max(...rentalEvolution.values, 1);
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-10">
@@ -44,30 +64,34 @@ export const DashboardView = ({ orgData, t }: any) => {
         <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-8"><TrendingUp size={16} className="text-[#0528d6]"/> {t.dashboard.revenueEvolution}</h3>
           <div className="flex items-end gap-2 h-48">
-            {revenueEvolution.values.map((v: number, i: number) => (
-              <div key={i} className="flex-1 bg-[#0528d6]/10 hover:bg-[#0528d6] rounded-t-lg transition-all relative group" style={{ height: `${(v / Math.max(...revenueEvolution.values)) * 100}%` }}>
+            {revenueEvolution.values.length === 0 ? (
+              <p className="text-xs text-slate-400 italic w-full text-center self-center">{t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}</p>
+            ) : revenueEvolution.values.map((v: number, i: number) => (
+              <div key={i} className="flex-1 bg-[#0528d6]/10 hover:bg-[#0528d6] rounded-t-lg transition-all relative group" style={{ height: `${(v / revenueMax) * 100}%` }}>
                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">{v.toLocaleString()} XAF</div>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-4 text-[8px] font-black text-slate-400  italic">
-            <span>{revenueEvolution.labels[0]}</span>
-            <span>{revenueEvolution.labels[revenueEvolution.labels.length - 1]}</span>
+            <span>{revenueEvolution.labels[0] ?? '—'}</span>
+            <span>{revenueEvolution.labels[revenueEvolution.labels.length - 1] ?? '—'}</span>
           </div>
         </div>
 
         <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-8"><CalendarCheck size={16} className="text-[#0528d6]"/> {t.dashboard.rentalVolume}</h3>
           <div className="flex items-end gap-2 h-48">
-            {rentalEvolution.values.map((v: number, i: number) => (
-              <div key={i} className="flex-1 bg-orange-500/10 hover:bg-orange-500 rounded-t-lg transition-all relative group" style={{ height: `${(v / Math.max(...rentalEvolution.values)) * 100}%` }}>
+            {rentalEvolution.values.length === 0 ? (
+              <p className="text-xs text-slate-400 italic w-full text-center self-center">{t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}</p>
+            ) : rentalEvolution.values.map((v: number, i: number) => (
+              <div key={i} className="flex-1 bg-orange-500/10 hover:bg-orange-500 rounded-t-lg transition-all relative group" style={{ height: `${(v / rentalMax) * 100}%` }}>
                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">{v}</div>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-4 text-[8px] font-black text-slate-400  italic">
-            <span>{rentalEvolution.labels[0]}</span>
-            <span>{rentalEvolution.labels[rentalEvolution.labels.length - 1]}</span>
+            <span>{rentalEvolution.labels[0] ?? '—'}</span>
+            <span>{rentalEvolution.labels[rentalEvolution.labels.length - 1] ?? '—'}</span>
           </div>
         </div>
       </div>
@@ -77,10 +101,12 @@ export const DashboardView = ({ orgData, t }: any) => {
             <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
                 <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mb-6"><PieChart size={14} className="text-[#0528d6]"/> {t.dashboard.fleetStatus}</h3>
                 <div className="space-y-4">
-                    {Object.entries(vehicleStatusDistribution.distribution).map(([key, val]: any) => (
+                    {Object.keys(vehicleStatusDistribution.distribution).length === 0 ? (
+                      <p className="text-xs text-slate-400 italic">{t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}</p>
+                    ) : Object.entries(vehicleStatusDistribution.distribution).map(([key, val]: any) => (
                         <div key={key} className="space-y-1.5">
                             <div className="flex justify-between text-[9px] font-black  italic text-slate-500"><span>{key}</span><span>{val}</span></div>
-                            <div className="h-1.5 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-[#0528d6]" style={{ width: `${(val / summary.totalVehicles) * 100}%` }}/></div>
+                            <div className="h-1.5 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-[#0528d6]" style={{ width: `${summary.totalVehicles ? (val / summary.totalVehicles) * 100 : 0}%` }}/></div>
                         </div>
                     ))}
                 </div>
@@ -88,10 +114,12 @@ export const DashboardView = ({ orgData, t }: any) => {
             <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
                 <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mb-6"><Activity size={14} className="text-orange-500"/> {t.dashboard.rentalStatus}</h3>
                 <div className="space-y-4">
-                    {Object.entries(rentalStatusDistribution.distribution).map(([key, val]: any) => (
+                    {Object.keys(rentalStatusDistribution.distribution).length === 0 ? (
+                      <p className="text-xs text-slate-400 italic">{t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}</p>
+                    ) : Object.entries(rentalStatusDistribution.distribution).map(([key, val]: any) => (
                         <div key={key} className="space-y-1.5">
                             <div className="flex justify-between text-[9px] font-black  italic text-slate-500"><span>{key}</span><span>{val}</span></div>
-                            <div className="h-1.5 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-orange-500" style={{ width: `${(val / summary.totalRentals) * 100}%` }}/></div>
+                            <div className="h-1.5 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-orange-500" style={{ width: `${summary.totalRentals ? (val / summary.totalRentals) * 100 : 0}%` }}/></div>
                         </div>
                     ))}
                 </div>
@@ -101,7 +129,9 @@ export const DashboardView = ({ orgData, t }: any) => {
         <div className="lg:col-span-2 bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-10"><Target size={18} className="text-[#0528d6]"/> {t.dashboard.agencyComparison}</h3>
           <div className="space-y-8">
-            {agencyComparison.map((agency: any, idx: number) => (
+            {agencyComparison.length === 0 ? (
+              <p className="text-xs text-slate-400 italic">{t.dashboard?.noAgencies ?? 'Aucune agence pour comparer les performances.'}</p>
+            ) : agencyComparison.map((agency: any, idx: number) => (
               <div key={idx} className="group">
                 <div className="flex justify-between items-end mb-3">
                   <div>
@@ -115,7 +145,7 @@ export const DashboardView = ({ orgData, t }: any) => {
                     <div className="flex items-center justify-end gap-1 text-[8px] font-black text-green-500 uppercase italic"><ArrowUpRight size={10}/> {t.dashboard.marketShare}</div>
                   </div>
                 </div>
-                <div className="h-3 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-[#0528d6] transition-all duration-1000" style={{ width: `${(agency.revenue / summary.totalRevenue) * 100}%` }}/></div>
+                <div className="h-3 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800"><div className="h-full bg-[#0528d6] transition-all duration-1000" style={{ width: `${summary.totalRevenue ? (agency.revenue / summary.totalRevenue) * 100 : 0}%` }}/></div>
               </div>
             ))}
           </div>

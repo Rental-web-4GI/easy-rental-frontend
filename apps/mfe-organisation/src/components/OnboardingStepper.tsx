@@ -11,12 +11,25 @@ import { StepperInput } from './StepperInput';
 import { StepperArea } from './StepperArea';
 import { LogoUpload } from './LogoUpload';
 
-export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t }: any) => {
+export const OnboardingStepper = ({ orgId, initialName, initialOrg, onComplete, onLogout, t }: any) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    name: initialName || '', description: '', address: '', city: '', postalCode: '', region: '', phone: '', email: '',
-    website: '', timezone: 'Africa/Douala', logoUrl: '', registrationNumber: '', taxNumber: '', isDriverBookingRequired: false
+    name: initialOrg?.name || initialName || '',
+    description: initialOrg?.description || '',
+    address: initialOrg?.address || '',
+    city: initialOrg?.city || '',
+    postalCode: initialOrg?.postalCode || '',
+    region: initialOrg?.region || '',
+    phone: initialOrg?.phone || '',
+    email: initialOrg?.email || '',
+    website: initialOrg?.website || '',
+    timezone: initialOrg?.timezone || 'Africa/Douala',
+    logoUrl: initialOrg?.logoUrl || '',
+    registrationNumber: initialOrg?.registrationNumber || '',
+    taxNumber: initialOrg?.taxNumber || '',
+    isDriverBookingRequired: Boolean(initialOrg?.isDriverBookingRequired),
   });
 
   const handleChange = (e: any) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,10 +44,25 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
 
   const handleFinalSubmit = async () => {
     setLoading(true);
+    setError('');
     try {
-      const res = await orgService.updateOrg(orgId, { ...formData });
-      if (res.ok) onComplete();
-    } finally { setLoading(false); }
+      const res = orgId
+        ? await orgService.updateOrg(orgId, { ...formData })
+        : await orgService.completeOnboarding({ ...formData });
+      if (res.ok) {
+        onComplete();
+        return;
+      }
+      const apiMessage = (res.data as { message?: string })?.message;
+      const normalizedMessage = apiMessage?.includes('KERNEL_TIMEOUT')
+        ? 'Connexion au kernel trop lente. Réessayez dans quelques secondes ou reconnectez-vous.'
+        : apiMessage;
+      setError(normalizedMessage || 'Impossible de finaliser l\'onboarding. Vérifiez vos informations.');
+    } catch {
+      setError('Erreur réseau ou serveur indisponible.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const stepsInfo = [
@@ -150,13 +178,20 @@ export const OnboardingStepper = ({ orgId, initialName, onComplete, onLogout, t 
                 )}
             </div>
 
-            <div className="mt-8 flex items-center justify-between pt-8 border-t dark:border-slate-800">
+            <div className="mt-8 flex flex-col gap-4 pt-8 border-t dark:border-slate-800">
+                {error && (
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold rounded-xl">
+                    {error}
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
                 {step > 1 ? (
                 <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-slate-400 font-black uppercase text-[10px] hover:text-[#0528d6] transition-all italic tracking-widest"><ChevronLeft size={16} /> {t.onboarding.btns.prev}</button>
                 ) : <div />}
                 <button onClick={step < 3 ? () => setStep(step + 1) : handleFinalSubmit} disabled={loading || !isStepValid()} className={`px-10 py-4 ${step < 3 ? 'bg-[#0528d6]' : 'bg-green-600'} text-white rounded-2xl font-black uppercase text-xs shadow-xl flex items-center gap-3 transition-all hover:scale-[1.02] disabled:opacity-30 italic tracking-widest`}>
                     {loading ? <Loader2 className="animate-spin" size={18} /> : <>{step < 3 ? t.onboarding.btns.next : t.onboarding.btns.finish} <ArrowRight size={18} /></>}
                 </button>
+                </div>
             </div>
         </div>
       </div>

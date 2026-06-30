@@ -13,8 +13,10 @@
     "clean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
+    "@pwa-easy-rental/shared-services": "workspace:*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.556.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

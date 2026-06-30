@@ -61,7 +61,7 @@ export const RolesView = ({ orgData, t }: { orgData: any, t: any }) => {
     }
   };
 
-  const isSystemRole = (poste: any) => poste.isSystem || poste.name.toLowerCase().includes('owner');
+  const isSystemRole = (poste: any) => poste.isSystem === true;
 
   if (loading) return (
     <div className="h-96 flex items-center justify-center">
@@ -122,6 +122,7 @@ export const RolesView = ({ orgData, t }: { orgData: any, t: any }) => {
 
       {isModalOpen && (
         <RoleFormModal 
+          key={editingPoste?.id ?? 'new'}
           t={t}
           editingPoste={editingPoste}
           permissionsByModule={permissionsByModule}

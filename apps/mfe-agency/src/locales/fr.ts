@@ -51,7 +51,35 @@ export const fr = {
     greet: "Console Opérationnelle",
     search: "Trouver un dossier, une plaque...",
     notifications: "Centre de notifications",
-    adminRole: "Personnel Agency"
+    adminRole: "Personnel",
+    switchLanguage: "Changer la langue",
+    toggleTheme: "Changer le thème"
+  },
+  booking: {
+    newReservation: "Nouvelle réservation",
+    newRental: "Ouverture location",
+    prerequisitesTitle: "Prérequis manquants",
+    needVehicle: "Sélectionnez un véhicule",
+    needPricing: "Tarif non configuré pour ce véhicule (jour/heure/mois)",
+    needClientName: "Nom du client requis",
+    needPhone: "Téléphone valide requis (9 chiffres, commence par 6)",
+    needDriver: "Chauffeur obligatoire",
+    needDates: "La date de fin doit être après le départ",
+    pricingBreakdown: "Détail tarifaire",
+    baseAmount: "Montant de base",
+    commission: "Commission plateforme (1 %)",
+    deposit: "Caution (10 %)",
+    total: "Total TTC",
+    savingsVsHourly: "Économisez {amount} XAF vs tarif horaire",
+    viewVehicleDetails: "Voir détails",
+    viewDriverDossier: "Voir dossier chauffeur",
+    driverUnavailable: "Le chauffeur sélectionné n'est plus disponible sur cette période",
+    noDriversAvailable: "Aucun chauffeur disponible (réservation, maladie ou indisponibilité)",
+    loadingDrivers: "Vérification des disponibilités chauffeurs…",
+    needDriverPricing: "Tarif chauffeur non configuré pour ce mode",
+    needZeroAmount: "Montant de base invalide (véhicule et/ou chauffeur)",
+    vehicleBase: "Tarif véhicule",
+    driverBase: "Tarif chauffeur",
   },
   kpi: {
     inventory: "Flotte Agence",
@@ -164,6 +192,7 @@ export const fr = {
       cancel: "Annuler",
       daily: "Par Jour",
       hourly: "Par Heure",
+      monthly: "Par Mois",
       days: "j",
       hours: "h"
     }
@@ -245,10 +274,16 @@ export const fr = {
     pendingReturns: "Retours Attente",
     closedFiles: "Dossiers Clôturés",
     validateReturnConfirm: "Valider retour ?",
+    validateReturn: "Valider le retour",
     confirmedLabel: "Confirmées (60%)"
   },
   dashboard: {
     agencyLabel: "Agence",
+    revenueEvolution: "Évolution des revenus",
+    noRevenueData: "Aucun paiement enregistré cette année.",
+    agencyActivity: "Activité agence",
+    pendingReservations: "Réservations en attente",
+    confirmedReservations: "Réservations confirmées (60 % payé)",
     pendingTransactions: "Transactions en attente"
   },
   resDetails: {
@@ -300,6 +335,7 @@ export const fr = {
     pricing: "Grille Tarifaire",
     pricePerHour: "Prix / Heure",
     pricePerDay: "Prix / Jour",
+    pricePerMonth: "Prix / Mois",
     planning: "Planning",
     reasonLabel: "Motif (Optionnel)",
     applyBtn: "Appliquer la configuration",
@@ -316,10 +352,17 @@ export const fr = {
     gender: "Genre",
     male: "Homme",
     female: "Femme",
+    cniNumber: "N° CNI",
+    licenseNumber: "N° Permis",
+    licenseExpiry: "Expiration permis",
+    yearsExperience: "Années d'expérience",
     scanDocs: "Documents à numériser",
     photoProfil: "Photo Profil",
     scanCni: "Scan CNI",
-    scanLicense: "Scan Permis"
+    scanLicense: "Scan Permis",
+    pricingHint: "Tarifs requis pour les réservations (heure et jour minimum)",
+    planningHint: "Cochez pour bloquer une période (maladie, congés…). Les réservations existantes s'affichent automatiquement.",
+    addUnavailability: "Bloquer période"
   },
   driverCard: {
     years: "ans",

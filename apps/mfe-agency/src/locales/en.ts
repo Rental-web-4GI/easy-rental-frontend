@@ -51,7 +51,35 @@ export const en = {
     greet: "Operational Console",
     search: "Find a file, plate...",
     notifications: "Notification center",
-    adminRole: "Agency Staff"
+    adminRole: "Staff",
+    switchLanguage: "Switch language",
+    toggleTheme: "Toggle theme"
+  },
+  booking: {
+    newReservation: "New reservation",
+    newRental: "Start rental",
+    prerequisitesTitle: "Missing requirements",
+    needVehicle: "Select a vehicle",
+    needPricing: "Pricing not configured for this vehicle",
+    needClientName: "Client name required",
+    needPhone: "Valid phone required (9 digits, starts with 6)",
+    needDriver: "Driver required",
+    needDates: "End date must be after start",
+    pricingBreakdown: "Price breakdown",
+    baseAmount: "Base amount",
+    commission: "Platform fee (1%)",
+    deposit: "Deposit (10%)",
+    total: "Total",
+    savingsVsHourly: "Save {amount} XAF vs hourly rate",
+    viewVehicleDetails: "View details",
+    viewDriverDossier: "View driver file",
+    driverUnavailable: "Selected driver is no longer available for this period",
+    noDriversAvailable: "No driver available (booking, sick leave or unavailability)",
+    loadingDrivers: "Checking driver availability…",
+    needDriverPricing: "Driver pricing not configured for this mode",
+    needZeroAmount: "Invalid base amount (vehicle and/or driver)",
+    vehicleBase: "Vehicle rate",
+    driverBase: "Driver rate",
   },
   kpi: {
     inventory: "Agency Fleet",
@@ -164,6 +192,7 @@ export const en = {
       cancel: "Cancel",
       daily: "Daily",
       hourly: "Hourly",
+      monthly: "Monthly",
       days: "d",
       hours: "h"
     }
@@ -249,6 +278,11 @@ export const en = {
   },
   dashboard: {
     agencyLabel: "Agency",
+    revenueEvolution: "Revenue evolution",
+    noRevenueData: "No payments recorded this year.",
+    agencyActivity: "Agency activity",
+    pendingReservations: "Pending reservations",
+    confirmedReservations: "Confirmed reservations (60% paid)",
     pendingTransactions: "Pending Transactions"
   },
   resDetails: {
@@ -300,6 +334,7 @@ export const en = {
     pricing: "Pricing Grid",
     pricePerHour: "Price / Hour",
     pricePerDay: "Price / Day",
+    pricePerMonth: "Price / Month",
     planning: "Planning",
     reasonLabel: "Reason (Optional)",
     applyBtn: "Apply configuration",
@@ -316,10 +351,17 @@ export const en = {
     gender: "Gender",
     male: "Male",
     female: "Female",
+    cniNumber: "ID number",
+    licenseNumber: "License number",
+    licenseExpiry: "License expiry",
+    yearsExperience: "Years of experience",
     scanDocs: "Documents to scan",
     photoProfil: "Profile Photo",
     scanCni: "CNI Scan",
-    scanLicense: "License Scan"
+    scanLicense: "License Scan",
+    pricingHint: "Rates required for bookings (hour and day minimum)",
+    planningHint: "Check to block a period (sick leave, holidays…). Existing bookings appear automatically.",
+    addUnavailability: "Block period"
   },
   driverCard: {
     years: "years",

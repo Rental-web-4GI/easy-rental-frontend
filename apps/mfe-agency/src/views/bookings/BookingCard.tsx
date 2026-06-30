@@ -1,21 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { User, Car, Phone, Info } from 'lucide-react';
+import { User, Car, Phone, Info, CheckCircle2 } from 'lucide-react';
 import { hasPermission } from '../../utils/permissions';
 
 interface BookingCardProps {
     rental: any;
     userData: any;
     onStart?: () => void;
+    onConfirmDeposit?: () => void;
     onView: () => void;
     staffPermissions: any;
     t: any;
+    variant?: 'active' | 'history';
 }
 
-export const BookingCard = ({ rental, userData, onStart, staffPermissions, onView, t }: BookingCardProps) => {
+export const BookingCard = ({
+  rental,
+  userData,
+  onStart,
+  onConfirmDeposit,
+  staffPermissions,
+  onView,
+  t,
+  variant = 'active',
+}: BookingCardProps) => {
   const isPaidTotal = rental.amountPaid >= rental.totalAmount;
-  const remaining = rental.totalAmount - rental.amountPaid;
+  const remaining = Math.max(0, Number(rental.totalAmount ?? 0) - Number(rental.amountPaid ?? 0));
+  const depositShare = Number(rental.totalAmount ?? 0) > 0
+    ? Math.round((Number(rental.amountPaid ?? 0) / Number(rental.totalAmount)) * 100)
+    : 0;
 
   const getStatusStyle = (s: string) => {
     switch (s) {
@@ -23,6 +37,8 @@ export const BookingCard = ({ rental, userData, onStart, staffPermissions, onVie
       case 'ONGOING': return 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
       case 'COMPLETED': return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
       case 'CANCELLED': return 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+      case 'RESERVED': return 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
+      case 'UNDER_REVIEW': return 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
       default: return 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
     }
   };
@@ -68,20 +84,36 @@ export const BookingCard = ({ rental, userData, onStart, staffPermissions, onVie
                 <p className="text-[9px] font-black text-slate-400 uppercase italic mb-1">{t.kpi.revenue}</p>
                 <div className="flex items-baseline gap-1">
                     <span className={`text-xl font-black ${isPaidTotal ? 'text-green-500' : 'text-[#0528d6]'}`}>
-                        {rental.amountPaid?.toLocaleString()}
+                        {Number(rental.amountPaid ?? 0).toLocaleString()}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400 italic">/ {rental.totalAmount?.toLocaleString()} XAF</span>
+                    <span className="text-[10px] font-bold text-slate-400 italic">/ {Number(rental.totalAmount ?? 0).toLocaleString()} XAF</span>
                 </div>
+                <p className="text-[8px] font-bold text-slate-400 italic mt-1">
+                  {t.booking?.totalIncludesFees ?? 'Total dossier (véhicule + chauffeur + frais)'}
+                  {depositShare > 0 && !isPaidTotal ? ` · Acompte ${depositShare}%` : ''}
+                </p>
             </div>
             {!isPaidTotal && remaining > 0 && (
                 <div className="px-2 py-1 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded text-[8px] font-black uppercase italic animate-pulse">
-                    Reste: {remaining.toLocaleString()}
+                    {t.booking?.balanceAtHandover ?? 'Solde à la remise'}: {remaining.toLocaleString()}
                 </div>
             )}
         </div>
 
+        {variant === 'history' && (
+          <p className="text-[8px] font-bold text-slate-400 italic -mt-4 mb-4">
+            {t.reservations?.historyHint ?? 'Dossier transformé en location ou clôturé'}
+          </p>
+        )}
+
         <div className="flex gap-2">
-            {onStart && hasPermission(userData, staffPermissions, 'rental:create') && (
+            {variant === 'active' && onConfirmDeposit && hasPermission(userData, staffPermissions, 'rental:create') && (
+                <button onClick={onConfirmDeposit} className="flex-1 py-4 bg-orange-500 text-white rounded-2xl font-black text-[11px] uppercase flex items-center justify-center gap-3 shadow-xl shadow-orange-500/20 hover:bg-orange-600 transition-all italic tracking-widest">
+                    <CheckCircle2 size={18}/>
+                    {t.reservations?.confirmDeposit ?? 'Encaisser acompte 60 %'}
+                </button>
+            )}
+            {variant === 'active' && onStart && hasPermission(userData, staffPermissions, 'rental:create') && (
                 <button onClick={onStart} className="flex-1 py-4 bg-[#0528d6] text-white rounded-2xl font-black text-[11px] uppercase flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all italic tracking-widest">
                     <Car size={18}/> 
                     {isPaidTotal ? t.table.handover : t.reservations.actionStart}

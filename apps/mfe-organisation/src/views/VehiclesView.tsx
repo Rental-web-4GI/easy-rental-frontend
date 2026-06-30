@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Car, Plus, Search, Loader2, CheckCircle2, Settings2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { agencyService, vehicleService } from '@pwa-easy-rental/shared-services';
+import { agencyService, vehicleService, buildVehicleFormInitialData } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { VehicleCard } from './vehicles/VehicleCard';
 import { VehicleFormModal } from './vehicles/VehicleFormModal';
@@ -10,6 +10,17 @@ import { VehicleDetailsModal } from './vehicles/VehicleDetailsModal';
 import { QuickStatusModal } from './vehicles/QuickStatusModal';
 
 const ITEMS_PER_PAGE = 6;
+
+function formatVehicleError(message?: string) {
+  if (!message) return 'Impossible d\'enregistrer le véhicule.';
+  if (message === 'Access Denied') {
+    return 'Accès refusé — vérifiez vos permissions ou reconnectez-vous.';
+  }
+  if (message.includes('HTTP_401') || message.toLowerCase().includes('unauthorized')) {
+    return 'Session kernel expirée. Reconnectez-vous à la console organisation, puis réessayez.';
+  }
+  return message.includes(': ') ? message.split(': ').slice(1).join(': ') : message;
+}
 
 export const VehiclesView = ({ orgData, t }: any) => {
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -23,6 +34,8 @@ export const VehiclesView = ({ orgData, t }: any) => {
   const [targetId, setTargetId] = useState<string | null>(null);
   const[editingVehicle, setEditingVehicle] = useState<any>(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [quickStatusError, setQuickStatusError] = useState('');
 
   const loadData = useCallback(async () => {
     if (!orgData?.id) return;
@@ -43,7 +56,17 @@ export const VehiclesView = ({ orgData, t }: any) => {
 
   const handleFormSubmit = async (formData: any) => {
     setModalLoading(true);
+    setFormError('');
     try {
+      if (!formData.agencyId) {
+        setFormError('Sélectionnez une agence.');
+        return;
+      }
+      if (!formData.categoryId) {
+        setFormError('Sélectionnez une catégorie.');
+        return;
+      }
+
       const payload = {
         ...formData,
         kilometrage: Number(formData.kilometrage || 0),
@@ -64,16 +87,70 @@ export const VehiclesView = ({ orgData, t }: any) => {
         ? await vehicleService.updateVehicle(editingVehicle.id, payload)
         : await vehicleService.createVehicle(orgData.id, payload);
       
-      if (res.ok) { setActiveModal(null); loadData(); }
-    } finally { setModalLoading(false); }
+      if (res.ok) {
+        setActiveModal(null);
+        setFormError('');
+        loadData();
+        return;
+      }
+      setFormError(formatVehicleError((res.data as { message?: string })?.message));
+    } catch {
+      setFormError('Erreur réseau ou serveur indisponible.');
+    } finally {
+      setModalLoading(false);
+    }
   };
 
   const handleQuickStatusSubmit = async (id: string, payload: any) => {
     setModalLoading(true);
+    setQuickStatusError('');
     try {
-      const res = await (vehicleService as any).updateStatusAndPricing(id, payload);
-      if (res.ok) { setActiveModal(null); loadData(); }
-    } finally { setModalLoading(false); }
+      if (!payload.skipPricing) {
+        const pricingRes = await vehicleService.updateVehiclePricing(id, {
+          pricePerHour: payload.pricePerHour,
+          pricePerDay: payload.pricePerDay,
+          pricePerMonth: payload.pricePerMonth,
+        });
+        if (!pricingRes.ok) {
+          setQuickStatusError(formatVehicleError((pricingRes.data as { message?: string })?.message));
+          return;
+        }
+      }
+
+      const statusRes = await vehicleService.updateVehicleStatus(id, payload.globalStatus);
+      if (!statusRes.ok) {
+        setQuickStatusError(formatVehicleError((statusRes.data as { message?: string })?.message));
+        return;
+      }
+
+      if (payload.globalStatus === 'MAINTENANCE' || payload.addSchedule) {
+        if (!payload.schedule?.reason?.trim()) {
+          setQuickStatusError('Indiquez la durée et le motif de maintenance.');
+          return;
+        }
+        const scheduleRes = await vehicleService.updateVehicleSchedule(id, {
+          schedules: [
+            {
+              startDate: new Date(payload.schedule.startDate).toISOString(),
+              endDate: new Date(payload.schedule.endDate).toISOString(),
+              status: payload.schedule.status || 'MAINTENANCE',
+              reason: payload.schedule.reason,
+            },
+          ],
+        });
+        if (!scheduleRes.ok) {
+          setQuickStatusError(formatVehicleError((scheduleRes.data as { message?: string })?.message));
+          return;
+        }
+      }
+
+      setActiveModal(null);
+      loadData();
+    } catch {
+      setQuickStatusError('Erreur réseau ou serveur indisponible.');
+    } finally {
+      setModalLoading(false);
+    }
   };
 
   const filteredVehicles = useMemo(() => vehicles.filter(v => 
@@ -99,7 +176,7 @@ export const VehiclesView = ({ orgData, t }: any) => {
           <input placeholder={t.vehicles.searchPlaceholder} className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
                  value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
         </div>
-        <button onClick={() => { setEditingVehicle(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
+        <button onClick={() => { setEditingVehicle(null); setFormError(''); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
           <Plus size={18} /> {t.vehicles.addBtn}
         </button>
       </div>
@@ -110,7 +187,7 @@ export const VehiclesView = ({ orgData, t }: any) => {
                        agencyName={agencies.find(a => a.id === v.agencyId)?.name}
                        categoryName={categories.find(c => c.id === v.categoryId)?.name}
                        onViewDetails={(id: string) => { setTargetId(id); setActiveModal('DETAILS'); }}
-                       onQuickStatus={(veh: any) => { setEditingVehicle(veh); setActiveModal('QUICK_STATUS'); }}
+                       onQuickStatus={(veh: any) => { setEditingVehicle(veh); setQuickStatusError(''); setActiveModal('QUICK_STATUS'); }}
                        onEdit={(veh: any) => { 
                          setEditingVehicle(veh); 
                          setActiveModal('FORM'); 
@@ -129,51 +206,29 @@ export const VehiclesView = ({ orgData, t }: any) => {
         </div>
       )}
 
-      {activeModal === 'DETAILS' && targetId && <VehicleDetailsModal vehicleId={targetId} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'QUICK_STATUS' && editingVehicle && <QuickStatusModal vehicle={editingVehicle} onSubmit={handleQuickStatusSubmit} modalLoading={modalLoading} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'DETAILS' && targetId && <VehicleDetailsModal vehicleId={targetId} onClose={() => setActiveModal(null)} t={t} />}
+      {activeModal === 'QUICK_STATUS' && editingVehicle && (
+        <QuickStatusModal
+          key={editingVehicle.id}
+          vehicle={editingVehicle}
+          onSubmit={handleQuickStatusSubmit}
+          modalLoading={modalLoading}
+          error={quickStatusError}
+          onClose={() => { setActiveModal(null); setQuickStatusError(''); }}
+        />
+      )}
       {activeModal === 'FORM' && (
         <VehicleFormModal 
+          key={editingVehicle?.id ?? 'new'}
           t={t}
           editingVehicle={editingVehicle}
           agencies={agencies}
           categories={categories}
-          initialData={editingVehicle ? {
-            ...editingVehicle,
-            yearProduction: editingVehicle.yearProduction ? editingVehicle.yearProduction.split('T')[0] : '',
-            engineDetails: editingVehicle.engineDetails || { type: '', horsepower: 0, capacity: 0 },
-            insuranceDetails: editingVehicle.insuranceDetails ? {
-              ...editingVehicle.insuranceDetails,
-              expiry: editingVehicle.insuranceDetails.expiry ? editingVehicle.insuranceDetails.expiry.split('T')[0] : ''
-            } : { provider: '', policy_number: '', expiry: '' },
-            fuelEfficiency: editingVehicle.fuelEfficiency || { city: '', highway: '' },
-            functionalities: editingVehicle.functionalities || {},
-            images: editingVehicle.images || [],
-            description: editingVehicle.description ||[]
-          } : { 
-            brand: '', model: '', licencePlate: '', vinNumber: '', kilometrage: 0, places: 5, color: '', transmission: 'MANUAL', agencyId: '', categoryId: '', statut: 'AVAILABLE',
-            yearProduction: '',
-            engineDetails: { type: '', horsepower: 0, capacity: 0 },
-            insuranceDetails: { provider: '', policy_number: '', expiry: '' },
-            fuelEfficiency: { city: '', highway: '' },
-            functionalities: {
-              air_condition: true,
-              usb_input: false,
-              seat_belt: true,
-              audio_input: false,
-              child_seat: false,
-              bluetooth: true,
-              sleeping_bed: false,
-              onboard_computer: true,
-              gps: true,
-              luggage: true,
-              water: false,
-              additional_covers: false
-            },
-            images: [], description:[]
-          }}
-          onClose={() => setActiveModal(null)}
+          initialData={buildVehicleFormInitialData(editingVehicle)}
+          onClose={() => { setActiveModal(null); setFormError(''); }}
           onSubmit={handleFormSubmit}
           modalLoading={modalLoading}
+          formError={formError}
         />
       )}
     </div>

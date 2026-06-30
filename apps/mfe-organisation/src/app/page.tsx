@@ -16,6 +16,7 @@ import { SubscriptionView } from '../views/SubscriptionView';
 import { ProfileView } from '../views/ProfileView';
 import { NotificationsView } from '../views/NotificationsView';
 import { OnboardingStepper } from '../components/OnboardingStepper';
+import { GovernanceBanner } from '../components/GovernanceBanner';
 import { ReservationsView } from '../views/ReservationsView';
 import { RentalsView } from '../views/RentalsView';
 import { TransactionsView } from '../views/TransactionsView';
@@ -23,7 +24,6 @@ import { TransactionsView } from '../views/TransactionsView';
 import { Loader2 } from 'lucide-react';
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
-import { defaultClient } from '@shared-services/api/api-client';
 
 export default function OrganisationDashboard() {
   const [currentView, setCurrentView] = useState<string>('DASHBOARD');
@@ -48,8 +48,7 @@ export default function OrganisationDashboard() {
         if (user) {
           setOrgData(organization);
           setUserData(user);
-          // Onboarding check
-          setIsOnboarded(organization && organization.city && organization.city !== "string");
+          setIsOnboarded(Boolean(meRes.data.isOnboarded));
           setIsAuth(true);
           return true;
         }
@@ -75,6 +74,10 @@ export default function OrganisationDashboard() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     const savedTheme = localStorage.getItem('theme');
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang === 'EN' || savedLang === 'FR') {
+      setLang(savedLang);
+    }
 
   if (savedTheme === 'dark') {
     document.documentElement.classList.add('dark');
@@ -86,40 +89,74 @@ export default function OrganisationDashboard() {
 
 
     const token = localStorage.getItem('auth_token');
-    if (token) fetchProfile();
-    else setIsLoading(false);
+    if (token) {
+      authService.setToken(token);
+      fetchProfile();
+    } else {
+      setIsLoading(false);
+    }
 
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    const onSessionExpired = () => {
+      setIsAuth(false);
+      setUserData(null);
+      setOrgData(null);
+    };
+    window.addEventListener('auth:session-expired', onSessionExpired);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('auth:session-expired', onSessionExpired);
+    };
   }, [fetchProfile]);
 
-  const handleAuthAction = async (isSignUp: boolean, form: any) => {
+  const persistTokenAndFetchProfile = async (token: string) => {
+    authService.setToken(token);
+    localStorage.setItem('auth_token', token);
+    return fetchProfile();
+  };
+
+  const handleAuthAction = async (
+    isSignUp: boolean,
+    form: any,
+    mfa?: { token: string; code: string }
+  ): Promise<boolean | { mfaRequired: true; mfaToken: string; mfaChannel?: string } | { error: string }> => {
     try {
-      let loginRes;
-      if (isSignUp) {
-        const regRes = await authService.registerOrg(form);
-        if (!regRes.ok) return false;
-        loginRes = await authService.login({ email: form.email, password: form.password });
-      } else {
-        loginRes = await authService.login({ email: form.email, password: form.password });
+      if (mfa) {
+        const mfaRes = await authService.confirmMfa(mfa.token, mfa.code);
+        if (mfaRes.ok) {
+          return await persistTokenAndFetchProfile(mfaRes.token);
+        }
+        return { error: 'Code MFA invalide' };
       }
 
-      if (loginRes.ok && loginRes.data.token) {
-        const token = loginRes.data.token;
-        
-        // 1. Mise à jour PRIORITAIRE de l'instance API en mémoire
-        defaultClient.setAuthToken(token);
-        
-        // 2. Sauvegarde persistante
-        localStorage.setItem('auth_token', token);
-        
-        // 3. Récupération du profil et attente de la validation
-        const success = await fetchProfile();
-        return success; // Si fetchProfile échoue, handleAuthAction renvoie false
+      if (isSignUp) {
+        const regRes = await authService.registerOrg(form);
+        if (!regRes.ok) {
+          const apiMessage = (regRes.data as { message?: string })?.message;
+          return { error: apiMessage || 'Inscription impossible. Vérifiez vos informations.' };
+        }
       }
-      return false;
-    } catch { 
-      // console.error("Auth process error", e); 
-      return false;
+
+      const loginRes = await authService.login({ email: form.email, password: form.password });
+      if ('mfaRequired' in loginRes && loginRes.mfaRequired) {
+        return {
+          mfaRequired: true,
+          mfaToken: loginRes.mfaToken,
+          mfaChannel: loginRes.mfaChannel,
+        };
+      }
+      if (loginRes.ok) {
+        const profileOk = await persistTokenAndFetchProfile(loginRes.token);
+        if (!profileOk) {
+          return {
+            error: 'Connexion réussie mais le profil organisation est inaccessible. Vérifiez que le backend local tourne sur le port 8081.',
+          };
+        }
+        return true;
+      }
+      return { error: loginRes.error || 'Connexion impossible. Vérifiez email et mot de passe.' };
+    } catch {
+      return { error: 'Erreur réseau ou serveur indisponible.' };
     }
   };
 
@@ -130,6 +167,11 @@ export default function OrganisationDashboard() {
     localStorage.setItem('theme', next ? 'dark' : 'light');
   };
 
+  const handleSetLang = (next: 'FR' | 'EN') => {
+    setLang(next);
+    localStorage.setItem('lang', next);
+  };
+
   if (isLoading) return (
     <div className="h-screen flex items-center justify-center bg-[#f4f7fe] dark:bg-[#080b14]">
       <Loader2 className="animate-spin text-[#0528d6] size-12" />
@@ -137,7 +179,7 @@ export default function OrganisationDashboard() {
   );
 
   if (!isAuth) return (
-    <AuthView onAuth={handleAuthAction} lang={lang} setLang={setLang} darkMode={darkMode} toggleTheme={toggleTheme} t={t} />
+    <AuthView onAuth={handleAuthAction} lang={lang} setLang={handleSetLang} darkMode={darkMode} toggleTheme={toggleTheme} t={t} />
   );
 
   if (!isOnboarded) return (
@@ -145,6 +187,7 @@ export default function OrganisationDashboard() {
       <OnboardingStepper 
         orgId={orgData?.id} 
         initialName={orgData?.name} 
+        initialOrg={orgData}
         onComplete={() => { setIsOnboarded(true); fetchProfile(); }} 
         onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} 
         t={t} 
@@ -170,7 +213,7 @@ export default function OrganisationDashboard() {
           setCurrentView={setCurrentView} 
           orgData={orgData} 
           lang={lang} 
-          setLang={setLang} 
+          setLang={handleSetLang} 
           darkMode={darkMode} 
           toggleTheme={toggleTheme} 
           setSidebarOpen={setSidebarOpen} 
@@ -180,6 +223,7 @@ export default function OrganisationDashboard() {
         />
         <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-[#f4f7fe] dark:bg-[#0f1323] custom-scrollbar text-left">
           <div className="max-w-[1600px] mx-auto">
+            <GovernanceBanner orgData={orgData} />
             {currentView === 'DASHBOARD' && <DashboardView orgData={orgData} t={t} />}
             {currentView === 'RESERVATIONS' && <ReservationsView orgData={orgData} t={t} />}
             {currentView === 'RENTALS' && <RentalsView orgData={orgData} t={t} />}

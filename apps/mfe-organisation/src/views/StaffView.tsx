@@ -1,15 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Users, Plus, Search, Loader2, MapPin, UserCheck, ChevronLeft, ChevronRight, Key } from 'lucide-react';
+import { Users, Plus, Search, Loader2, MapPin, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { agencyService, staffService } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { StaffCard } from './staff/StaffCard';
 import { StaffFormModal } from './staff/StaffFormModal';
 import { StaffDetailsModal } from './staff/StaffDetailsModal';
-import { Portal } from '@/components/Portal';
+import { StaffCredentialsModal, parseInviteCredentials } from './staff/StaffCredentialsModal';
 
 const ITEMS_PER_PAGE = 6;
+
+function formatStaffInviteError(message?: string) {
+  if (!message) return 'Impossible de recruter cet agent. Vérifiez les informations saisies.';
+  if (message.includes('kernel-core') || message.includes(':443') || message.includes('KERNEL_UNAVAILABLE')) {
+    return 'Connexion au serveur kernel impossible. Réessayez dans quelques secondes.';
+  }
+  const lower = message.toLowerCase();
+  if (lower.includes('not verified') || lower.includes('email_not_verified') || lower.includes('email_verification')) {
+    return 'Le compte kernel nécessite une vérification email (mail envoyé par kernel-core). '
+      + 'En local, Easy Rental n\'envoie pas d\'email : réessayez après vérification, ou utilisez un autre email.';
+  }
+  const withoutCode = message.includes(': ') ? message.split(': ').slice(1).join(': ') : message;
+  return withoutCode.trim() || message;
+}
 
 export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
   const [staffList, setStaffList] = useState<any[]>([]);
@@ -21,20 +35,31 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
   const [activeModal, setActiveModal] = useState<'FORM' | 'DETAILS' | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
   const [modalLoading, setModalLoading] = useState(false);
-  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [staffCredentials, setStaffCredentials] = useState<{
+    email: string;
+    password: string;
+    agencyUrl: string;
+  } | null>(null);
+
+  const kernelMode = Boolean(orgData?.kernelOrganizationId);
 
   const loadData = useCallback(async () => {
     if (!orgData?.id) return;
     setLoading(true);
     try {
-      const [staffRes, agRes, postRes] = await Promise.all([
+      const results = await Promise.allSettled([
         staffService.getStaffByOrg(orgData.id),
         agencyService.getAgencies(orgData.id),
-        staffService.getPostes(orgData.id)
+        staffService.getPostes(orgData.id),
       ]);
-      if (staffRes.ok) setStaffList(staffRes.data || []);
-      if (agRes.ok) setAgencies(agRes.data || []);
-      if (postRes.ok) setPostes(postRes.data || []);
+      const staffRes = results[0].status === 'fulfilled' ? results[0].value : null;
+      const agRes = results[1].status === 'fulfilled' ? results[1].value : null;
+      const postRes = results[2].status === 'fulfilled' ? results[2].value : null;
+      if (staffRes?.ok) setStaffList(staffRes.data || []);
+      if (agRes?.ok) setAgencies(agRes.data || []);
+      if (postRes?.ok) setPostes(postRes.data || []);
     } finally { setLoading(false); }
   }, [orgData?.id]);
 
@@ -49,17 +74,44 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
 
   const handleSubmit = async (formData: any) => {
     setModalLoading(true);
+    setSuccessMessage(null);
+    setFormError('');
     const isNew = !selectedStaff;
+    const normalizedForm = {
+      ...formData,
+      email: formData.email?.trim().toLowerCase(),
+    };
     try {
         const res = selectedStaff 
-          ? await staffService.updateStaff(selectedStaff.id, formData)
-          : await staffService.addStaff(orgData.id, formData);
+          ? await staffService.updateStaff(selectedStaff.id, normalizedForm)
+          : kernelMode
+            ? await staffService.inviteStaff(orgData.id, {
+                firstname: normalizedForm.firstname,
+                lastname: normalizedForm.lastname,
+                email: normalizedForm.email,
+                agencyId: normalizedForm.agencyId,
+                kernelRoleId: normalizedForm.posteId,
+              })
+            : await staffService.addStaff(orgData.id, normalizedForm);
         
         if (res.ok) { 
           setActiveModal(null); 
+          setFormError('');
           loadData(); 
-          if (isNew) setShowPasswordPopup(true);
+          if (isNew && kernelMode) {
+            const credentials = parseInviteCredentials(res.data, formData.email);
+            if (credentials) {
+              setStaffCredentials(credentials);
+            } else {
+              setSuccessMessage(`Un email avec les identifiants a été envoyé à ${formData.email}`);
+            }
+          }
+          return;
         }
+        const apiMessage = (res.data as { message?: string })?.message;
+        setFormError(formatStaffInviteError(apiMessage));
+    } catch {
+        setFormError('Erreur réseau ou serveur indisponible.');
     } finally {
         setModalLoading(false);
     }
@@ -69,6 +121,11 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+      {successMessage && (
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-6 py-4 rounded-2xl text-sm font-bold italic">
+          {successMessage}
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard label={t.staff.statTotal} value={staffList.length} icon={<Users />} />
         <StatCard label={t.staff.statRoles} value={postes.length} icon={<MapPin className="text-orange-500" />} />
@@ -81,8 +138,11 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
           <input placeholder={t.staff.searchPlaceholder} className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
                  value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
         </div>
-        <button onClick={() => { setSelectedStaff(null); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
-          <Plus size={18} /> {t.staff.recruitBtn}
+        <button
+          onClick={() => { setSelectedStaff(null); setFormError(''); setActiveModal('FORM'); }}
+          className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic"
+        >
+          <Plus size={18} /> {kernelMode ? 'Recruter un agent' : t.staff.recruitBtn}
         </button>
       </div>
 
@@ -105,32 +165,26 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
         </div>
       )}
 
-      {/* POPUP SÉCURITÉ */}
-      {showPasswordPopup && (
-        <Portal>
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in" onClick={() => setShowPasswordPopup(false)} />
-            <div className="relative w-full max-w-sm bg-white dark:bg-[#1a1d2d] rounded-[3rem] shadow-2xl p-10 text-center animate-in zoom-in border border-white/20">
-              <div className="size-20 bg-blue-50 dark:bg-blue-500/10 rounded-3xl flex items-center justify-center text-[#0528d6] mx-auto mb-6 shadow-inner">
-                <Key size={40} />
-              </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic mb-2 leading-none">{t.staff.popupTitle}</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 italic mb-8">
-                {t.staff.popupDesc}
-                <span className="block mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl font-mono text-xl font-black text-[#0528d6] border-2 border-blue-100 dark:border-blue-900/50 shadow-sm">password123</span>
-              </p>
-              <button onClick={() => setShowPasswordPopup(false)} className="w-full py-4 bg-[#0528d6] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition-all italic">{t.staff.popupBtn}</button>
-            </div>
-          </div>
-        </Portal>
+      {staffCredentials && (
+        <StaffCredentialsModal
+          credentials={staffCredentials}
+          onClose={() => setStaffCredentials(null)}
+        />
       )}
-
       {activeModal === 'DETAILS' && <StaffDetailsModal staffId={selectedStaff} onClose={() => setActiveModal(null)} t={t} />}
       {activeModal === 'FORM' && (
         <StaffFormModal 
+          key={selectedStaff?.id ?? 'new'}
           t={t}
+          kernelMode={kernelMode}
+          formError={formError}
           editingStaff={selectedStaff} agencies={agencies} postes={postes}
-          initialData={selectedStaff ? { ...selectedStaff, posteId: selectedStaff.poste?.id } : { firstname: '', lastname: '', email: '', agencyId: '', posteId: '', status: 'ACTIVE' }}
+          initialData={selectedStaff ? { ...selectedStaff, posteId: selectedStaff.poste?.id } : {
+            firstname: '', lastname: '', email: '',
+            agencyId: agencies.length === 1 ? agencies[0].id : '',
+            posteId: postes.length === 1 ? postes[0].id : '',
+            status: 'ACTIVE',
+          }}
           onClose={() => setActiveModal(null)} onSubmit={handleSubmit} modalLoading={modalLoading}
         />
       )}

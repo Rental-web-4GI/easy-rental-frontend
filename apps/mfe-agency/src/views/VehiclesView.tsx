@@ -2,10 +2,11 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Car, Plus, Search, Loader2, CheckCircle2, Settings2 } from 'lucide-react';
-import { vehicleService } from '@pwa-easy-rental/shared-services';
+import { vehicleService, buildVehicleFormInitialData } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { VehicleCard } from './vehicles/VehicleCard';
 import { VehicleFormModal } from './vehicles/VehicleFormModal';
+import { QuickStatusModal } from './vehicles/QuickStatusModal';
 import { ResourceDetailsModal } from './vehicles/ResourceDetailsModal';
 import { hasPermission } from '@/utils/permissions';
 
@@ -15,10 +16,11 @@ export const VehiclesView = ({ userData, t, staffPermissions }: { userData: any,
   const [loading, setLoading] = useState(true);
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<'FORM' | 'QUICK_STATUS' | null>(null);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
-  const[modalLoading, setModalLoading] = useState(false);
-  const [, setBackendError] = useState<string | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [backendError, setBackendError] = useState<string | null>(null);
+  const [quickStatusError, setQuickStatusError] = useState<string | null>(null);
   const[viewingVehicleId, setViewingVehicleId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
@@ -64,11 +66,65 @@ export const VehiclesView = ({ userData, t, staffPermissions }: { userData: any,
         : await vehicleService.createVehicle(userData.organizationId, payload);
       
       if (res.ok) {
-        setIsModalOpen(false);
+        setActiveModal(null);
         loadData();
       } else {
         setBackendError(res.data?.message || t.vehicles.errorSave);
       }
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleQuickStatusSubmit = async (id: string, payload: any) => {
+    setModalLoading(true);
+    setQuickStatusError(null);
+    try {
+      if (!payload.skipPricing) {
+        const pricingRes = await vehicleService.updateVehiclePricing(id, {
+          pricePerHour: payload.pricePerHour,
+          pricePerDay: payload.pricePerDay,
+          pricePerMonth: payload.pricePerMonth,
+        });
+        if (!pricingRes.ok) {
+          const msg = (pricingRes.data as { message?: string })?.message;
+          setQuickStatusError(msg === 'Access Denied' ? 'Accès refusé — vérifiez vos permissions.' : (msg || t.vehicles.errorSave));
+          return;
+        }
+      }
+
+      const statusRes = await vehicleService.updateVehicleStatus(id, payload.globalStatus);
+      if (!statusRes.ok) {
+        const msg = (statusRes.data as { message?: string })?.message;
+        setQuickStatusError(msg === 'Access Denied' ? 'Accès refusé — vérifiez vos permissions.' : (msg || t.vehicles.errorSave));
+        return;
+      }
+
+      if (payload.globalStatus === 'MAINTENANCE' || payload.addSchedule) {
+        if (!payload.schedule?.reason?.trim()) {
+          setQuickStatusError('Indiquez la durée et le motif de maintenance.');
+          return;
+        }
+        const scheduleRes = await vehicleService.updateVehicleSchedule(id, {
+          schedules: [
+            {
+              startDate: new Date(payload.schedule.startDate).toISOString(),
+              endDate: new Date(payload.schedule.endDate).toISOString(),
+              status: payload.schedule.status || 'MAINTENANCE',
+              reason: payload.schedule.reason,
+            },
+          ],
+        });
+        if (!scheduleRes.ok) {
+          setQuickStatusError((scheduleRes.data as { message?: string })?.message || t.vehicles.errorSave);
+          return;
+        }
+      }
+
+      setActiveModal(null);
+      loadData();
+    } catch {
+      setQuickStatusError(t.vehicles.errorSave);
     } finally {
       setModalLoading(false);
     }
@@ -103,7 +159,7 @@ export const VehiclesView = ({ userData, t, staffPermissions }: { userData: any,
           />
         </div>
         {hasPermission(userData, staffPermissions, 'vehicle:create') && <button 
-          onClick={() => { setEditingVehicle(null); setBackendError(null); setIsModalOpen(true); }}
+          onClick={() => { setEditingVehicle(null); setBackendError(null); setActiveModal('FORM'); }}
           className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-lg font-bold text-sm shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
         >
           <Plus size={18} /> {t.vehicles.addBtn}
@@ -115,57 +171,40 @@ export const VehiclesView = ({ userData, t, staffPermissions }: { userData: any,
           <VehicleCard 
             key={v.id} 
             vehicle={v} 
+            userData={userData}
             staffPermissions={staffPermissions}
             categoryName={categories.find(c => c.id === v.categoryId)?.name}
-            onEdit={(veh: any) => { setEditingVehicle(veh); setBackendError(null); setIsModalOpen(true); }}
+            onEdit={(veh: any) => { setEditingVehicle(veh); setBackendError(null); setActiveModal('FORM'); }}
             onDelete={async (id: string) => { if(confirm(t.vehicles.deleteConfirmMsg)) { await vehicleService.deleteVehicle(id); loadData(); } }}
             onStatusUpdate={handleQuickStatus}
+            onQuickStatus={(veh: any) => { setEditingVehicle(veh); setQuickStatusError(null); setActiveModal('QUICK_STATUS'); }}
             onViewDetails={(veh: any) => setViewingVehicleId(veh.id)}
             t={t}
           />
         ))}
       </div>
 
-      {isModalOpen && (
-        <VehicleFormModal 
+      {activeModal === 'QUICK_STATUS' && editingVehicle && hasPermission(userData, staffPermissions, 'vehicle:update') && (
+        <QuickStatusModal
+          key={editingVehicle.id}
           t={t}
+          vehicle={editingVehicle}
+          onSubmit={handleQuickStatusSubmit}
+          modalLoading={modalLoading}
+          error={quickStatusError}
+          onClose={() => { setActiveModal(null); setQuickStatusError(null); }}
+        />
+      )}
+
+      {activeModal === 'FORM' && (
+        <VehicleFormModal 
+          key={editingVehicle?.id ?? 'new'}
+          t={t}
+          backendError={backendError}
           editingVehicle={editingVehicle}
           categories={categories}
-          initialData={editingVehicle ? {
-            ...editingVehicle,
-            yearProduction: editingVehicle.yearProduction ? editingVehicle.yearProduction.split('T')[0] : '',
-            engineDetails: editingVehicle.engineDetails || { type: '', horsepower: 0, capacity: 0 },
-            insuranceDetails: editingVehicle.insuranceDetails ? {
-              ...editingVehicle.insuranceDetails,
-              expiry: editingVehicle.insuranceDetails.expiry ? editingVehicle.insuranceDetails.expiry.split('T')[0] : ''
-            } : { provider: '', policy_number: '', expiry: '' },
-            fuelEfficiency: editingVehicle.fuelEfficiency || { city: '', highway: '' },
-            functionalities: editingVehicle.functionalities || {},
-            images: editingVehicle.images || [],
-            description: editingVehicle.description ||[]
-          } : { 
-            brand: '', model: '', licencePlate: '', vinNumber: '', kilometrage: 0, places: 5, color: '', transmission: 'MANUAL', agencyId: '', categoryId: '', statut: 'AVAILABLE',
-            yearProduction: '',
-            engineDetails: { type: '', horsepower: 0, capacity: 0 },
-            insuranceDetails: { provider: '', policy_number: '', expiry: '' },
-            fuelEfficiency: { city: '', highway: '' },
-            functionalities: {
-              air_condition: true,
-              usb_input: false,
-              seat_belt: true,
-              audio_input: false,
-              child_seat: false,
-              bluetooth: true,
-              sleeping_bed: false,
-              onboard_computer: true,
-              gps: true,
-              luggage: true,
-              water: false,
-              additional_covers: false
-            },
-            images: [], description:[]
-          }}
-          onClose={() => setIsModalOpen(false)}
+          initialData={buildVehicleFormInitialData(editingVehicle)}
+          onClose={() => setActiveModal(null)}
           onSubmit={handleSubmit}
           modalLoading={modalLoading}
         />

@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Loader2, Lock, CheckSquare, Square, Check, ShieldCheck, AlignLeft } from 'lucide-react';
 import { Portal } from '../../components/Portal';
 
 export const RoleFormModal = ({ editingPoste, permissionsByModule, initialData, onSubmit, onClose, modalLoading, t }: any) => {
   const [formData, setFormData] = useState(initialData);
+
+  useEffect(() => {
+    setFormData(initialData);
+  }, [initialData]);
 
   const togglePermission = (id: string) => {
     setFormData((prev: any) => ({

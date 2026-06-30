@@ -283,7 +283,10 @@ export const fr = {
     search: "Rechercher agences, IDs...",
     installBtn: "App",
     adminRole: "Admin",
-    avatarAlt: "Avatar"
+    avatarAlt: "Avatar",
+    pendingApproval: "En attente d'approbation",
+    switchLanguage: "Changer la langue",
+    toggleTheme: "Basculer thème clair / sombre"
   },
   kpi: { 
     agencies: "Agences Actives", 

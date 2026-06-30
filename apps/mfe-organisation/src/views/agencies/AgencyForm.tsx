@@ -4,24 +4,36 @@ import React, { useState, useEffect } from 'react';
 import { X, Loader2, Clock, Globe, MapPin, Phone, Mail, Percent, Crosshair } from 'lucide-react';
 import { Portal } from '@/components/Portal';
 import { LogoUpload } from '@/components/LogoUpload';
+import { CM_PHONE_HINT, isValidCmMobile, normalizeCmPhone } from '@pwa-easy-rental/shared-services';
 
-export const AgencyForm = ({ editingAgency, initialData, onSubmit, onClose, modalLoading, t }: any) => {
+export const AgencyForm = ({ editingAgency, initialData, onSubmit, onClose, modalLoading, formError, t }: any) => {
   const [formData, setFormData] = useState(initialData);
   const [startHour, setStartHour] = useState('08:00');
   const [endHour, setEndHour] = useState('18:00');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   useEffect(() => {
+    setFormData({
+      ...initialData,
+      phone: normalizeCmPhone(String(initialData?.phone ?? '')),
+    });
     if (initialData.workingHours && initialData.workingHours.includes('-')) {
       const [start, end] = initialData.workingHours.split('-');
       setStartHour(start);
       setEndHour(end);
     }
-  }, [initialData.workingHours]);
+  }, [initialData]);
 
   const handleLocalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalWorkingHours = formData.is24Hours ? "00:00-23:59" : `${startHour}-${endHour}`;
-    onSubmit({ ...formData, workingHours: finalWorkingHours });
+    const phone = normalizeCmPhone(formData.phone ?? '');
+    if (!isValidCmMobile(phone)) {
+      setPhoneError(t.agencies?.modal?.phoneInvalid ?? CM_PHONE_HINT);
+      return;
+    }
+    setPhoneError(null);
+    const finalWorkingHours = formData.is24Hours ? '00:00-23:59' : `${startHour}-${endHour}`;
+    onSubmit({ ...formData, phone, workingHours: finalWorkingHours });
   };
 
   return (
@@ -50,7 +62,21 @@ export const AgencyForm = ({ editingAgency, initialData, onSubmit, onClose, moda
                     <FormInput label={t.agencies.modal.name} value={formData.name} onChange={(v: any) => setFormData({...formData, name: v})} required placeholder={t.agencies.modal.namePlaceholder} />
                     <FormInput label={t.agencies.modal.city} value={formData.city} onChange={(v: any) => setFormData({...formData, city: v})} required placeholder={t.agencies.modal.cityPlaceholder} />
                     <FormInput label={t.agencies.modal.email} type="email" value={formData.email} onChange={(v: any) => setFormData({...formData, email: v})} required icon={<Mail size={14}/>} />
-                    <FormInput label={t.agencies.modal.phone} value={formData.phone} onChange={(v:any) => setFormData({...formData, phone: v.replace(/\D/g, '')})} required icon={<Phone size={14}/>} />
+                    <FormInput
+                      label={t.agencies.modal.phone}
+                      value={formData.phone}
+                      onChange={(v: string) => {
+                        setPhoneError(null);
+                        setFormData({ ...formData, phone: normalizeCmPhone(v) });
+                      }}
+                      required
+                      icon={<Phone size={14} />}
+                      inputMode="numeric"
+                      maxLength={9}
+                      placeholder="678123456"
+                      hint={t.agencies?.modal?.phoneHint ?? CM_PHONE_HINT}
+                      error={phoneError}
+                    />
                 </div>
             </div>
 
@@ -80,11 +106,18 @@ export const AgencyForm = ({ editingAgency, initialData, onSubmit, onClose, moda
             </section>
           </div>
 
-          <div className="px-6 md:px-10 py-7 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row gap-4">
+          <div className="px-6 md:px-10 py-7 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-4">
+            {formError && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold rounded-xl">
+                {formError}
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-4">
             <button type="button" onClick={onClose} className="flex-1 py-4 text-xs font-black text-slate-400 uppercase italic hover:text-red-500 transition-colors">{t.agencies.modal.cancel}</button>
             <button disabled={modalLoading} className="flex-[2] py-4 bg-[#0528d6] text-white rounded-2xl font-black text-xs uppercase shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2 italic tracking-widest">
               {modalLoading ? <Loader2 className="animate-spin size-4" /> : t.agencies.modal.submit}
             </button>
+            </div>
           </div>
         </form>
       </div>
@@ -92,13 +125,44 @@ export const AgencyForm = ({ editingAgency, initialData, onSubmit, onClose, moda
   );
 };
 
-const FormInput = ({ label, value, onChange, type = "text", required = false, icon, placeholder }: any) => (
+const FormInput = ({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  required = false,
+  icon,
+  placeholder,
+  maxLength,
+  inputMode,
+  hint,
+  error,
+}: any) => {
+  const isEmail = type === 'email';
+  return (
   <div className="space-y-1.5 w-full">
     <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase italic ml-1 tracking-widest">{label}</label>
     <div className="relative group">
       {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#0528d6] transition-colors">{icon}</div>}
-      <input type={type} required={required} value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} 
-             className={`w-full ${icon ? 'pl-11' : 'px-4'} p-3.5 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-black text-sm outline-none focus:border-[#0528d6] dark:text-white transition-all shadow-inner italic uppercase`} />
+      <input
+        type={type}
+        required={required}
+        value={value}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        inputMode={inputMode}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full ${icon ? 'pl-11' : 'px-4'} p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-2xl font-bold text-sm outline-none dark:text-white transition-all shadow-inner ${
+          error ? 'border-red-300 focus:border-red-500' : 'border-slate-100 dark:border-slate-800 focus:border-[#0528d6]'
+        } ${isEmail ? 'normal-case' : 'italic uppercase'}`}
+      />
     </div>
+    {hint && !error && (
+      <p className="text-[9px] font-bold text-slate-400 italic ml-1">{hint}</p>
+    )}
+    {error && (
+      <p className="text-[9px] font-bold text-red-500 italic ml-1">{error}</p>
+    )}
   </div>
-);
+  );
+};

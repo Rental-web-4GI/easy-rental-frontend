@@ -234,7 +234,10 @@ export const en = {
     search: "Search agencies, IDs...",
     installBtn: "App",
     adminRole: "Admin",
-    avatarAlt: "Avatar"
+    avatarAlt: "Avatar",
+    pendingApproval: "Pending approval",
+    switchLanguage: "Switch language",
+    toggleTheme: "Toggle light / dark theme"
   },
   kpi: { 
     agencies: "Active Agencies", 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { MapPin, Phone, Mail, Trash2, Edit3, Info, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Trash2, Edit3, Info, Clock, BarChart3 } from 'lucide-react';
 
 export const AgencyCard = ({ agency, onEdit, onDelete, onView, t }: any) => (
   <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group flex flex-col h-full text-left">
@@ -25,7 +25,7 @@ export const AgencyCard = ({ agency, onEdit, onDelete, onView, t }: any) => (
       
       <div className="flex flex-col gap-2 shrink-0 items-end">
         <div className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest italic border flex items-center gap-1 ${agency.is24Hours ? 'bg-green-50 text-green-600 border-green-100 dark:bg-green-900/20' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800'}`}>
-          <Clock size={10} /> {agency.is24Hours ? (t.agencies.modal.hours24 || '24H/24') : 'LIMITÉ'}
+          <Clock size={10} /> {agency.is24Hours ? (t.agencies.modal.hours24 || '24H/24') : (t.agencies.modal?.limitedHours ?? 'LIMITÉ')}
         </div>
         
         {/* Actions conditionnelles aux permissions */}
@@ -43,11 +43,20 @@ export const AgencyCard = ({ agency, onEdit, onDelete, onView, t }: any) => (
     <div className="space-y-3 mb-8 pt-4 border-t border-slate-50 dark:border-slate-800">
       <div className="flex items-center gap-3 text-xs font-bold text-slate-600 dark:text-slate-400 italic overflow-hidden">
         <Mail size={14} className="text-slate-300 dark:text-slate-600 shrink-0" /> 
-        <span className="truncate">{agency.email}</span>
+        <span className="truncate">{agency.email || '—'}</span>
       </div>
       <div className="flex items-center gap-3 text-xs font-bold text-slate-600 dark:text-slate-400 italic overflow-hidden">
         <Phone size={14} className="text-slate-300 dark:text-slate-600 shrink-0" /> 
-        <span className="truncate">{agency.phone}</span>
+        <span className="truncate">{agency.phone || '—'}</span>
+      </div>
+      <div className="flex items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase italic">
+          <BarChart3 size={14} className="text-green-500" />
+          {t.agencies.revenue ?? 'Revenu'}
+        </div>
+        <span className="text-sm font-black text-green-600 dark:text-green-400 italic">
+          {Number(agency.monthlyRevenue ?? 0).toLocaleString()} XAF
+        </span>
       </div>
     </div>
 

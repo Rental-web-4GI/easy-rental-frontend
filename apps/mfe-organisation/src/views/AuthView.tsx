@@ -3,11 +3,14 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Building, ShieldCheck, ArrowRight, Loader2, Languages, Sun, Moon } from 'lucide-react';
 import { AuthInput } from '../components/AuthInput';
+import { HeaderIconButton } from '../components/HeaderIconButton';
 
 export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: any) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mfaStep, setMfaStep] = useState<{ token: string; channel?: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
   const [form, setForm] = useState({ 
     firstname: '', 
     lastname: '', 
@@ -20,9 +23,30 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: an
     e.preventDefault();
     setLoading(true);
     setError('');
-    const success = await onAuth(isSignUp, form);
-    if (!success) {
-      setError(t.auth.errorMsg);
+
+    const result = mfaStep
+      ? await onAuth(isSignUp, form, { token: mfaStep.token, code: mfaCode })
+      : await onAuth(isSignUp, form);
+
+    if (typeof result === 'object' && result && 'mfaRequired' in result && result.mfaRequired) {
+      setMfaStep({ token: result.mfaToken, channel: result.mfaChannel });
+      setLoading(false);
+      return;
+    }
+
+    if (typeof result === 'object' && result && 'error' in result) {
+      setError(result.error);
+      setLoading(false);
+      return;
+    }
+
+    if (result === true) {
+      setLoading(false);
+      return;
+    }
+
+    if (!result) {
+      setError(mfaStep ? 'Code MFA invalide' : t.auth.errorMsg);
       setLoading(false);
     }
   };
@@ -70,6 +94,28 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: an
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                {mfaStep ? (
+                  <div className="space-y-5 animate-in fade-in">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Un code de vérification a été envoyé{mfaStep.channel ? ` (${mfaStep.channel})` : ''}.
+                    </p>
+                    <AuthInput
+                      label="Code MFA"
+                      icon={<ShieldCheck />}
+                      placeholder="123456"
+                      value={mfaCode}
+                      onChange={v => setMfaCode(v)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { setMfaStep(null); setMfaCode(''); }}
+                      className="text-xs font-bold text-slate-400 hover:text-[#0528d6]"
+                    >
+                      Retour à la connexion
+                    </button>
+                  </div>
+                ) : (
+                  <>
                 {isSignUp && (
                   <div className="animate-in fade-in slide-in-from-top-4 duration-500 space-y-5">
                     <div className="grid grid-cols-2 gap-4">
@@ -82,6 +128,8 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: an
                 
                 <AuthInput label={t.auth.email} icon={<Mail/>} type="email" placeholder="manager@rental.com" value={form.email} onChange={v => setForm({...form, email: v})} />
                 <AuthInput label={t.auth.password} icon={<Lock/>} type="password" placeholder="••••••••" value={form.password} onChange={v => setForm({...form, password: v})} />
+                  </>
+                )}
 
                 {error && (
                   <div className="p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold rounded-xl flex items-center gap-2">
@@ -95,7 +143,7 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: an
                 >
                   {loading ? <Loader2 className="animate-spin size-5" /> : (
                     <>
-                      {isSignUp ? t.auth.btnSignUp : t.auth.btnSignIn}
+                      {mfaStep ? 'Valider le code' : (isSignUp ? t.auth.btnSignUp : t.auth.btnSignIn)}
                       <ArrowRight size={18} />
                     </>
                   )}
@@ -110,13 +158,22 @@ export const AuthView = ({ onAuth, lang, setLang, darkMode, toggleTheme, t }: an
                   {isSignUp ? t.auth.toggleSignIn : t.auth.toggleSignUp}
                 </button>
 
-                <div className="flex items-center gap-6 pt-6 border-t border-slate-50 dark:border-slate-800 w-full justify-center">
-                  <button onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} className="flex items-center gap-2 text-[10px] font-black text-slate-300 hover:text-slate-600  transition-colors">
-                    <Languages size={14} /> {lang}
-                  </button>
-                  <button onClick={toggleTheme} className="p-2 text-slate-300 hover:text-orange-500 transition-colors">
-                    {darkMode ? <Sun size={18}/> : <Moon size={18}/>}
-                  </button>
+                <div className="flex items-center justify-center gap-1 pt-6 border-t border-slate-50 dark:border-slate-800 w-full">
+                  <HeaderIconButton
+                    onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')}
+                    aria-label={t.header.switchLanguage}
+                    title={t.header.switchLanguage}
+                  >
+                    <Languages size={18} className="text-[#0528d6] shrink-0" />
+                    <span className="text-[10px] font-black italic">{lang}</span>
+                  </HeaderIconButton>
+                  <HeaderIconButton
+                    onClick={toggleTheme}
+                    aria-label={t.header.toggleTheme}
+                    title={t.header.toggleTheme}
+                  >
+                    {darkMode ? <Sun size={18} className="text-[#0528d6]" /> : <Moon size={18} className="text-[#0528d6]" />}
+                  </HeaderIconButton>
                 </div>
               </div>
             </div>

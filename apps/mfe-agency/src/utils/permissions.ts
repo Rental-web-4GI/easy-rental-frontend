@@ -3,13 +3,14 @@
 export const hasPermission = (userData: any, staffPermissions: any, tag: string): boolean => {
   if (!userData) return false;
 
-  if (['ORGANIZATION_OWNER', 'ADMIN'].includes(userData.role)) {
+  if (['ORGANIZATION_OWNER', 'ADMIN', 'ORGANIZATION'].includes(userData.role)) {
     return true;
   }
 
   if (!Array.isArray(staffPermissions)) return false;
 
-  // console.log(tag, staffPermissions.some((p: any) => p.tag === tag), staffPermissions);
-
-  return staffPermissions.some((p: any) => p.tag === tag);
+  return staffPermissions.some((p: any) => {
+    const permissionTag = typeof p === 'string' ? p : p.tag;
+    return permissionTag === tag;
+  });
 };

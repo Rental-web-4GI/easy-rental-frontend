@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Bell, Check, Clock, Info, AlertTriangle, Loader2 } from 'lucide-react';
-import { notifService } from '@pwa-easy-rental/shared-services';
+import { notifService, isNotificationRead } from '@pwa-easy-rental/shared-services';
 
 export const NotificationsView = ({ clientId }: { clientId: string }) => {
   const [notifs, setNotifs] = useState<any[]>([]);
@@ -30,9 +30,11 @@ export const NotificationsView = ({ clientId }: { clientId: string }) => {
 
   // Marquer comme lu sans recharger la page
   const handleMarkRead = async (id: string) => {
-    const res = await notifService.markAsRead(id);
+    const res = await notifService.markAsReadClient(id);
     if (res.ok) {
-      setNotifs(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+      setNotifs((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isReadAgency: true } : n))
+      );
     }
   };
 
@@ -65,11 +67,13 @@ export const NotificationsView = ({ clientId }: { clientId: string }) => {
             </div>
         ) : (
             <div className="space-y-4">
-              {notifs.map((n) => (
+              {notifs.map((n) => {
+                const read = isNotificationRead(n, 'CLIENT');
+                return (
                   <div
                       key={n.id}
                       className={`p-6 rounded-[2.5rem] border transition-all flex items-start gap-5 ${
-                          n.isRead
+                          read
                               ? 'bg-white/50 dark:bg-[#1a1d2d]/50 border-slate-100 dark:border-slate-800 opacity-60'
                               : 'bg-white dark:bg-[#1a1d2d] border-blue-100 dark:border-blue-900 shadow-md border-l-4 border-l-[#0528d6]'
                       }`}
@@ -90,7 +94,7 @@ export const NotificationsView = ({ clientId }: { clientId: string }) => {
                       <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-4">{n.details}</p>
 
                       <div className="flex items-center gap-6">
-                        {!n.isRead && (
+                        {!read && (
                             <button
                                 onClick={() => handleMarkRead(n.id)}
                                 className="text-[9px] font-black  text-[#0528d6] flex items-center gap-1.5 hover:underline"
@@ -106,7 +110,8 @@ export const NotificationsView = ({ clientId }: { clientId: string }) => {
                       </div>
                     </div>
                   </div>
-              ))}
+                );
+              })}
             </div>
         )}
       </div>

@@ -28,6 +28,17 @@ import { fr } from '../locales/fr';
 import { en } from '../locales/en';
 import { hasPermission } from '../utils/permissions';
 
+function normalizeAgencyUser(raw: Record<string, unknown> | null | undefined) {
+  if (!raw) return null;
+  return {
+    ...raw,
+    agencyId: raw.agencyId ?? raw.agency_id,
+    organizationId: raw.organizationId ?? raw.organization_id,
+    firstname: raw.firstname ?? raw.first_name,
+    lastname: raw.lastname ?? raw.last_name,
+  };
+}
+
 export default function AgencyDashboard() {
   // --- ÉTATS DE L'INTERFACE ---
   const [currentView, setCurrentView] = useState<string>('DASHBOARD');
@@ -57,22 +68,22 @@ export default function AgencyDashboard() {
       ]);
 
       if (meRes.ok && meRes.data) {
-        const user = meRes.data;
+        const user = normalizeAgencyUser(meRes.data);
         const perms = permsRes.ok ? permsRes.data : [];
         
         setUserData(user);
         setStaffPermissions(perms);
 
-        if (user.status === 'SUSPENDED') {
+        if (user?.status === 'SUSPENDED') {
           setInitError(t.auth.suspended);
           throw new Error('User is suspended');
         }
 
-        if (user.agencyId) {
+        if (user?.agencyId) {
           // 2. Récupérer les détails de l'agence et de l'organisation
           const [agencyRes, orgRes] = await Promise.all([
-            agencyService.getAgencyDetails(user.agencyId),
-            orgService.getOrgDetails(user.organizationId)
+            agencyService.getAgencyDetails(user.agencyId as string),
+            orgService.getOrgDetails(user.organizationId as string)
           ]);
           
           if (agencyRes.ok) setAgencyData(agencyRes.data);
@@ -113,6 +124,10 @@ export default function AgencyDashboard() {
   // --- INITIALISATION ---
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang === 'EN' || savedLang === 'FR') {
+      setLang(savedLang);
+    }
 
   if (savedTheme === 'dark') {
     document.documentElement.classList.add('dark');
@@ -124,8 +139,12 @@ export default function AgencyDashboard() {
 
 
     const token = localStorage.getItem('auth_token');
-    if (token) fetchContext();
-    else setIsLoading(false);
+    if (token) {
+      authService.setToken(token);
+      fetchContext();
+    } else {
+      setIsLoading(false);
+    }
   }, [fetchContext]);
 
   // --- ACTIONS ---
@@ -133,8 +152,9 @@ export default function AgencyDashboard() {
     try {
       setInitError('');
       const res = await authService.login(form);
-      if (res.ok && res.data.token) {
-        localStorage.setItem('auth_token', res.data.token);
+      if (res.ok && 'token' in res) {
+        authService.setToken(res.token);
+        localStorage.setItem('auth_token', res.token);
         await fetchContext();
         return true;
       }
@@ -195,7 +215,7 @@ export default function AgencyDashboard() {
           <div className="max-w-[1600px] mx-auto">
             
             {currentView === 'DASHBOARD' && hasPermission(userData, staffPermissions, 'stats:dashboard') && (
-                <DashboardView userData={userData} agencyData={agencyData} stats={stats} t={t} />
+                <DashboardView userData={userData} agencyData={agencyData} stats={stats} t={t} setCurrentView={setCurrentView} />
             )}
 
             {currentView === 'RESERVATIONS' && hasPermission(userData, staffPermissions, 'rental:list') && (

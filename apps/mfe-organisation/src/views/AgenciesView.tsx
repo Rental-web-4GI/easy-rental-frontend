@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Store, Plus, Search, Loader2, ChevronLeft, ChevronRight, LayoutGrid, ShieldCheck } from 'lucide-react';
-import { agencyService, orgService } from '@pwa-easy-rental/shared-services';
+import { agencyService, orgService, buildAgencyFormInitialData, normalizeCmPhone } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 import { AgencyCard } from './agencies/AgencyCard';
 import { AgencyForm } from './agencies/AgencyForm';
@@ -21,6 +21,14 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
   const [subscription, setSubscription] = useState<any>(null);
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  const governanceStatus = orgData?.governanceStatus ?? orgData?.governance_status;
+  const agencySaveFallback = selectedAgency
+    ? 'Impossible de modifier l\'agence. Vérifiez vos informations.'
+    : governanceStatus === 'PENDING_APPROVAL'
+      ? 'Création impossible : votre organisation est en attente d\'approbation par la plateforme.'
+      : 'Impossible de créer l\'agence. Vérifiez vos informations.';
 
   const loadData = useCallback(async () => {
     if (!orgData?.id) return;
@@ -46,16 +54,34 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
 
   const handleFormSubmit = async (finalData: any) => {
     setModalLoading(true);
-    const res = selectedAgency 
-      ? await agencyService.updateAgency(selectedAgency.id, finalData) 
-      : await agencyService.createAgency(orgData.id, finalData);
-    if (res.ok) { setActiveModal(null); loadData(); }
-    setModalLoading(false);
+    setFormError('');
+    const payload = {
+      ...finalData,
+      email: finalData.email?.trim().toLowerCase(),
+      phone: normalizeCmPhone(String(finalData.phone ?? '')),
+    };
+    try {
+      const res = selectedAgency
+        ? await agencyService.updateAgency(selectedAgency.id, payload)
+        : await agencyService.createAgency(orgData.id, payload);
+      if (res.ok) {
+        setActiveModal(null);
+        setFormError('');
+        loadData();
+        return;
+      }
+      const apiMessage = (res.data as { message?: string })?.message;
+      setFormError(apiMessage || agencySaveFallback);
+    } catch {
+      setFormError('Erreur réseau ou serveur indisponible.');
+    } finally {
+      setModalLoading(false);
+    }
   };
 
   const handleAddClick = () => {
     if (agencies.length >= (subscription?.maxAgencies || 1)) setShowQuotaModal(true);
-    else { setSelectedAgency(null); setActiveModal('FORM'); }
+    else { setSelectedAgency(null); setFormError(''); setActiveModal('FORM'); }
   };
 
   if (loading) return <div className="h-96 flex items-center justify-center"><Loader2 className="animate-spin text-[#0528d6] size-10" /></div>;
@@ -65,7 +91,7 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard label={t.agencies.statsPoints} value={agencies.length} icon={<Store />} />
         <StatCard label={t.agencies.statsZone} value={new Set(agencies.map(a => a.city)).size} icon={<LayoutGrid className="text-orange-500" />} />
-        <StatCard label={t.agencies.statsFleet} value={agencies.reduce((acc, a) => acc + (a.currentVehicles || 0), 0)} icon={<ShieldCheck className="text-green-500" />} />
+        <StatCard label={t.agencies.statsFleet} value={agencies.reduce((acc, a) => acc + (Number(a.totalVehicles) || 0), 0)} icon={<ShieldCheck className="text-green-500" />} />
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#1a1d2d] p-4 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -87,7 +113,7 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
         {paginated.map(agency => (
           <AgencyCard key={agency.id} agency={agency} 
                      onView={(id: string) => { setSelectedAgency(id); setActiveModal('DETAILS'); }}
-                     onEdit={(a: any) => { setSelectedAgency(a); setActiveModal('FORM'); }} 
+                     onEdit={(a: any) => { setSelectedAgency(a); setFormError(''); setActiveModal('FORM'); }} 
                      onDelete={async (id: string) => { if(confirm(t.agencies.deleteConfirm)) { await agencyService.deleteAgency(id); loadData(); } }} 
                      t={t}
           />
@@ -107,12 +133,14 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
       {activeModal === 'DETAILS' && <AgencyDetailsModal agencyId={selectedAgency} onClose={() => setActiveModal(null)} t={t} />}
       {activeModal === 'FORM' && (
         <AgencyForm 
+                    key={selectedAgency?.id ?? 'new'}
                     t={t}
                     editingAgency={selectedAgency} 
-                    initialData={selectedAgency || { name: '', description: '', address: '', city: '', country: 'Cameroun', postalCode: '', region: '', phone: '', email: '', geofenceRadius: 5, is24Hours: true, workingHours: '08:00-18:00', allowOnlineBooking: true, depositPercentage: 10, logoUrl: '' }}
-                    onClose={() => setActiveModal(null)} 
+                    initialData={buildAgencyFormInitialData(selectedAgency)}
+                    onClose={() => { setActiveModal(null); setFormError(''); }} 
                     onSubmit={handleFormSubmit} 
-                    modalLoading={modalLoading} />
+                    modalLoading={modalLoading}
+                    formError={formError} />
       )}
       {showQuotaModal && <QuotaAlertModal t={t} limit={subscription?.maxAgencies} type={t.agencies.quotaType} onClose={() => setShowQuotaModal(false)} onUpgrade={() => setCurrentView('SUBSCRIPTION')} />}
     </div>

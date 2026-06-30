@@ -82,6 +82,15 @@ export class ApiClient {
 
       const responseData = await response.json().catch(() => null);
 
+      if (!response.ok && response.status === 401 && typeof window !== 'undefined') {
+        this.memoryToken = null;
+        localStorage.removeItem('auth_token');
+      }
+
+      if (!response.ok) {
+        this.handleUnauthorized(response.status);
+      }
+
       return {
         data: responseData,
         status: response.status,
@@ -91,6 +100,15 @@ export class ApiClient {
       // console.error(`[API Error] ${method} ${url}:`, error);
       return { data: null as any, status: 0, ok: false };
     }
+  }
+
+  private handleUnauthorized(status: number): void {
+    if (status !== 401 || typeof window === 'undefined') {
+      return;
+    }
+    this.memoryToken = null;
+    localStorage.removeItem('auth_token');
+    window.dispatchEvent(new CustomEvent('auth:session-expired'));
   }
 
   async get<T>(e: string) { return this.request<T>('GET', e); }

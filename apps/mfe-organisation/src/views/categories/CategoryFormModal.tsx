@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Loader2, Info, LayoutGrid, AlignLeft } from 'lucide-react';
 import { Portal } from '../../components/Portal';
 
-export const CategoryFormModal = ({ editingCat, initialData, onSubmit, onClose, modalLoading, t }: any) => {
+export const CategoryFormModal = ({ editingCat, initialData, onSubmit, onClose, modalLoading, formError, t }: any) => {
   const [formData, setFormData] = useState(initialData);
+
+  useEffect(() => {
+    setFormData(initialData);
+  }, [initialData]);
 
   return (
     <Portal>
@@ -26,6 +30,11 @@ export const CategoryFormModal = ({ editingCat, initialData, onSubmit, onClose, 
           </div>
 
           <div className="p-6 md:p-10 space-y-6 text-left">
+            {formError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-200 px-5 py-4 rounded-2xl text-xs font-bold italic">
+                {formError}
+              </div>
+            )}
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic">{t.categories.modal.name}</label>
               <div className="relative group">

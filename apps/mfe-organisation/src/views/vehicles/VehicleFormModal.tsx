@@ -1,33 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Loader2, Hash, Settings, Wind, ShieldCheck, Image as ImageIcon, Trash2, UploadCloud, Binary, Palette } from 'lucide-react';
 import { Portal } from '../../components/Portal';
 import { extraService } from '@pwa-easy-rental/shared-services';
 
-export const VehicleFormModal = ({ editingVehicle, agencies, categories, initialData, onSubmit, onClose, modalLoading, t }: any) => {
+export const VehicleFormModal = ({ editingVehicle, agencies, categories, initialData, onSubmit, onClose, modalLoading, formError, t }: any) => {
   const [formData, setFormData] = useState(initialData);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setFormData(initialData);
+    setUploadError('');
+  }, [initialData]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
+    setUploadError('');
     const body = new FormData();
     body.append('file', file);
 
     try {
       const res = await extraService.uploadMedia(body);
-      if (res.ok) {
+      const url = res.data?.url as string | undefined;
+      if (res.ok && url) {
         setFormData((prev: any) => ({
           ...prev,
-          images:[...prev.images, res.data.url]
+          images: [...(prev.images || []), url],
         }));
+      } else {
+        setUploadError((res.data as { message?: string })?.message || t.vehicleformdata.uploadError || 'Upload impossible');
       }
+    } catch {
+      setUploadError(t.vehicleformdata.uploadError || 'Erreur réseau lors de l\'upload');
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -140,6 +153,9 @@ export const VehicleFormModal = ({ editingVehicle, agencies, categories, initial
                     </button>
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept="image/*" />
                 </div>
+                {uploadError && (
+                  <p className="text-xs font-bold text-red-500 italic">{uploadError}</p>
+                )}
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {formData.images.map((url: string, idx: number) => (
@@ -171,11 +187,16 @@ export const VehicleFormModal = ({ editingVehicle, agencies, categories, initial
 
           </div>
 
-          <div className="px-10 py-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 flex gap-4">
+          <div className="px-10 py-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 flex flex-col gap-4">
+            {formError && (
+              <p className="text-xs font-bold text-red-500 italic text-center">{formError}</p>
+            )}
+            <div className="flex gap-4">
             <button type="button" onClick={onClose} className="flex-1 py-4 text-sm font-black text-slate-400 uppercase italic">{t.common.cancel}</button>
             <button disabled={modalLoading || uploading} className="flex-[2] py-4 bg-[#0528d6] text-white rounded-2xl font-black text-xs uppercase shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
               {modalLoading ? <Loader2 className="animate-spin size-4" /> : t.vehicleformdata.saveBtn}
             </button>
+            </div>
           </div>
         </form>
       </div>

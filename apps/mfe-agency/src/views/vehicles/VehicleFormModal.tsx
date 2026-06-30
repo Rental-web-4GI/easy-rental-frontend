@@ -1,33 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Loader2, Hash, Settings, Wind, ShieldCheck, Image as ImageIcon, Trash2, UploadCloud, Binary, Palette } from 'lucide-react';
 import { Portal } from '../../components/Portal';
 import { extraService } from '@pwa-easy-rental/shared-services';
 
-export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSubmit, onClose, modalLoading, t }: any) => {
+export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSubmit, onClose, modalLoading, backendError, t }: any) => {
   const [formData, setFormData] = useState(initialData);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setFormData(initialData);
+    setUploadError('');
+  }, [initialData]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
+    setUploadError('');
     const body = new FormData();
     body.append('file', file);
 
     try {
       const res = await extraService.uploadMedia(body);
-      if (res.ok) {
+      const url = res.data?.url as string | undefined;
+      if (res.ok && url) {
         setFormData((prev: any) => ({
           ...prev,
-          images:[...prev.images, res.data.url]
+          images: [...(prev.images || []), url],
         }));
+      } else {
+        setUploadError((res.data as { message?: string })?.message || 'Upload impossible');
       }
+    } catch {
+      setUploadError('Erreur réseau lors de l\'upload');
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -162,6 +175,10 @@ export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSu
             </div>
 
           </div>
+
+          {backendError && (
+            <p className="px-10 pb-2 text-xs font-bold text-red-500 italic text-center">{backendError}</p>
+          )}
 
           <div className="px-10 py-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 flex gap-4">
             <button type="button" onClick={onClose} className="flex-1 py-4 text-sm font-black text-slate-400 uppercase italic">{t.common.cancel}</button>
