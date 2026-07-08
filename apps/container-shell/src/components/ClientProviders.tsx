@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import { SupportChatWidget } from './SupportChatWidget';
+import { SupportChatWidget } from '@pwa-easy-rental/shared-ui';
 import { LangProvider } from './LangContext';
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
@@ -74,7 +74,11 @@ export default function ClientProviders({ children }: { children: React.ReactNod
   };
 
   if (!mounted) {
-    return <div className="opacity-0">{children}</div>;
+    return (
+      <main className="min-h-screen flex flex-col pt-16 bg-white dark:bg-[#0f1323]">
+        {children}
+      </main>
+    );
   }
 
   return (

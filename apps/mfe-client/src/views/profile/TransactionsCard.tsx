@@ -22,7 +22,8 @@ export const TransactionCard = ({ tx }: { tx: any }) => {
         try {
           const res = await transactionService.getTransactionDetails(tx.id);
           if (res.ok) setDetails(res.data);
-        } catch (error) { console.error(error); } //finally { setLoading(false); }
+        } catch (error) { console.error(error); }
+        finally { setLoading(false); }
       };
       fetchDetails();
     }
@@ -35,29 +36,29 @@ export const TransactionCard = ({ tx }: { tx: any }) => {
   };
 
   return (
-    <div className={`mb-4 overflow-hidden transition-all duration-300 rounded-[2rem] border ${
+    <div className={`mb-3 overflow-hidden transition-all duration-300 rounded-2xl border ${
       isOpen 
-        ? 'bg-white dark:bg-[#1e2235] border-[#0528d6]/30 shadow-2xl scale-[1.01]' 
-        : 'bg-white/80 dark:bg-[#1a1d2d]/80 border-slate-100 dark:border-slate-800 shadow-sm hover:border-slate-300'
+        ? 'bg-white dark:bg-[#1e2235] border-[#0528d6]/30 shadow-lg' 
+        : 'bg-white dark:bg-[#1a1d2d] border-slate-100 dark:border-slate-800 shadow-sm hover:border-slate-200'
     }`}>
       
       {/* --- HEADER PRINCIPAL --- */}
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-5 flex items-center justify-between cursor-pointer group"
+        className="p-4 flex items-center justify-between cursor-pointer group"
       >
-        <div className="flex items-center gap-4">
-          <div className={`size-12 rounded-2xl flex items-center justify-center transition-all ${
+        <div className="flex items-center gap-3">
+          <div className={`size-11 rounded-xl flex items-center justify-center transition-all ${
             isCredit ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10' : 'bg-rose-100 text-rose-600 dark:bg-rose-500/10'
           }`}>
-            {isCredit ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
+            {isCredit ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
           </div>
           <div>
-            <h4 className="text-sm font-black text-slate-900 dark:text-white  tracking-tight">
+            <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight">
               {tx.description}
             </h4>
             <div className="flex items-center gap-2 mt-1">
-               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 ">
+               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">
                 {tx.method}
               </span>
               <span className="text-[10px] font-medium text-slate-400">
@@ -67,14 +68,14 @@ export const TransactionCard = ({ tx }: { tx: any }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className={`text-lg font-black italic ${isCredit ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {isCredit ? '+' : '-'}{tx.amount.toLocaleString()} <span className="text-[10px] not-italic">FCFA</span>
+            <p className={`text-base font-black italic ${isCredit ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {isCredit ? '+' : '-'}{tx.amount.toLocaleString()} <span className="text-[10px] not-italic">XAF</span>
             </p>
-            <span className="text-[9px] font-bold text-slate-400 tracking-widest ">{tx.status}</span>
+            <span className="text-[9px] font-bold text-slate-400 tracking-widest">{tx.status}</span>
           </div>
-          <ChevronDown className={`text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#0528d6]' : ''}`} size={20} />
+          <ChevronDown className={`text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#0528d6]' : ''}`} size={18} />
         </div>
       </div>
 

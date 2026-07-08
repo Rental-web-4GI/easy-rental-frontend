@@ -59,8 +59,12 @@ export const Sidebar = ({
       </nav>
 
       <div className="flex-shrink-0 mt-auto p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
-        <button onClick={handleInstall} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all group italic">
-          <Download size={18} className="text-[#0528d6] group-hover:scale-110 transition-transform"/>
+        <button
+          type="button"
+          onClick={handleInstall}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#F76513] bg-orange-50/80 dark:bg-orange-500/10 hover:bg-orange-100 dark:hover:bg-orange-500/20 border border-orange-100 dark:border-orange-500/20 transition-all group italic"
+        >
+          <Download size={18} className="text-[#F76513] group-hover:scale-110 transition-transform"/>
           <span>{t.sidebar.install}</span>
         </button>
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all italic">

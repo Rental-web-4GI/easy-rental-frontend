@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, Quote, Loader2 } from 'lucide-react';
 import { TestimonialCard } from './TestimonialCard';
 import { useLang } from './LangContext';
+import { LandingSection, SectionTitle } from './landing/LandingSection';
 
 const FALLBACK = [
   {
@@ -66,43 +67,37 @@ const Testimonial = () => {
   }, []);
 
   return (
-    <section className="py-16 md:py-20 bg-slate-50 dark:bg-slate-900/30">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-600 text-[10px] font-black tracking-widest uppercase mb-3">
-              <Star size={12} fill="currentColor" /> {labels.badge}
-            </div>
-            <h2 className="text-3xl md:text-5xl font-[900] italic leading-none tracking-tighter text-slate-900 dark:text-white">
-              {labels.title} <span className="text-[#0528d6]">{labels.titleAccent}</span>
-            </h2>
-          </div>
-          <div className="flex items-center gap-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
-            {loading ? (
-              <Loader2 className="animate-spin text-[#0528d6]" size={24} />
-            ) : (
-              <>
-                <div className="text-2xl font-black text-[#0528d6] italic">{avg.toFixed(1)}/5</div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase leading-tight">
-                  {labels.basedOn} {total > 0 ? total : '2500+'} <br /> {labels.certified}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {items.map((testimonial, index) => (
-            <div key={index} className="relative group">
-              <div className="absolute -top-3 -right-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Quote size={48} className="text-[#0528d6]" />
+    <LandingSection variant="muted" containerClassName="!px-6">
+      <div className="flex flex-col items-center gap-6 mb-8 md:mb-10">
+        <SectionTitle eyebrow={labels.badge} className="mb-0">
+          {labels.title} {labels.titleAccent}
+        </SectionTitle>
+        <div className="flex items-center gap-3 bg-white dark:bg-slate-800 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          {loading ? (
+            <Loader2 className="animate-spin text-primary" size={24} />
+          ) : (
+            <>
+              <div className="text-2xl font-black text-primary italic">{avg.toFixed(1)}/5</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase leading-tight text-left">
+                <Star size={10} className="inline text-orange-500 mb-0.5" fill="currentColor" />
+                {' '}{labels.basedOn} {total > 0 ? total : '2500+'} <br /> {labels.certified}
               </div>
-              <TestimonialCard {...testimonial} />
-            </div>
-          ))}
+            </>
+          )}
         </div>
       </div>
-    </section>
+
+      <div className="grid md:grid-cols-3 gap-5">
+        {items.map((testimonial, index) => (
+          <div key={index} className="relative group">
+            <div className="absolute -top-3 -right-2 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Quote size={48} className="text-primary" />
+            </div>
+            <TestimonialCard {...testimonial} />
+          </div>
+        ))}
+      </div>
+    </LandingSection>
   );
 };
 

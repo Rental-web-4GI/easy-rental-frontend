@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { authService, initAuthSessionWatcher, getStoredToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
 import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
+import { SupportChatWidget } from '@pwa-easy-rental/shared-ui';
 
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -181,6 +182,25 @@ export default function OrganisationDashboard() {
     localStorage.setItem('lang', next);
   };
 
+  const handleInstallApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice?.outcome === 'accepted') setDeferredPrompt(null);
+      return;
+    }
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS) {
+      alert(
+        lang === 'FR'
+          ? 'Sur iPhone/iPad : appuyez sur Partager puis « Sur l’écran d’accueil » pour installer Easy Rental.'
+          : 'On iPhone/iPad: tap Share, then “Add to Home Screen” to install Easy Rental.'
+      );
+      return;
+    }
+    alert(t.installNotice || t.hero?.installNotice || 'Utilisez Chrome ou Edge pour installer l’application.');
+  };
+
   if (isLoading) return (
     <div className="h-screen flex items-center justify-center bg-[#f4f7fe] dark:bg-[#080b14]">
       <Loader2 className="animate-spin text-[#0528d6] size-12" />
@@ -211,7 +231,7 @@ export default function OrganisationDashboard() {
         setCurrentView={setCurrentView} 
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen} 
-        handleInstall={() => deferredPrompt?.prompt()} 
+        handleInstall={handleInstallApp} 
         handleLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} 
         userData={userData}
         t={t}
@@ -227,7 +247,7 @@ export default function OrganisationDashboard() {
           darkMode={darkMode} 
           toggleTheme={toggleTheme} 
           setSidebarOpen={setSidebarOpen} 
-          onInstall={() => deferredPrompt?.prompt()} 
+          onInstall={handleInstallApp} 
           hasPrompt={!!deferredPrompt} 
           t={t} 
         />
@@ -249,6 +269,7 @@ export default function OrganisationDashboard() {
           </div>
         </div>
       </main>
+      {isAuth && <SupportChatWidget />}
     </div>
   );
 }

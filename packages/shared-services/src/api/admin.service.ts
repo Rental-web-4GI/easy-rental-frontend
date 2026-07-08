@@ -9,9 +9,13 @@ export const adminService = {
   createPlan: extraService.createPlan,
   updatePlan: extraService.updatePlanQuotas,
   assignPlan: (orgId: string, planName: string) => orgService.assignPlan(orgId, planName),
-  getSupportThreads: () => supportService.listThreads(),
-  getSupportMessages: (threadId: string) => supportService.getThreadMessages(threadId),
-  replyToSupportThread: (threadId: string, body: string) => supportService.replyToThread(threadId, body),
+  getSupportConversations: () => supportService.listConversations(),
+  getSupportConversationMessages: (params: { email?: string; visitorSessionId?: string }) =>
+    supportService.getAdminConversationMessages(params),
+  replyToSupportConversation: (params: { email?: string; visitorSessionId?: string; body: string }) =>
+    supportService.replyToConversation(params),
+  markSupportConversationRead: (params: { email?: string; visitorSessionId?: string }) =>
+    supportService.markConversationAsRead(params),
   getReviews: () => reviewService.listAllForAdmin(),
   getReviewModerationStats: () => reviewService.getModerationStats(),
   setReviewPublished: (id: string, published: boolean) => reviewService.setPublished(id, published),

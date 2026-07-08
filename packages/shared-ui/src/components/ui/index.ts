@@ -12,6 +12,10 @@ export type { LoadingSpinnerProps } from './LoadingSpinner';
 
 export { DateTimePicker } from './DateTimePicker';
 export { DocumentUploadZone } from './DocumentUploadZone';
+export { PlatformFeedbackPrompt } from './PlatformFeedbackPrompt';
+export { SupportChatWidget } from './SupportChatWidget';
+export { Footer } from './Footer';
+export { About } from './About';
 export { VehicleDetailsBody } from './VehicleDetailsBody';
 export type { VehicleDetailsBodyProps } from './VehicleDetailsBody';
 

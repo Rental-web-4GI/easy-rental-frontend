@@ -28,7 +28,12 @@ export type { CreatePlanPayload } from './extra.service';
 export type { NormalizedSubscriptionPlan } from './subscription.mapper';
 export { adminService } from './admin.service';
 export { supportService } from './support.service';
-export type { SupportConfig, SupportMessage, SupportThread } from './support.service';
+export type { SupportConfig, SupportConversation, SupportMessage } from './support.service';
+export {
+  getOrCreateSupportSessionId,
+  resolveSupportVisitorContext,
+} from './support-visitor';
+export type { SupportVisitorContext } from './support-visitor';
 export { rentalService } from './rental.service';
 export { statsService } from './stats.service';
 export { transactionService } from './transaction.service';

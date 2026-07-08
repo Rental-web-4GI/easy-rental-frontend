@@ -8,8 +8,10 @@ import { VehicleCard } from './catalog/VehicleCard';
 import { VehicleDetailsView } from './VehicleDetailsView';
 import { AgencyDetailsView } from './AgencyDetailsView';
 import { AgencyCard } from './catalog/AgencyCard';
+import { useClientI18n } from '../hooks/useClientI18n';
 
 export const CatalogView = ({ userData, lang = 'FR' }: { userData: any; lang?: 'FR' | 'EN' }) => {
+  const t = useClientI18n(lang);
   const [activeTab, setActiveTab] = useState<'vehicles' | 'agencies'>('vehicles');
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [agencies, setAgencies] = useState<any[]>([]);
@@ -85,35 +87,35 @@ export const CatalogView = ({ userData, lang = 'FR' }: { userData: any; lang?: '
   }
 
   return (
-    <div className="animate-in fade-in duration-300 pb-8">
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        <aside className="w-full lg:w-52 flex flex-row lg:flex-col gap-2 shrink-0">
+    <div className="animate-in fade-in duration-300 pb-2">
+      <div className="flex flex-col lg:flex-row gap-4 items-start">
+        <aside className="w-full lg:w-48 flex flex-row lg:flex-col gap-2 shrink-0">
           <button
             type="button"
             onClick={() => { setActiveTab('vehicles'); setSearchTerm(''); }}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
               activeTab === 'vehicles' ? 'bg-[#0528d6] text-white' : 'bg-white dark:bg-slate-900 text-slate-500 border border-slate-200 dark:border-slate-800'
             }`}
           >
-            <Car size={16} /> Véhicules
+            <Car size={16} /> {t.catalog.vehicles}
           </button>
           <button
             type="button"
             onClick={() => { setActiveTab('agencies'); setSearchTerm(''); }}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
               activeTab === 'agencies' ? 'bg-[#0528d6] text-white' : 'bg-white dark:bg-slate-900 text-slate-500 border border-slate-200 dark:border-slate-800'
             }`}
           >
-            <Store size={16} /> Agences
+            <Store size={16} /> {t.catalog.agencies}
           </button>
         </aside>
 
-        <div className="flex-1 w-full min-w-0 space-y-5">
-          <div className="flex flex-col sm:flex-row gap-3 bg-white dark:bg-[#1a1d2d] p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+        <div className="flex-1 w-full min-w-0 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3 bg-white dark:bg-[#1a1d2d] p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
-                placeholder={activeTab === 'vehicles' ? 'Rechercher par modèle…' : 'Rechercher une agence…'}
+                placeholder={activeTab === 'vehicles' ? t.catalog.searchVehicles : t.catalog.searchAgencies}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-[#0528d6] dark:text-white"
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setItemsToShow(12); }}
@@ -125,7 +127,7 @@ export const CatalogView = ({ userData, lang = 'FR' }: { userData: any; lang?: '
                 onChange={(e) => { setSelectedCat(e.target.value); setItemsToShow(12); }}
                 className="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-[#0528d6] dark:text-white min-w-[160px]"
               >
-                <option value="all">Tous les segments</option>
+                <option value="all">{t.catalog.allSegments}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -160,7 +162,7 @@ export const CatalogView = ({ userData, lang = 'FR' }: { userData: any; lang?: '
             </div>
           ) : activeTab === 'vehicles' ? (
             <>
-              <p className="text-xs text-slate-500">{filtered.length} véhicule(s) disponible(s)</p>
+              <p className="text-xs text-slate-500">{filtered.length} {t.catalog.vehiclesAvailable}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filtered.slice(0, itemsToShow).map((v) => (
                   <VehicleCard
@@ -175,7 +177,7 @@ export const CatalogView = ({ userData, lang = 'FR' }: { userData: any; lang?: '
             </>
           ) : (
             <>
-              <p className="text-xs text-slate-500">{filtered.length} agence(s) partenaire(s)</p>
+              <p className="text-xs text-slate-500">{filtered.length} {t.catalog.agenciesAvailable}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filtered.map((a) => (
                   <AgencyCard key={a.id} agency={a} onClick={(id) => setSelectedAgencyId(id)} />

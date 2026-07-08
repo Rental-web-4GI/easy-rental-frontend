@@ -39,11 +39,17 @@ export const Header = ({ title, orgData, lang, setLang, darkMode, toggleTheme, s
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
-        {hasPrompt && (
-            <button onClick={onInstall} className="hidden md:flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-500/10 text-[#F76513] rounded-full font-black text-[9px] uppercase border border-orange-100 dark:border-orange-500/20 hover:bg-orange-100 transition-all animate-pulse">
-                <Download size={14} /> {t.header.installBtn}
-            </button>
-        )}
+        <button
+          type="button"
+          onClick={onInstall}
+          className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-full font-black text-[9px] uppercase border transition-all ${
+            hasPrompt
+              ? 'bg-[#F76513] text-white border-[#F76513] shadow-lg shadow-orange-500/25 animate-pulse hover:bg-orange-600'
+              : 'bg-orange-50 dark:bg-orange-500/10 text-[#F76513] border-orange-100 dark:border-orange-500/20 hover:bg-orange-100'
+          }`}
+        >
+          <Download size={14} /> {t.header.installBtn}
+        </button>
 
         <button onClick={() => setCurrentView('NOTIFICATIONS')} className="p-2.5 text-slate-400 hover:text-[#0528d6] hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-full transition-all relative group">
           <Bell size={20} className="group-hover:rotate-12 transition-transform" />

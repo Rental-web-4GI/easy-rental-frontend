@@ -129,6 +129,15 @@ export const authService = {
     persistAuthToken(token);
     client.setAuthToken(token);
   },
-  updateProfile: (data: any) => client.put<any>('/api/users/profile', data),
-  updatePassword: (data: any) => client.put<any>('/api/users/password', data),
+  updateProfile: (data: { firstname: string; lastname: string }) =>
+    client.put<Record<string, unknown>>('/api/users/profile', {
+      firstname: data.firstname,
+      lastname: data.lastname,
+    }),
+
+  updatePassword: (data: { oldPassword: string; newPassword: string }) =>
+    client.put<unknown>('/api/users/password', {
+      old_password: data.oldPassword,
+      new_password: data.newPassword,
+    }),
 };

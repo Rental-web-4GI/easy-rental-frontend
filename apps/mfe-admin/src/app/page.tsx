@@ -51,7 +51,7 @@ export default function AdminConsole() {
   const loadStats = useCallback(async () => {
     const [orgsRes, threadsRes, reviewStatsRes] = await Promise.all([
       adminService.getAllOrganizations(),
-      adminService.getSupportThreads(),
+      adminService.getSupportConversations(),
       adminService.getReviewModerationStats(),
     ]);
     if (orgsRes.ok && Array.isArray(orgsRes.data)) {

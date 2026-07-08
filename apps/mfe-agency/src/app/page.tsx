@@ -14,6 +14,7 @@ import {
   markFirstUsageDone,
 } from '@pwa-easy-rental/shared-services';
 import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
+import { SupportChatWidget } from '@pwa-easy-rental/shared-ui';
 
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -263,6 +264,7 @@ export default function AgencyDashboard() {
           </div>
         </div>
       </main>
+      {isAuth && <SupportChatWidget />}
     </div>
   );
 }

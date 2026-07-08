@@ -26,7 +26,7 @@ export function PlatformFeedbackPrompt({ feedbackUrl, label }: PlatformFeedbackP
   };
 
   return (
-    <div className="mx-4 md:mx-8 mb-4 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 flex flex-col sm:flex-row sm:items-center gap-4">
+    <div className="mx-0 mb-3 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 flex flex-col sm:flex-row sm:items-center gap-4">
       <div className="flex items-start gap-3 flex-1">
         <Star className="text-orange-500 shrink-0 mt-0.5" size={20} fill="currentColor" />
         <div>
@@ -41,7 +41,7 @@ export function PlatformFeedbackPrompt({ feedbackUrl, label }: PlatformFeedbackP
       <div className="flex items-center gap-2 shrink-0">
         <a
           href={feedbackUrl}
-          className="px-4 py-2 rounded-xl bg-[#0528d6] text-white text-xs font-black uppercase italic"
+          className="px-4 py-2 rounded-xl bg-[#F76513] text-white text-xs font-black uppercase italic shadow-md shadow-orange-500/25 hover:bg-orange-600 transition-colors"
         >
           Noter
         </a>

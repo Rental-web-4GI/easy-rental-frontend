@@ -70,10 +70,10 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 
 #### UX-001 — Modification de profil ne fonctionne pas
 - **Priorité :** P0
-- **Statut :** À faire
+- **Statut :** Corrigé
 - **Page :** `ProfileView` (`apps/mfe-client/src/views/ProfileView.tsx`)
 - **Remarque :** La sauvegarde du profil ne donne pas de retour ; le formulaire semble ne pas persister les changements.
-- **Piste technique :** `updateProfile` n'inspecte pas `res.ok` ; pas de feedback utilisateur ; vérifier endpoint `PUT /api/users/profile` et proxy `/client/api-rental`.
+- **Piste résolue :** UI profil refondue ; `res.ok` + feedback ; MDP envoie `old_password`/`new_password` ; `onProfileUpdated` rafraîchit le header.
 
 #### UX-002 — Photo de profil non modifiable (client)
 - **Priorité :** P0
@@ -429,4 +429,14 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 - **Priorité :** P1
 - **Statut :** Corrigé
 - **Piste résolue :** Toggle auto-renew dans `SubscriptionView` + champ `autoRenew` dans `SubscriptionResponseDTO`.
+
+#### UX-054 — Envoi avis landing `/feedback` (validation 400)
+- **Priorité :** P0
+- **Statut :** Corrigé
+- **Piste résolue :** `review.service.ts` envoie `author_name` / `author_role` (snake_case API) ; message d'erreur UI moins verbeux.
+
+#### UX-055 — Organisation : install PWA + boutons noirs + graphiques
+- **Priorité :** P1
+- **Statut :** Corrigé
+- **Piste résolue :** SW + `handleInstallApp` (prompt ou instructions) ; bouton Noter / CTA cards en `#F76513` ; dashboard en courbes area style trading (`SparklineChart`).
 

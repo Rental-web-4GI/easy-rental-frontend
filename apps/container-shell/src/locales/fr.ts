@@ -1,5 +1,7 @@
 export const fr = {
   nav: {
+    home: "Accueil",
+    reviews: "Avis",
     features: "Fonctionnalités",
     solutions: "Solutions",
     pricing: "Tarifs",
@@ -10,6 +12,11 @@ export const fr = {
     reserve: "Réserver",
     install: "Installer",
     admin: "Console Admin",
+  },
+  heroSlider: {
+    clientHeadline: "Réservez votre voiture de rêve en un clic.",
+    clientDesc: "Tous types de véhicules, pour toutes les occasions — dans nos agences partout au Cameroun.",
+    clientCta: "Réserver un véhicule",
   },
   hero: {
     badge: "Écosystème de location nouvelle génération",

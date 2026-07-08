@@ -6,15 +6,15 @@ export type SupportConfig = {
   consoleUrl: string;
 };
 
-export type SupportThread = {
-  id: string;
-  visitorEmail: string;
-  visitorName?: string;
-  subject?: string;
-  status: string;
+export type SupportConversation = {
+  conversationKey: string;
+  displayLabel: string;
+  visitorEmail?: string;
+  visitorSessionId?: string;
+  visitorRole?: string;
   adminUnreadCount: number;
   lastMessageAt?: string | null;
-  createdAt?: string | null;
+  canonicalThreadId: string;
 };
 
 export type SupportMessage = {
@@ -29,16 +29,16 @@ function str(value: unknown, fallback = ''): string {
   return value != null ? String(value) : fallback;
 }
 
-function normalizeThread(raw: Record<string, unknown>): SupportThread {
+function normalizeConversation(raw: Record<string, unknown>): SupportConversation {
   return {
-    id: str(raw.id),
-    visitorEmail: str(raw.visitorEmail ?? raw.visitor_email),
-    visitorName: str(raw.visitorName ?? raw.visitor_name) || undefined,
-    subject: str(raw.subject) || undefined,
-    status: str(raw.status, 'OPEN'),
+    conversationKey: str(raw.conversationKey ?? raw.conversation_key),
+    displayLabel: str(raw.displayLabel ?? raw.display_label),
+    visitorEmail: str(raw.visitorEmail ?? raw.visitor_email) || undefined,
+    visitorSessionId: str(raw.visitorSessionId ?? raw.visitor_session_id) || undefined,
+    visitorRole: str(raw.visitorRole ?? raw.visitor_role) || undefined,
     adminUnreadCount: Number(raw.adminUnreadCount ?? raw.admin_unread_count ?? 0),
     lastMessageAt: (raw.lastMessageAt ?? raw.last_message_at ?? null) as string | null,
-    createdAt: (raw.createdAt ?? raw.created_at ?? null) as string | null,
+    canonicalThreadId: str(raw.canonicalThreadId ?? raw.canonical_thread_id),
   };
 }
 
@@ -50,6 +50,14 @@ function normalizeMessage(raw: Record<string, unknown>): SupportMessage {
     body: str(raw.body),
     createdAt: (raw.createdAt ?? raw.created_at ?? null) as string | null,
   };
+}
+
+function conversationQuery(email?: string, visitorSessionId?: string): string {
+  const params = new URLSearchParams();
+  if (email) params.set('email', email);
+  if (visitorSessionId) params.set('visitorSessionId', visitorSessionId);
+  const query = params.toString();
+  return query ? `?${query}` : '';
 }
 
 export const supportService = {
@@ -69,8 +77,10 @@ export const supportService = {
 
   sendMessage: async (payload: {
     threadId?: string;
-    email: string;
+    email?: string;
+    visitorSessionId?: string;
     authorName?: string;
+    visitorRole?: string;
     body: string;
   }) => {
     const res = await client.post<Record<string, unknown>>('/api/support/messages', payload);
@@ -81,24 +91,43 @@ export const supportService = {
         threadId: str(res.data.threadId ?? res.data.thread_id),
         confirmationMessage: str(
           res.data.confirmationMessage ?? res.data.confirmation_message,
-          'Message envoyé.'
+          'Message envoyé.',
         ),
       },
     };
   },
 
-  getThreadMessages: async (threadId: string) => {
-    const res = await client.get<Record<string, unknown>[]>(`/api/support/threads/${threadId}/messages`);
+  getConversationMessages: async (params: { email?: string; visitorSessionId?: string }) => {
+    const res = await client.get<Record<string, unknown>[]>(
+      `/api/support/conversation/messages${conversationQuery(params.email, params.visitorSessionId)}`,
+    );
     if (!res.ok || !Array.isArray(res.data)) return res;
     return { ...res, data: res.data.map((row) => normalizeMessage(row)) };
   },
 
-  listThreads: async () => {
-    const res = await client.get<Record<string, unknown>[]>('/api/support/threads');
+  listConversations: async () => {
+    const res = await client.get<Record<string, unknown>[]>('/api/support/admin/conversations');
     if (!res.ok || !Array.isArray(res.data)) return res;
-    return { ...res, data: res.data.map((row) => normalizeThread(row)) };
+    return { ...res, data: res.data.map((row) => normalizeConversation(row)) };
   },
 
-  replyToThread: (threadId: string, body: string) =>
-    client.post<Record<string, unknown>>(`/api/support/threads/${threadId}/reply`, { body }),
+  getAdminConversationMessages: async (params: { email?: string; visitorSessionId?: string }) => {
+    const res = await client.get<Record<string, unknown>[]>(
+      `/api/support/admin/conversation/messages${conversationQuery(params.email, params.visitorSessionId)}`,
+    );
+    if (!res.ok || !Array.isArray(res.data)) return res;
+    return { ...res, data: res.data.map((row) => normalizeMessage(row)) };
+  },
+
+  replyToConversation: (params: { email?: string; visitorSessionId?: string; body: string }) =>
+    client.post<Record<string, unknown>>(
+      `/api/support/admin/conversation/reply${conversationQuery(params.email, params.visitorSessionId)}`,
+      { body: params.body },
+    ),
+
+  markConversationAsRead: (params: { email?: string; visitorSessionId?: string }) =>
+    client.patch<void>(
+      `/api/support/admin/conversation/read${conversationQuery(params.email, params.visitorSessionId)}`,
+      {},
+    ),
 };

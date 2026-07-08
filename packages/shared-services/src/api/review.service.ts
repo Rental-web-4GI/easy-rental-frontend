@@ -33,11 +33,31 @@ export type ReviewModerationStats = {
   unpublishedCount: number;
 };
 
+function toReviewApiPayload(data: ReviewPayload) {
+  return {
+    resource_id: data.resourceId,
+    resource_type: data.resourceType,
+    rating: data.rating,
+    comment: data.comment,
+    author_name: data.authorName,
+  };
+}
+
+function toPlatformFeedbackApiPayload(data: PlatformFeedbackPayload) {
+  return {
+    author_name: data.authorName,
+    author_role: data.authorRole,
+    rating: data.rating,
+    comment: data.comment,
+  };
+}
+
 export const reviewService = {
-  addReview: (data: ReviewPayload) => client.post<ReviewItem>('/api/reviews', data),
+  addReview: (data: ReviewPayload) =>
+    client.post<ReviewItem>('/api/reviews', toReviewApiPayload(data)),
 
   submitPlatformFeedback: (data: PlatformFeedbackPayload) =>
-    client.post<ReviewItem>('/api/reviews/platform-feedback', data),
+    client.post<ReviewItem>('/api/reviews/platform-feedback', toPlatformFeedbackApiPayload(data)),
 
   getReviews: (type: 'VEHICLE' | 'DRIVER', id: string) =>
     client.get<ReviewItem[]>(`/api/reviews/${type}/${id}`),

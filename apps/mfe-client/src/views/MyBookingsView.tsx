@@ -3,12 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Bell, Loader2, Calendar, CreditCard, ChevronRight, X, MapPin, Car, Phone, Mail, Shield, UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale, enUS } from 'date-fns/locale';
 import { rentalService, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
 import { ReviewModal } from './ReviewModal';
+import { useClientI18n } from '../hooks/useClientI18n';
 
 
-export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: any; onNavigateToCatalog?: () => void }) => {
+export const MyBookingsView = ({ userData, onNavigateToCatalog, lang = 'FR' }: { userData: any; onNavigateToCatalog?: () => void; lang?: 'FR' | 'EN' }) => {
+  const t = useClientI18n(lang);
+  const dateLocale = lang === 'EN' ? enUS : frLocale;
   const [rentals, setRentals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRental, setSelectedRental] = useState<any>(null);
@@ -71,17 +74,16 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
   );
 
   return (
-    <div className="w-full mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20 text-left px-4">
+    <div className="w-full mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-4 text-left">
       
       {/* Header */}
-      <div className="flex justify-between items-center border-b pb-6 mt-4">
+      <div className="flex justify-between items-center border-b border-slate-100 pb-4">
         <div>
-          <h2 className="text-3xl font-[900] tracking-tighter text-slate-900">Mes trajets</h2>
-          <p className="text-slate-400 text-xs font-medium">Historique et locations en cours</p>
+          <h2 className="text-3xl font-[900] tracking-tighter text-[#0528d6]">{t.trips.title}</h2>
+          <p className="text-slate-400 text-xs font-medium mt-1">{t.trips.subtitle}</p>
         </div>
-        <div className="relative size-12 bg-white shadow-sm border border-slate-100 text-[#0528d6] rounded-2xl flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
-          <Bell size={20}/>
-          <span className="absolute top-3 right-3 size-2 bg-red-500 rounded-full border-2 border-white"></span>
+        <div className="relative size-11 bg-white shadow-sm border border-slate-100 text-[#0528d6] rounded-2xl flex items-center justify-center">
+          <Bell size={18}/>
         </div>
       </div>
 
@@ -118,12 +120,12 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
                           <Calendar size={18} />
                         </div>
                         <div>
-                          <p className="text-[10px] text-slate-400 font-bold">Dates</p>
+                          <p className="text-[10px] text-slate-400 font-bold">{t.trips.dates}</p>
                           <p className="text-sm font-bold text-slate-700">
-                            Du {format(new Date(rental.startDate), 'dd MMM yyyy', { locale: fr })}
+                            Du {format(new Date(rental.startDate), 'dd MMM yyyy', { locale: dateLocale })}
                           </p>
                           <p className="text-xs text-slate-500">
-                            au {format(new Date(rental.endDate), 'dd MMM yyyy', { locale: fr })}
+                            au {format(new Date(rental.endDate), 'dd MMM yyyy', { locale: dateLocale })}
                           </p>
                         </div>
                       </div>
@@ -133,12 +135,12 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
                           <CreditCard size={18} />
                         </div>
                         <div>
-                          <p className="text-[10px] text-slate-400 font-bold">Paiement</p>
-                          <p className="text-sm font-black text-slate-900">
+                          <p className="text-[10px] text-slate-400 font-bold">{t.trips.payment}</p>
+                          <p className="text-sm font-black text-slate-800">
                             {rental.totalAmount.toLocaleString()} XAF
                           </p>
                           <p className={`text-[10px] font-bold ${rental.amountPaid >= rental.totalAmount ? 'text-green-500' : 'text-orange-500'}`}>
-                            {rental.amountPaid >= rental.totalAmount ? 'Soldé' : `Reste: ${(rental.totalAmount - rental.amountPaid).toLocaleString()} XAF`}
+                            {rental.amountPaid >= rental.totalAmount ? t.trips.paid : `${t.trips.remaining}: ${(rental.totalAmount - rental.amountPaid).toLocaleString()} XAF`}
                           </p>
                         </div>
                       </div>
@@ -149,9 +151,9 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
                   <div className="flex flex-col justify-center items-center md:items-end gap-3 shrink-0">
                     <button
                       onClick={() => handleViewDetails(rental)}
-                      className="w-full md:w-auto bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-black transition-colors"
+                      className="w-full md:w-auto bg-[#0528d6] text-white px-6 py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
                     >
-                      Détails du trajet <ChevronRight size={16} />
+                      {t.trips.details} <ChevronRight size={16} />
                     </button>
                     {rental.status === 'COMPLETED' && rental.vehicleId && rental.driverId && (
                       <button
@@ -162,7 +164,7 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
                         }}
                         className="w-full md:w-auto border-2 border-[#0528d6] text-[#0528d6] px-6 py-2.5 rounded-2xl text-xs font-black uppercase"
                       >
-                        Noter le trajet
+                        {t.trips.rate}
                       </button>
                     )}
                   </div>
@@ -175,15 +177,15 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
               <div className="size-20 bg-orange-50 text-orange-600 rounded-[2.5rem] flex items-center justify-center shadow-inner mx-auto mb-2">
                 <Clock size={48} className="animate-pulse" />
               </div>
-              <h4 className="text-2xl font-black text-slate-900 mb-2 italic tracking-tighter">Aucun trajet trouvé</h4>
+              <h4 className="text-2xl font-black text-slate-800 mb-2 italic tracking-tighter">{t.trips.emptyTitle}</h4>
               <p className="text-slate-400 text-sm font-medium italic leading-relaxed max-w-sm mx-auto">
-                Aucune location terminée ou en cours. Vos futures locations apparaîtront ici.
+                {t.trips.emptyDesc}
               </p>
               <button
                 onClick={onNavigateToCatalog}
                 className="mt-8 bg-[#0528d6] text-white px-8 py-4 rounded-3xl font-black text-sm tracking-widest hover:shadow-lg hover:shadow-blue-200 transition-all"
               >
-                Louer un véhicule
+                {t.trips.rentCta}
               </button>
             </div>
           )}

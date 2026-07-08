@@ -10,9 +10,9 @@ module.exports = {
       colors: {
         // Couleur principale - Bleu
         primary: {
-          DEFAULT: "#062AD7", // bleu principal
-          dark: "#041FA3",    // optionnel si tu veux une version plus foncée
-          light: "#3D5AFE"    // optionnel si tu veux une version plus claire
+          DEFAULT: "#0528d6",
+          dark: "#041FA3",
+          light: "#3D5AFE",
         },
 
         // Couleur secondaire - Orange

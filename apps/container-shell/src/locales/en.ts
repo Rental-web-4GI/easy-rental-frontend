@@ -1,17 +1,24 @@
 // import { headers } from "next/headers";
 
 export const en = {
-  nav: { 
-    features: "Features", 
-    solutions: "Solutions", 
+  nav: {
+    home: "Home",
+    reviews: "Reviews",
+    features: "Features",
+    solutions: "Solutions",
     pricing: "Pricing",
     team: "Team",
     feedback: "Feedback",
-    help: "Help", 
-    login: "Pro Space", 
+    help: "Help",
+    login: "Pro Space",
     reserve: "Book Now",
     install: "Install",
     admin: "Admin Console",
+  },
+  heroSlider: {
+    clientHeadline: "Rent your dream car in a click.",
+    clientDesc: "All types of vehicles, for every occasion — across our agencies in Cameroon.",
+    clientCta: "Book a vehicle",
   },
   hero: {
     badge: "Next-gen rental ecosystem",

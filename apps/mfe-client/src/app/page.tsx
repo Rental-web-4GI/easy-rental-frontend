@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Footer } from '@shared-ui/components/ui/Footer';
 import { authService, initAuthSessionWatcher, getStoredToken, persistAuthToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
 import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
+import { SupportChatWidget } from '@pwa-easy-rental/shared-ui';
 
 import { Header } from '../components/Header';
 import { AuthView } from '../views/AuthView';
@@ -182,7 +183,7 @@ export default function ClientDashboard() {
   );
 
   return (
-      <div className="min-h-screen bg-[#f4f7fe] dark:bg-[#0f1323] transition-colors duration-500 font-sans">
+      <div className="min-h-screen bg-[#f4f7fe] dark:bg-[#0f1323] transition-colors duration-300 font-sans flex flex-col">
         <Header
             isAuth={isAuth}
             userData={userData}
@@ -197,20 +198,32 @@ export default function ClientDashboard() {
             onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }}
         />
 
-        {isAuth && <PlatformFeedbackPrompt feedbackUrl="http://localhost:3000/feedback" />}
+        {isAuth && (
+          <div className="max-w-7xl mx-auto w-full px-4 md:px-8 pt-20 md:pt-[4.5rem]">
+            <PlatformFeedbackPrompt feedbackUrl="http://localhost:3000/feedback" />
+          </div>
+        )}
 
-        <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 pt-24 md:pt-28">
+        <main className={`flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 pb-6 ${isAuth ? 'pt-3' : 'pt-20 md:pt-[4.5rem]'}`}>
           {currentView === 'HOME' && <HomeView lang={lang} onSearch={() => setCurrentView('CATALOG')} setViewAll={() => setCurrentView('CATALOG')} onSelectVehicle={(id: string) => { setSelectedVehicleId(id); setCurrentView('DETAILS'); }} />}
           {currentView === 'CATALOG' && <CatalogView lang={lang} userData={userData} />}
           {currentView === 'DETAILS' && selectedVehicleId && <VehicleDetailsView vehicleId={selectedVehicleId} isAuth={isAuth} onBack={() => setCurrentView('CATALOG')} onAuthRequired={() => setCurrentView('AUTH')} onStartBooking={() => setCurrentView('CATALOG')} />}
-          {currentView === 'MY_BOOKINGS' && <MyBookingsView userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
-          {currentView === 'MY_RESERVATIONS' && <MyReservationsView userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
-          {currentView === 'PROFILE' && <ProfileView userData={userData} onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} />}
+          {currentView === 'MY_BOOKINGS' && <MyBookingsView lang={lang} userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
+          {currentView === 'MY_RESERVATIONS' && <MyReservationsView lang={lang} userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
+          {currentView === 'PROFILE' && (
+            <ProfileView
+              lang={lang}
+              userData={userData}
+              onBack={() => setCurrentView('HOME')}
+              onProfileUpdated={(updated) => setUserData(updated)}
+              onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }}
+            />
+          )}
 
-          {/* Utilisation de clientId au lieu de userData pour correspondre au composant */}
           {currentView === 'NOTIFICATIONS' && <NotificationsView clientId={userData?.id} />}
         </main>
-        <Footer/>
+        <Footer t={t.footer} nav={{ features: t.footer.features }} landingBaseUrl="http://localhost:3000" />
+        {isAuth && <SupportChatWidget />}
       </div>
   );
 }

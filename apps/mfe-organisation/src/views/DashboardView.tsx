@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { statsService } from '@pwa-easy-rental/shared-services';
 import { KpiCard } from '../components/KpiCard';
+import { SparklineChart } from '../components/SparklineChart';
 
 export const DashboardView = ({ orgData, t }: any) => {
   const [data, setData] = useState<any>(null);
@@ -43,8 +44,6 @@ export const DashboardView = ({ orgData, t }: any) => {
   }
 
   const { summary, revenueEvolution, rentalEvolution, vehicleStatusDistribution, rentalStatusDistribution, agencyComparison } = data;
-  const revenueMax = Math.max(...revenueEvolution.values, 1);
-  const rentalMax = Math.max(...rentalEvolution.values, 1);
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-10">
@@ -62,36 +61,35 @@ export const DashboardView = ({ orgData, t }: any) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-8"><TrendingUp size={16} className="text-[#0528d6]"/> {t.dashboard.revenueEvolution}</h3>
-          <div className="flex items-end gap-2 h-48">
-            {revenueEvolution.values.length === 0 ? (
-              <p className="text-xs text-slate-400 italic w-full text-center self-center">{t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}</p>
-            ) : revenueEvolution.values.map((v: number, i: number) => (
-              <div key={i} className="flex-1 bg-[#0528d6]/10 hover:bg-[#0528d6] rounded-t-lg transition-all relative group" style={{ height: `${(v / revenueMax) * 100}%` }}>
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">{v.toLocaleString()} XAF</div>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-4 text-[8px] font-black text-slate-400  italic">
-            <span>{revenueEvolution.labels[0] ?? '—'}</span>
-            <span>{revenueEvolution.labels[revenueEvolution.labels.length - 1] ?? '—'}</span>
+          <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-6">
+            <TrendingUp size={16} className="text-[#0528d6]" /> {t.dashboard.revenueEvolution}
+          </h3>
+          <SparklineChart
+            values={revenueEvolution.values ?? []}
+            labels={revenueEvolution.labels ?? []}
+            color="#0528d6"
+            unit="XAF"
+            emptyLabel={t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}
+          />
+          <div className="flex justify-between mt-3 text-[8px] font-black text-slate-400 italic">
+            <span>{revenueEvolution.labels?.[0] ?? '—'}</span>
+            <span>{revenueEvolution.labels?.[revenueEvolution.labels.length - 1] ?? '—'}</span>
           </div>
         </div>
 
         <div className="bg-white dark:bg-[#1a1d2d] rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-8"><CalendarCheck size={16} className="text-[#0528d6]"/> {t.dashboard.rentalVolume}</h3>
-          <div className="flex items-end gap-2 h-48">
-            {rentalEvolution.values.length === 0 ? (
-              <p className="text-xs text-slate-400 italic w-full text-center self-center">{t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}</p>
-            ) : rentalEvolution.values.map((v: number, i: number) => (
-              <div key={i} className="flex-1 bg-orange-500/10 hover:bg-orange-500 rounded-t-lg transition-all relative group" style={{ height: `${(v / rentalMax) * 100}%` }}>
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">{v}</div>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-4 text-[8px] font-black text-slate-400  italic">
-            <span>{rentalEvolution.labels[0] ?? '—'}</span>
-            <span>{rentalEvolution.labels[rentalEvolution.labels.length - 1] ?? '—'}</span>
+          <h3 className="text-sm font-black uppercase italic tracking-tighter flex items-center gap-2 mb-6">
+            <CalendarCheck size={16} className="text-[#F76513]" /> {t.dashboard.rentalVolume}
+          </h3>
+          <SparklineChart
+            values={rentalEvolution.values ?? []}
+            labels={rentalEvolution.labels ?? []}
+            color="#F76513"
+            emptyLabel={t.dashboard?.noData ?? 'Aucune donnée pour le moment.'}
+          />
+          <div className="flex justify-between mt-3 text-[8px] font-black text-slate-400 italic">
+            <span>{rentalEvolution.labels?.[0] ?? '—'}</span>
+            <span>{rentalEvolution.labels?.[rentalEvolution.labels.length - 1] ?? '—'}</span>
           </div>
         </div>
       </div>

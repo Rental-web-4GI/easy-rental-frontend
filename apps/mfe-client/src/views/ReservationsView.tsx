@@ -11,13 +11,16 @@ import {
   MapPin,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale, enUS } from 'date-fns/locale';
 import { rentalService, resolveMediaDisplayUrl } from '@pwa-easy-rental/shared-services';
 import ReservationDetail from './reservation/ReservationDetail';
+import { useClientI18n } from '../hooks/useClientI18n';
 
 const VEHICLE_FALLBACK = '/client/vehicle-placeholder.svg';
 
-export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
+export const MyReservationsView = ({ userData, onNavigateToCatalog, lang = 'FR' }: any) => {
+  const t = useClientI18n(lang);
+  const dateLocale = lang === 'EN' ? enUS : frLocale;
   const [reservations, setReservations] = useState<any[]>([]);
   const [detailsCache, setDetailsCache] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
@@ -98,9 +101,9 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
 
   const formatDate = (dateStr: any) => {
     try {
-      return format(new Date(dateStr), 'dd MMM yyyy', { locale: fr });
+      return format(new Date(dateStr), 'dd MMM yyyy', { locale: dateLocale });
     } catch {
-      return 'Date non définie';
+      return lang === 'EN' ? 'Date unavailable' : 'Date non définie';
     }
   };
 
@@ -116,16 +119,17 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
   const selectedId = selectedRes?.rental?.id;
 
   return (
-    <div className="w-full mx-auto space-y-8 animate-in fade-in duration-700 pb-20 px-4">
-      <div className="flex justify-between items-center border-b pb-6 mt-4">
+    <div className="w-full mx-auto space-y-6 animate-in fade-in duration-500 pb-4">
+      <div className="flex justify-between items-center border-b border-slate-100 pb-4">
         <div>
-          <h2 className="text-3xl font-[900] tracking-tighter text-slate-900">
-            Réservations <span className="text-[#0528d6]">{selectedRes ? 'Détails' : 'Actives'}</span>
+          <h2 className="text-3xl font-[900] tracking-tighter text-[#0528d6]">
+            {t.reservations.title}{' '}
+            <span className="text-slate-700 dark:text-white">{selectedRes ? t.reservations.details : t.reservations.active}</span>
           </h2>
-          <p className="text-slate-400 text-xs font-medium mt-1">Gestion de vos demandes en cours.</p>
+          <p className="text-slate-400 text-xs font-medium mt-1">{t.reservations.subtitle}</p>
         </div>
-        <div className="size-12 bg-blue-50 text-[#0528d6] rounded-2xl flex items-center justify-center shadow-sm">
-          <Bell size={20} />
+        <div className="size-11 bg-blue-50 text-[#0528d6] rounded-2xl flex items-center justify-center shadow-sm">
+          <Bell size={18} />
         </div>
       </div>
 
@@ -161,8 +165,8 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[8px] font-black text-slate-400 tracking-widest">#{res?.id?.slice(0, 8)}</p>
-                      <p className="text-sm font-bold text-slate-900 truncate">
-                        {vehicle ? `${vehicle.brand} ${vehicle.model}` : 'Véhicule'}
+                      <p className="text-sm font-bold text-slate-800 truncate">
+                        {vehicle ? `${vehicle.brand} ${vehicle.model}` : (lang === 'EN' ? 'Vehicle' : 'Véhicule')}
                       </p>
                       {agency && (
                         <p className="text-[10px] text-slate-500 flex items-center gap-1 truncate mt-0.5">
@@ -186,7 +190,7 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
                   )}
 
                   <div className="flex justify-between items-center">
-                    <p className={`${selectedRes ? 'text-sm' : 'text-lg'} font-black text-slate-900`}>
+                    <p className={`${selectedRes ? 'text-sm' : 'text-lg'} font-black text-slate-800`}>
                       {res?.totalAmount?.toLocaleString('fr-FR')} <span className="text-[10px] opacity-40">XAF</span>
                     </p>
                     <ChevronRight size={16} className={`text-slate-300 ${selectedId === res.id ? 'rotate-90 text-[#0528d6]' : ''}`} />
@@ -195,7 +199,7 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
               );
             })
           ) : (
-            <EmptyState onNavigateToCatalog={onNavigateToCatalog} />
+            <EmptyState onNavigateToCatalog={onNavigateToCatalog} labels={t.reservations} />
           )}
         </div>
 
@@ -219,11 +223,10 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
       </div>
 
       {!selectedRes && reservations.length > 0 && (
-        <div className="p-6 bg-slate-900 rounded-[2.5rem] flex items-start gap-4 text-white/80 shadow-2xl">
-          <Info className="text-blue-400 shrink-0" size={24} />
-          <p className="text-[11px] leading-relaxed">
-            Les réservations <span className="text-blue-400 font-bold">PENDING</span> sont en attente de confirmation par l&apos;agence.
-            Contactez-la par téléphone ou email pour valider votre créneau et régler l&apos;acompte.
+        <div className="p-5 bg-[#0528d6] rounded-2xl flex items-start gap-4 text-white shadow-lg shadow-[#0528d6]/20">
+          <Info className="text-blue-200 shrink-0" size={22} />
+          <p className="text-[11px] leading-relaxed text-blue-50">
+            {t.reservations.pendingHint}
           </p>
         </div>
       )}
@@ -231,21 +234,21 @@ export const MyReservationsView = ({ userData, onNavigateToCatalog }: any) => {
   );
 };
 
-const EmptyState = ({ onNavigateToCatalog }: { onNavigateToCatalog?: () => void }) => (
-  <div className="bg-white rounded-[3rem] p-12 border border-slate-100 shadow-sm text-center col-span-full">
-    <div className="size-24 bg-orange-50 text-orange-500 rounded-[2.8rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
-      <Clock size={48} />
+const EmptyState = ({ onNavigateToCatalog, labels }: { onNavigateToCatalog?: () => void; labels: { emptyTitle: string; emptyDesc: string; rentCta: string } }) => (
+  <div className="bg-white rounded-[2rem] p-10 border border-slate-100 shadow-sm text-center col-span-full">
+    <div className="size-20 bg-orange-50 text-orange-500 rounded-[2rem] flex items-center justify-center mx-auto mb-5 shadow-inner">
+      <Clock size={40} />
     </div>
-    <h4 className="text-3xl font-black text-slate-900 tracking-tighter">Aucune réservation</h4>
-    <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto mt-3 leading-relaxed">
-      Vos réservations actives s&apos;afficheront ici.
+    <h4 className="text-2xl font-black text-slate-800 tracking-tighter">{labels.emptyTitle}</h4>
+    <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto mt-2 leading-relaxed">
+      {labels.emptyDesc}
     </p>
     <button
       type="button"
       onClick={onNavigateToCatalog}
-      className="mt-10 bg-[#0528d6] text-white px-12 py-5 rounded-full font-black text-xs tracking-[0.2em] shadow-2xl hover:scale-105 transition-all"
+      className="mt-8 bg-[#0528d6] text-white px-10 py-4 rounded-full font-black text-xs tracking-[0.15em] shadow-xl hover:scale-105 transition-all"
     >
-      Louer un véhicule
+      {labels.rentCta}
     </button>
   </div>
 );

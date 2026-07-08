@@ -61,7 +61,7 @@ export const AgencyCard = ({ agency, onEdit, onDelete, onView, t }: any) => (
     </div>
 
     <div className="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
-      <button onClick={() => onView(agency.id)} className="w-full py-3 bg-slate-900 text-white dark:bg-white dark:text-[#0528d6] rounded-xl text-[10px] font-black uppercase italic tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-md">
+      <button onClick={() => onView(agency.id)} className="w-full py-3 bg-[#F76513] text-white rounded-xl text-[10px] font-black uppercase italic tracking-widest hover:scale-[1.02] hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/25">
           <Info size={16}/> {t.agencies.card.details || 'Détails & Opérations'}
       </button>
     </div>

@@ -1,112 +1,106 @@
 'use client';
+
 import { Building, Car, Smartphone, Zap } from 'lucide-react';
 import React from 'react';
 
-type Props = {
-  onInstall?: () => void; // fonction pour déclencher l'installation PWA
+type AboutLabels = {
+  title?: string;
+  subtitle?: string;
+  completeTitle?: string;
+  completeDesc?: string;
+  agenciesTitle?: string;
+  agenciesDesc?: string;
+  performanceTitle?: string;
+  performanceDesc?: string;
+  pwaTitle?: string;
+  pwaDesc?: string;
+  installTitle?: string;
+  installDesc?: string;
+  installCta?: string;
 };
 
-export const About = ({ onInstall }: Props) => {
-  return (
-    <div className="w-full mx-auto px-6 py-12 animate-in fade-in duration-500">
+type Props = {
+  onInstall?: () => void;
+  labels?: AboutLabels;
+};
 
-      {/* HEADER */}
-      <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-          À propos de Easy-Rent
-        </h1>
-        <p className="mt-4 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Une plateforme moderne de location de véhicules pensée pour simplifier la mise en relation 
-          entre agences et clients, avec une expérience rapide, intuitive et accessible partout.
+const DEFAULTS: Required<AboutLabels> = {
+  title: 'À propos de Easy-Rent',
+  subtitle:
+    'Une plateforme moderne de location de véhicules pensée pour simplifier la mise en relation entre agences et clients, avec une expérience rapide, intuitive et accessible partout.',
+  completeTitle: 'Une solution complète',
+  completeDesc:
+    'Easy-Rent permet aux utilisateurs de rechercher, comparer et réserver des véhicules en quelques clics. Grâce à un système de filtres avancés, vous pouvez trouver rapidement le véhicule adapté à vos besoins.',
+  agenciesTitle: 'Pour les agences',
+  agenciesDesc:
+    'Les agences peuvent gérer leur catalogue de véhicules, suivre les disponibilités et optimiser leurs services grâce à une interface claire et performante.',
+  performanceTitle: 'Performance & Simplicité',
+  performanceDesc:
+    'L’application est conçue pour être rapide, fluide et accessible même dans des environnements à ressources limitées.',
+  pwaTitle: 'Progressive Web App',
+  pwaDesc:
+    'Installez Easy-Rent directement sur votre téléphone ou ordinateur, sans passer par un store. Expérience native, accès rapide, navigation fluide.',
+  installTitle: 'Installer Easy-Rent',
+  installDesc:
+    'Accédez rapidement à la plateforme depuis votre écran d’accueil et profitez d’une expérience encore plus fluide.',
+  installCta: 'Installer l’application',
+};
+
+export const About = ({ onInstall, labels }: Props) => {
+  const l = { ...DEFAULTS, ...labels };
+
+  return (
+    <div className="w-full mx-auto animate-in fade-in duration-500">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl md:text-4xl font-[900] italic tracking-tighter text-[#0528d6]">
+          {l.title}
+        </h2>
+        <p className="mt-3 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+          {l.subtitle}
         </p>
       </div>
 
-      {/* CONTENU */}
-      <div className="grid md:grid-cols-2 gap-8">
-
-        {/* BLOC 1 */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#1a1d2d] border border-slate-200 dark:border-slate-800 shadow-sm flex gap-4 items-start">
-          <Car size={36} className="text-[#0528d6] flex-shrink-0" />
-          <div>
-            <h2 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">
-              Une solution complète
-            </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            Easy-Rent permet aux utilisateurs de rechercher, comparer et réserver des véhicules 
-            en quelques clics. Grâce à un système de filtres avancés, vous pouvez trouver rapidement 
-            le véhicule adapté à vos besoins, que ce soit pour un usage personnel ou professionnel.
-          </p>
-          </div>
-        </div>
-
-        {/* BLOC 2 */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#1a1d2d] border border-slate-200 dark:border-slate-800 shadow-sm flex gap-4 items-start">
-          <Building size={36} className="text-[#0528d6] flex-shrink-0" />
-          <div>
-            <h2 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">
-              Pour les agences
-            </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            Les agences peuvent gérer leur catalogue de véhicules, suivre les disponibilités 
-            et optimiser leurs services grâce à une interface claire et performante. 
-            Easy-Rent agit comme un véritable levier de visibilité et de gestion.
-          </p>
-          </div>
-        </div>
-
-        {/* BLOC 3 */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#1a1d2d] border border-slate-200 dark:border-slate-800 shadow-sm flex gap-4 items-start">
-          <Zap size={36} className="text-[#0528d6] flex-shrink-0" />
-          <div>
-            <h2 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">
-              Performance & Simplicité
-            </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            L'application est conçue pour être rapide, fluide et accessible même dans des 
-            environnements à ressources limitées. Chaque interaction est optimisée pour offrir 
-            une expérience utilisateur agréable et efficace.
-          </p>
-          </div>
-        </div>
-
-        {/* BLOC 4 (PWA) */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#1a1d2d] border border-slate-200 dark:border-slate-800 shadow-sm flex gap-4 items-start">
-          <Smartphone size={36} className="text-[#0528d6] flex-shrink-0" />
-          <div>
-            <h2 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">
-              Progressive Web App
-            </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            Easy-Rent est une application web progressive (PWA), ce qui signifie que vous pouvez 
-            l’installer directement sur votre téléphone ou ordinateur, sans passer par un store. 
-            Elle fonctionne comme une application native, avec un accès rapide, une navigation fluide 
-            et la possibilité d’être utilisée même avec une connexion limitée.
-          </p>
-          </div>
-        </div>
-
+      <div className="grid md:grid-cols-2 gap-4 md:gap-5">
+        {[
+          { icon: Car, title: l.completeTitle, desc: l.completeDesc },
+          { icon: Building, title: l.agenciesTitle, desc: l.agenciesDesc },
+          { icon: Zap, title: l.performanceTitle, desc: l.performanceDesc },
+          { icon: Smartphone, title: l.pwaTitle, desc: l.pwaDesc },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <div
+              key={item.title}
+              className="p-5 md:p-6 rounded-2xl bg-white dark:bg-[#1a1d2d] border border-slate-100 dark:border-slate-800 shadow-sm flex gap-4 items-start"
+            >
+              <div className="size-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                <Icon size={22} className="text-[#0528d6]" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold mb-1.5 text-slate-800 dark:text-white">{item.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* CTA INSTALL */}
-      <div className="mt-12 text-center">
-        <div className="inline-block p-8 rounded-[2rem] bg-gradient-to-r from-[#0528d6] to-blue-600 text-white shadow-xl">
-          <h3 className="text-xl font-black mb-2">
-            Installer Easy-Rent
-          </h3>
-          <p className="text-sm opacity-90 mb-6">
-            Accédez rapidement à la plateforme depuis votre écran d’accueil et profitez d’une 
-            expérience encore plus fluide.
-          </p>
-
-          <button
-            onClick={onInstall}
-            className="px-8 py-3 rounded-xl bg-white text-[#0528d6] font-bold text-sm hover:scale-105 transition-all"
-          >
-            Installer l’application
-          </button>
+      <div className="mt-8 text-center">
+        <div className="relative overflow-hidden p-7 md:p-9 rounded-[1.75rem] bg-[#0528d6] text-white shadow-xl shadow-[#0528d6]/25">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+          <div className="relative">
+            <h3 className="text-xl font-[900] italic mb-2">{l.installTitle}</h3>
+            <p className="text-sm text-blue-100 mb-5 max-w-lg mx-auto leading-relaxed">{l.installDesc}</p>
+            <button
+              type="button"
+              onClick={onInstall}
+              className="px-8 py-3 rounded-xl bg-white text-[#0528d6] font-bold text-sm hover:scale-105 transition-transform"
+            >
+              {l.installCta}
+            </button>
+          </div>
         </div>
       </div>
-
     </div>
   );
 };

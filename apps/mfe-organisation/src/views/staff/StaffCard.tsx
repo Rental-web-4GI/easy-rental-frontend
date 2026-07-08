@@ -45,7 +45,7 @@ export const StaffCard = ({ staff, agencies, onEdit, onDelete, onView, t }: any)
       </div>
 
       <div className="flex gap-2 mt-auto pt-6 border-t border-slate-50 dark:border-slate-800">
-        <button onClick={() => onView(staff.id)} className="flex-1 py-3 bg-slate-900 text-white dark:bg-white dark:text-[#0528d6] rounded-2xl text-[9px] font-black uppercase italic tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-md">
+        <button onClick={() => onView(staff.id)} className="flex-1 py-3 bg-[#F76513] text-white rounded-2xl text-[9px] font-black uppercase italic tracking-widest hover:scale-[1.02] hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/25">
             <Info size={14}/> {t.staff.viewProfile.split(' ')[0]}
         </button>
         <button onClick={() => onEdit(staff)} className="p-3 text-slate-400 hover:text-[#0528d6] bg-slate-50 dark:bg-slate-800 rounded-2xl transition-all shadow-inner"><Edit3 size={16}/></button>

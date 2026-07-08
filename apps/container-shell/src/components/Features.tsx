@@ -1,5 +1,6 @@
 import React from 'react';
 import { WifiOff, MapPin, Receipt, Zap, CheckCircle2 } from 'lucide-react';
+import { LandingSection, SectionTitle } from './landing/LandingSection';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Features = ({ t }: any) => {
@@ -10,45 +11,54 @@ export const Features = ({ t }: any) => {
     { icon: Zap, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-900/20', title: t.f4, desc: t.f4d },
   ];
 
-  return (
-    <section id="features" className="py-16 md:py-20 bg-slate-50 dark:bg-slate-900/50 scroll-mt-24">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-5 gap-10 lg:gap-12 items-start">
-          <div className="lg:col-span-2 lg:sticky lg:top-28">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-3">Pourquoi Easy Rental</p>
-            <h2 className="text-3xl md:text-5xl font-[900] italic leading-[0.95] tracking-tighter text-slate-900 dark:text-white mb-5">
-              {t.title.split(' ').slice(0, -2).join(' ')} <br />
-              <span className="text-blue-600">{t.title.split(' ').slice(-2).join(' ')}</span>
-            </h2>
-            <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-6">{t.desc}</p>
-            <ul className="space-y-2 text-sm font-bold text-slate-600 dark:text-slate-300">
-              {['Sans installation lourde', 'Paiement Mobile Money en agence', 'Multi-profils B2B2C'].map((line) => (
-                <li key={line} className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-500 shrink-0" /> {line}
-                </li>
-              ))}
-            </ul>
-          </div>
+  const highlights = [
+    'Sans installation lourde',
+    'Paiement Mobile Money en agence',
+    'Multi-profils B2B2C',
+  ];
 
-          <div className="lg:col-span-3 grid sm:grid-cols-2 gap-4">
-            {items.map((f) => {
-              const Icon = f.icon;
-              return (
-                <div
-                  key={f.title}
-                  className="bg-white dark:bg-slate-800 p-5 rounded-[1.75rem] border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-shadow"
-                >
-                  <div className={`w-12 h-12 ${f.bg} rounded-2xl flex items-center justify-center mb-4`}>
-                    <Icon className={f.color} size={22} />
-                  </div>
-                  <h4 className="text-base font-black italic uppercase text-slate-900 dark:text-white mb-2">{f.title}</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+  return (
+    <LandingSection id="features" variant="muted">
+      <SectionTitle eyebrow="Pourquoi Easy Rental">{t.title}</SectionTitle>
+
+      <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 items-start">
+        <div className="lg:col-span-2 space-y-6">
+          <p className="text-lg md:text-xl lg:text-[1.35rem] text-slate-600 dark:text-slate-300 leading-relaxed font-medium text-center lg:text-left">
+            {t.desc}
+          </p>
+          <ul className="space-y-4 max-w-md mx-auto lg:mx-0">
+            {highlights.map((line) => (
+              <li
+                key={line}
+                className="flex items-center gap-3 text-base md:text-lg font-bold text-slate-700 dark:text-slate-200"
+              >
+                <span className="shrink-0 size-8 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <CheckCircle2 size={18} className="text-emerald-500" />
+                </span>
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lg:col-span-3 grid sm:grid-cols-2 gap-4">
+          {items.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div
+                key={f.title}
+                className="bg-white dark:bg-slate-800 p-5 md:p-6 rounded-[1.75rem] border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-shadow"
+              >
+                <div className={`w-12 h-12 ${f.bg} rounded-2xl flex items-center justify-center mb-4`}>
+                  <Icon className={f.color} size={22} />
                 </div>
-              );
-            })}
-          </div>
+                <h4 className="text-base font-black italic uppercase text-slate-800 dark:text-white mb-2">{f.title}</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 };

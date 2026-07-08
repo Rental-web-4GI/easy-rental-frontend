@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, Send, ThumbsUp, MessageSquare, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Star, Send, ThumbsUp, MessageSquare, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { reviewService } from '@pwa-easy-rental/shared-services';
 
 export default function FeedbackPage() {
@@ -36,9 +36,21 @@ export default function FeedbackPage() {
     setSubmitting(false);
 
     if (!res.ok) {
+      const apiMessage =
+        res.data && typeof res.data === 'object'
+          ? String(
+              (res.data as Record<string, unknown>).message
+              ?? (res.data as Record<string, unknown>).error
+              ?? (res.data as Record<string, unknown>).detail
+              ?? '',
+            )
+          : '';
       setFeedback({
         type: 'error',
-        message: 'Envoi impossible. Vérifiez que le backend est démarré puis réessayez.',
+        message: apiMessage.trim()
+          || (res.status === 0
+            ? 'Impossible de joindre l\'API. Vérifiez que le backend tourne sur le port 8081.'
+            : `Envoi refusé (HTTP ${res.status}). Réessayez dans un instant.`),
       });
       return;
     }
@@ -53,76 +65,110 @@ export default function FeedbackPage() {
     setComment('');
   };
 
-  return (
-    <main className="min-h-screen bg-gray-50 text-slate-800 font-sans mt-20">
+  const reasons = [
+    {
+      icon: ThumbsUp,
+      title: 'Amélioration continue',
+      desc: 'Vos retours font évoluer nos services de location au quotidien.',
+    },
+    {
+      icon: Star,
+      title: 'Mise en avant',
+      desc: 'Les meilleurs agents et agences gagnent en visibilité.',
+    },
+    {
+      icon: MessageSquare,
+      title: 'Support réactif',
+      desc: 'Nous répondons concrètement à vos besoins spécifiques.',
+    },
+  ];
 
-      <section className="bg-blue-600 text-white py-16 text-center">
-        <h1 className="text-4xl font-bold mb-4">Votre avis compte énormément pour nous</h1>
-        <p className="text-blue-100 max-w-2xl mx-auto">
-          {"Aidez-nous à améliorer Easy-Rent. Que vous soyez client, agent ou une organisation, votre retour d'expérience est précieux."}
-        </p>
+  return (
+    <main className="min-h-screen bg-slate-50 dark:bg-[#0f1323] text-slate-800 dark:text-slate-100 font-sans">
+      <section className="bg-primary text-white py-10 md:py-12 px-6 text-center relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-20 -right-16 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-16 -left-10 w-48 h-48 bg-secondary/20 rounded-full blur-3xl" />
+        </div>
+        <div className="relative max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-[10px] font-black uppercase tracking-widest mb-4 border border-white/20">
+            <Sparkles size={12} /> Votre voix compte
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-[900] italic tracking-tight mb-3">
+            Votre avis compte pour nous
+          </h1>
+          <p className="text-blue-100 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+            Aidez-nous à améliorer Easy Rental. Que vous soyez client, agent ou organisation,
+            votre retour d&apos;expérience est précieux.
+          </p>
+        </div>
       </section>
 
-      <section className="container mx-auto">
-        <div className="bg-white mx-auto overflow-hidden flex flex-col md:flex-row">
+      <section className="max-w-6xl mx-auto px-6 py-10 md:py-12">
+        <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
+          <aside className="lg:col-span-2 space-y-4">
+            <h2 className="text-xl md:text-2xl font-[900] italic text-primary tracking-tight mb-2">
+              Pourquoi donner votre avis ?
+            </h2>
+            {reasons.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.title}
+                  className="flex gap-4 p-4 md:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm"
+                >
+                  <div className="shrink-0 size-11 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-secondary flex items-center justify-center">
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <p className="font-black text-slate-800 dark:text-white text-sm mb-1">{item.title}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </aside>
 
-          <div className="md:w-1/3 bg-slate-900 text-white p-8 flex flex-col justify-between">
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Pourquoi donner votre avis ?</h3>
-              <ul className="space-y-6">
-                <li className="flex items-start gap-3">
-                  <ThumbsUp className="text-orange-500 w-6 h-6 mt-1" />
-                  <p className="text-sm text-gray-300">Amélioration continue de nos services de location.</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Star className="text-orange-500 w-6 h-6 mt-1" />
-                  <p className="text-sm text-gray-300">Mise en avant des meilleurs agents et agences.</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <MessageSquare className="text-orange-500 w-6 h-6 mt-1" />
-                  <p className="text-sm text-gray-300">Support réactif à vos besoins spécifiques.</p>
-                </li>
-              </ul>
-            </div>
-            <div className="mt-12 text-sm text-gray-500">
-              © 2025 Easy-Rent Inc.
-            </div>
-          </div>
-
-          <div className="md:w-2/3 p-8 md:p-12">
-            <h2 className="text-2xl font-bold text-blue-700 mb-6">Partagez votre expérience</h2>
+          <div className="lg:col-span-3 bg-white dark:bg-slate-900 rounded-[1.75rem] border border-slate-100 dark:border-slate-800 shadow-sm p-6 md:p-8 lg:p-10">
+            <h2 className="text-xl md:text-2xl font-[900] italic text-primary tracking-tight mb-6">
+              Partagez votre expérience
+            </h2>
 
             {feedback && (
               <div
-                className={`mb-6 flex items-start gap-3 rounded-lg px-4 py-3 text-sm ${
+                className={`mb-6 flex items-start gap-3 rounded-xl px-4 py-3 text-sm ${
                   feedback.type === 'success'
-                    ? 'bg-green-50 text-green-800 border border-green-200'
-                    : 'bg-red-50 text-red-800 border border-red-200'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-100'
+                    : 'bg-red-50 text-red-800 border border-red-100'
                 }`}
               >
-                {feedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                {feedback.type === 'success' ? <CheckCircle2 size={18} className="shrink-0 mt-0.5" /> : <AlertCircle size={18} className="shrink-0 mt-0.5" />}
                 <p>{feedback.message}</p>
               </div>
             )}
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-2">Votre Nom</label>
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                    Votre nom
+                  </label>
                   <input
                     type="text"
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
-                    placeholder="John Doe"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="Votre prénom ou nom"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-2">Votre Rôle</label>
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                    Votre rôle
+                  </label>
                   <select
                     value={authorRole}
                     onChange={(e) => setAuthorRole(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                   >
                     <option>Client</option>
                     <option>Agent</option>
@@ -133,45 +179,57 @@ export default function FeedbackPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-2">Notez votre expérience</label>
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-3">
+                  Notez votre expérience
+                </label>
                 <div className="flex gap-2">
                   {[...Array(5)].map((_, index) => {
                     const ratingValue = index + 1;
+                    const active = ratingValue <= (hover || rating);
                     return (
-                      <Star
+                      <button
                         key={index}
-                        size={32}
-                        className={`cursor-pointer transition-colors duration-200 ${ratingValue <= (hover || rating) ? 'fill-orange-500 text-orange-500' : 'text-gray-300'}`}
+                        type="button"
                         onClick={() => setRating(ratingValue)}
                         onMouseEnter={() => setHover(ratingValue)}
                         onMouseLeave={() => setHover(0)}
-                      />
+                        className="p-1 transition-transform hover:scale-110"
+                        aria-label={`Note ${ratingValue} sur 5`}
+                      >
+                        <Star
+                          size={34}
+                          className={`transition-colors ${
+                            active ? 'fill-secondary text-secondary' : 'text-slate-300 dark:text-slate-600'
+                          }`}
+                        />
+                      </button>
                     );
                   })}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-2">Votre Message</label>
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                  Votre message
+                </label>
                 <textarea
                   rows={4}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Racontez-nous votre expérience..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Racontez-nous votre expérience…"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-blue-600 text-white font-bold py-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg disabled:opacity-60"
+                className="w-full bg-primary text-white font-black py-4 rounded-xl hover:bg-primary-dark transition flex items-center justify-center gap-2 shadow-lg shadow-primary/25 disabled:opacity-60"
               >
-                {submitting ? 'Envoi en cours…' : 'Envoyer mon avis'} <Send size={20} />
+                {submitting ? 'Envoi en cours…' : 'Envoyer mon avis'} <Send size={18} />
               </button>
             </form>
           </div>
-
         </div>
       </section>
     </main>
