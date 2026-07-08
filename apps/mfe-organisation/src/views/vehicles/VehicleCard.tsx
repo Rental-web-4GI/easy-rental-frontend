@@ -2,6 +2,10 @@
 'use client';
 import React from 'react';
 import { MapPin, Gauge, Users, Trash2, Edit3, Info, CalendarClock } from 'lucide-react';
+import { resolveMediaDisplayUrl } from '@pwa-easy-rental/shared-services';
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop';
 
 export const VehicleCard = ({ vehicle, agencyName, categoryName, onEdit, onDelete, onViewDetails, onQuickStatus }: any) => {
   const getStatusColor = (status: string) => {
@@ -13,11 +17,13 @@ export const VehicleCard = ({ vehicle, agencyName, categoryName, onEdit, onDelet
     }
   };
 
+  const imageUrl = resolveMediaDisplayUrl(vehicle.images?.[0] || FALLBACK_IMAGE);
+
   return (
     <div className="bg-white dark:bg-[#1a1d2d] rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group flex flex-col h-full text-left">
       <div className="relative h-48 w-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
         <img 
-          src={vehicle.images?.[0] || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop'} 
+          src={imageUrl} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           alt="v"
         />

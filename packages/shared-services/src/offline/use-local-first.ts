@@ -18,7 +18,6 @@ export function useLocalFirst() {
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    syncEngine.initSchema().catch(() => undefined);
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -30,13 +29,15 @@ export function useLocalFirst() {
     try {
       await syncEngine.pull();
       setLastSync(Date.now());
+    } catch {
+      /* offline sync optional — catalogue works via API */
     } finally {
       setIsSyncing(false);
     }
   }, []);
 
   useEffect(() => {
-    if (isOnline) {
+    if (isOnline && process.env.NEXT_PUBLIC_OFFLINE_SYNC === 'true') {
       sync().catch(() => undefined);
     }
   }, [isOnline, sync]);

@@ -1,12 +1,13 @@
 export const en = {
   nav: {
     home: "Home",
+    catalog: "Catalog",
+    myTrips: "My trips",
+    reservations: "Bookings",
     vehicles: "Vehicles",
     agencies: "Agencies",
-    install: "Install App",
     login: "Login",
-    logout: "Logout",
-    backHome: "Global Home"
+    client: "Client",
   },
   hero: {
     title: "The Perfect Rental for your", accent: "Journey",

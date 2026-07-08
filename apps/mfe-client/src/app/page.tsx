@@ -2,7 +2,8 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Footer } from '@shared-ui/components/ui/Footer';
-import { authService } from '@pwa-easy-rental/shared-services';
+import { authService, initAuthSessionWatcher, getStoredToken, persistAuthToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
+import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
 
 import { Header } from '../components/Header';
 import { AuthView } from '../views/AuthView';
@@ -13,7 +14,9 @@ import { MyBookingsView } from '../views/MyBookingsView';
 import { ProfileView } from '../views/ProfileView';
 import { NotificationsView } from '../views/NotificationsView';
 
+import { useClientI18n } from '../hooks/useClientI18n';
 import { Loader2 } from 'lucide-react';
+
 import { MyReservationsView } from '@/views/ReservationsView';
 
 export default function ClientDashboard() {
@@ -29,6 +32,7 @@ export default function ClientDashboard() {
   const[isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState<any>(null);
+  const t = useClientI18n(lang);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -52,6 +56,8 @@ export default function ClientDashboard() {
     window.addEventListener('beforeinstallprompt', handlePrompt);
 
     const savedTheme = localStorage.getItem('theme');
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang === 'EN' || savedLang === 'FR') setLang(savedLang);
 
   if (savedTheme === 'dark') {
     document.documentElement.classList.add('dark');
@@ -62,11 +68,22 @@ export default function ClientDashboard() {
   }
 
 
-    const token = localStorage.getItem('auth_token');
-    if (token) fetchProfile();
-    else setIsLoading(false);
+    const token = getStoredToken();
+    if (token) {
+      authService.setToken(token);
+      fetchProfile();
+    } else setIsLoading(false);
 
-    return () => window.removeEventListener('beforeinstallprompt', handlePrompt);
+    const stopWatcher = initAuthSessionWatcher(() => {
+      setIsAuth(false);
+      setUserData(null);
+      alert('Votre session a expiré. Veuillez vous reconnecter.');
+    });
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handlePrompt);
+      stopWatcher();
+    };
   }, [fetchProfile]);
 
   const toggleDarkMode = () => {
@@ -75,21 +92,76 @@ export default function ClientDashboard() {
     localStorage.setItem('theme', !darkMode ? 'dark' : 'light');
   }
 
-  const handleAuthAction = async (isSignUp: boolean, form: any) => {
-  
-      const res = isSignUp ? await authService.registerClient(form) : await authService.login(form);
-      if (res.ok) {
-        const credentials = isSignUp ? { email: form.email, password: form.password } : form;
-        const logRes = await authService.login(credentials);
-        if (logRes.ok && logRes.data.token) {
-          localStorage.setItem('auth_token', logRes.data.token);
+  const handleAuthAction = async (
+    isSignUp: boolean,
+    form: { firstname: string; lastname: string; email: string; password: string },
+    mfa?: { token: string; code: string }
+  ): Promise<
+    | boolean
+    | { mfaRequired: true; mfaToken: string; mfaChannel?: string }
+    | { emailVerificationRequired: true; message: string }
+    | { error: string }
+  > => {
+    try {
+      if (mfa) {
+        const mfaRes = await authService.confirmMfa(mfa.token, mfa.code);
+        if (mfaRes.ok) {
+          persistAuthToken(mfaRes.token);
+          authService.setToken(mfaRes.token);
           await fetchProfile();
           setCurrentView('HOME');
           return true;
         }
+        return { error: 'Code MFA invalide' };
       }
-    
-    return false;
+
+      if (isSignUp) {
+        const regRes = await authService.registerClient(form);
+        if (!regRes.ok) {
+          return { error: regRes.error };
+        }
+        if (regRes.emailVerificationRequired) {
+          return {
+            emailVerificationRequired: true,
+            message:
+              'Inscription réussie ! Un email de vérification a été envoyé. '
+              + 'Vérifiez votre boîte mail avant de vous connecter.',
+          };
+        }
+      }
+
+      const loginRes = await authService.login({ email: form.email, password: form.password });
+      if ('mfaRequired' in loginRes && loginRes.mfaRequired) {
+        return {
+          mfaRequired: true,
+          mfaToken: loginRes.mfaToken,
+          mfaChannel: loginRes.mfaChannel,
+        };
+      }
+      if (loginRes.ok) {
+        persistAuthToken(loginRes.token);
+        authService.setToken(loginRes.token);
+        markFirstUsageDone();
+        await fetchProfile();
+        setCurrentView('HOME');
+        return true;
+      }
+      const loginError = loginRes.error || '';
+      if (
+        isSignUp
+        && (loginError.includes('EMAIL_NOT_VERIFIED') || loginError.toLowerCase().includes('not verified'))
+      ) {
+        return {
+          emailVerificationRequired: true,
+          message:
+            'Inscription enregistrée. Un email de vérification a été envoyé — '
+            + 'vérifiez votre boîte mail avant de vous connecter.',
+        };
+      }
+      return { error: loginError || 'Connexion impossible. Verifiez email et mot de passe.' };
+    } catch {
+      return { error: 'Erreur reseau ou serveur indisponible.' };
+    }
   };
 
   if (isLoading) return (
@@ -99,7 +171,14 @@ export default function ClientDashboard() {
   );
 
   if (!isAuth && currentView === 'AUTH') return (
-      <AuthView onAuth={handleAuthAction} lang={lang} setLang={setLang} darkMode={darkMode} toggleTheme={() => toggleDarkMode()} />
+      <AuthView
+        onAuth={handleAuthAction}
+        onBack={() => setCurrentView('CATALOG')}
+        lang={lang}
+        setLang={setLang}
+        darkMode={darkMode}
+        toggleTheme={() => toggleDarkMode()}
+      />
   );
 
   return (
@@ -113,14 +192,16 @@ export default function ClientDashboard() {
             darkMode={darkMode}
             lang={lang}
             setLang={setLang}
-            setSidebarOpen={setSidebarOpen} // Passé au Header pour le menu mobile
+            t={t}
+            setSidebarOpen={setSidebarOpen}
             onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }}
         />
 
-        {/* Ajustement du padding top (pt-28) pour compenser le Header fixed (h-20) */}
-        <main className="max-w-7xl mx-auto p-6 md:p-10 pt-28 md:pt-28">
-          {currentView === 'HOME' && <HomeView onSearch={() => setCurrentView('CATALOG')} setViewAll={() => setCurrentView('CATALOG')} onSelectVehicle={(id: string) => { setSelectedVehicleId(id); setCurrentView('DETAILS'); }} />}
-          {currentView === 'CATALOG' && <CatalogView userData={userData} />}
+        {isAuth && <PlatformFeedbackPrompt feedbackUrl="http://localhost:3000/feedback" />}
+
+        <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 pt-24 md:pt-28">
+          {currentView === 'HOME' && <HomeView lang={lang} onSearch={() => setCurrentView('CATALOG')} setViewAll={() => setCurrentView('CATALOG')} onSelectVehicle={(id: string) => { setSelectedVehicleId(id); setCurrentView('DETAILS'); }} />}
+          {currentView === 'CATALOG' && <CatalogView lang={lang} userData={userData} />}
           {currentView === 'DETAILS' && selectedVehicleId && <VehicleDetailsView vehicleId={selectedVehicleId} isAuth={isAuth} onBack={() => setCurrentView('CATALOG')} onAuthRequired={() => setCurrentView('AUTH')} onStartBooking={() => setCurrentView('CATALOG')} />}
           {currentView === 'MY_BOOKINGS' && <MyBookingsView userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
           {currentView === 'MY_RESERVATIONS' && <MyReservationsView userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}

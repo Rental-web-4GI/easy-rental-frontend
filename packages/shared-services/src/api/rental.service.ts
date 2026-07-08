@@ -1,15 +1,26 @@
 import { defaultClient as client } from './api-client';
 import {
   formatRentalApiError,
+  normalizeRentalDetails,
   normalizeRentalInitResponse,
   normalizeRentalList,
   normalizeRentalRecord,
   toApiAgencyRentalPayload,
   toApiPaymentPayload,
+  toApiRentalInitPayload,
 } from './rental.mapper';
 
 export const rentalService = {
-  initiateRental: (data: any) => client.post<any>('/api/rentals/init', data),
+  initiateRental: async (data: Record<string, unknown>) => {
+    const res = await client.post<Record<string, unknown>>(
+      '/api/rentals/init',
+      toApiRentalInitPayload(data)
+    );
+    if (!res.ok) {
+      return { ...res, data: { message: formatRentalApiError(res.data) } };
+    }
+    return { ...res, data: normalizeRentalInitResponse(res.data) };
+  },
 
   createAgencyRental: async (agencyId: string, data: Record<string, unknown>) => {
     const res = await client.post<Record<string, unknown>>(
@@ -41,11 +52,13 @@ export const rentalService = {
   getRentalDetails: async (id: string) => {
     const res = await client.get<Record<string, unknown>>(`/api/rentals/${id}/details`);
     if (res.ok && res.data && typeof res.data === 'object') {
-      const raw = res.data as Record<string, unknown>;
-      const rental = raw.rental ?? raw;
-      return { ...res, data: { ...raw, rental: normalizeRentalRecord(rental as Record<string, unknown>) } };
+      return { ...res, data: normalizeRentalDetails(res.data as Record<string, unknown>) };
     }
-    return res;
+    return {
+      ...res,
+      ok: false,
+      data: { message: 'Dossier introuvable ou véhicule associé supprimé.' },
+    };
   },
 
   getOrgReservations: async (orgId: string) => {

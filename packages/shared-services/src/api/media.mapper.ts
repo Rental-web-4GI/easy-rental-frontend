@@ -6,10 +6,24 @@ export function extractUploadedMediaUrl(raw: Record<string, unknown> | null | un
 }
 
 /** Rewrites backend upload URL to the current MFE proxy when running on localhost. */
+export function canonicalMediaStoragePath(url: string): string {
+  if (!url || typeof url !== 'string') return url;
+  let trimmed = url.trim();
+  trimmed = trimmed.replace(/^https?:\/\/[^/]+(?::\d+)?/, '');
+  const withoutProxy = trimmed.replace(/^\/(organisation|agency|client)\/api-rental/, '');
+  if (withoutProxy.startsWith('/uploads/')) {
+    return withoutProxy;
+  }
+  const match = trimmed.match(/\/uploads\/[^/?#]+/);
+  return match ? match[0] : trimmed;
+}
+
+/** Rewrites backend upload URL to the current MFE proxy when running on localhost. */
 export function resolveMediaDisplayUrl(url: string): string {
-  if (typeof window === 'undefined') return url;
+  const canonical = canonicalMediaStoragePath(url);
+  if (typeof window === 'undefined') return canonical;
   try {
-    const parsed = new URL(url, window.location.origin);
+    const parsed = new URL(canonical, window.location.origin);
     if (parsed.pathname.startsWith('/uploads/')) {
       const path = window.location.pathname;
       if (path.startsWith('/organisation')) return `/organisation/api-rental${parsed.pathname}`;
@@ -17,12 +31,12 @@ export function resolveMediaDisplayUrl(url: string): string {
       if (path.startsWith('/client')) return `/client/api-rental${parsed.pathname}`;
     }
   } catch {
-    if (url.startsWith('/uploads/')) {
+    if (canonical.startsWith('/uploads/')) {
       const path = window.location.pathname;
-      if (path.startsWith('/organisation')) return `/organisation/api-rental${url}`;
-      if (path.startsWith('/agency')) return `/agency/api-rental${url}`;
-      if (path.startsWith('/client')) return `/client/api-rental${url}`;
+      if (path.startsWith('/organisation')) return `/organisation/api-rental${canonical}`;
+      if (path.startsWith('/agency')) return `/agency/api-rental${canonical}`;
+      if (path.startsWith('/client')) return `/client/api-rental${canonical}`;
     }
   }
-  return url;
+  return canonical;
 }

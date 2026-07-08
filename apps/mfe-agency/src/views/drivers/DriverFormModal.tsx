@@ -116,6 +116,9 @@ export const DriverFormModal = ({ editingDriver, onSubmit, onClose, modalLoading
               <p className="text-[9px] font-bold text-slate-400 uppercase italic tracking-widest -mt-2">
                 {t.driverForm.pricingHint}
               </p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase italic tracking-widest">
+                JPG, PNG, WEBP ou PDF — max 16 Mo par document
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input
                   label={t.driverStatus.pricePerHour}

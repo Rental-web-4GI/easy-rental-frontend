@@ -14,7 +14,8 @@ export const Header = ({
                            darkMode,
                            lang,
                            setLang,
-                           onLogout
+                           onLogout,
+                           t,
                        }: any) => {
     const [unreadCount, setUnreadCount] = useState(0);
 
@@ -50,12 +51,12 @@ export const Header = ({
 
                 {/* NAV */}
                 <nav className="hidden lg:flex items-center gap-6">
-                    <NavLink label="Accueil" active={currentView === "HOME"} onClick={() => setCurrentView("HOME")} icon={<Home size={16} />}/>
-                    <NavLink label="Catalogue" active={currentView === "CATALOG"} onClick={() => setCurrentView("CATALOG")} icon={<Car size={16} />}/>
+                    <NavLink label={t?.nav?.home ?? 'Accueil'} active={currentView === "HOME"} onClick={() => setCurrentView("HOME")} icon={<Home size={16} />}/>
+                    <NavLink label={t?.nav?.catalog ?? 'Catalogue'} active={currentView === "CATALOG"} onClick={() => setCurrentView("CATALOG")} icon={<Car size={16} />}/>
                     {isAuth ? (
                         <div className="hidden lg:flex items-center gap-6">
-                            <NavLink label="Mes trajets" active={currentView === "MY_BOOKINGS"} onClick={() => setCurrentView("MY_BOOKINGS")} icon={<Route size={16} />}/>
-                            <NavLink label="Réservations" active={currentView === "MY_RESERVATIONS"} onClick={() => setCurrentView("MY_RESERVATIONS")} icon={<Ticket size={16} />}/>
+                            <NavLink label={t?.nav?.myTrips ?? 'Mes trajets'} active={currentView === "MY_BOOKINGS"} onClick={() => setCurrentView("MY_BOOKINGS")} icon={<Route size={16} />}/>
+                            <NavLink label={t?.nav?.reservations ?? 'Réservations'} active={currentView === "MY_RESERVATIONS"} onClick={() => setCurrentView("MY_RESERVATIONS")} icon={<Ticket size={16} />}/>
                         </div>
                     ) : (<></>)}
                 </nav>
@@ -64,8 +65,13 @@ export const Header = ({
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-4">
                 <button
-                    onClick={() => setLang(lang === "FR" ? "EN" : "FR")}
+                    onClick={() => {
+                      const next = lang === "FR" ? "EN" : "FR";
+                      setLang(next);
+                      if (typeof window !== 'undefined') localStorage.setItem('lang', next);
+                    }}
                     className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    title={lang === 'FR' ? 'Switch to English' : 'Passer en français'}
                 >
                     {lang}
                 </button>
@@ -100,7 +106,7 @@ export const Header = ({
                             >
                                 <div className="hidden sm:block text-right">
                                     <p className="text-sm font-medium text-slate-900 dark:text-white">{userData?.firstname}</p>
-                                    <p className="text-xs text-slate-500">Client</p>
+                                    <p className="text-xs text-slate-500">{t?.nav?.client ?? 'Client'}</p>
                                 </div>
 
                                 <div className="size-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-medium text-[#0528d6]">
@@ -122,7 +128,7 @@ export const Header = ({
                         onClick={() => setCurrentView("AUTH")}
                         className="px-5 py-2.5 bg-[#0528d6] text-white rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition"
                     >
-                        Connexion
+                        {t?.nav?.login ?? 'Connexion'}
                     </button>
                 )}
             </div>

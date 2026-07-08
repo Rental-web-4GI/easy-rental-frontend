@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Shield, LayoutGrid, Loader2, AlertCircle, Clock, Zap } from 'lucide-react';
 import { agencyService, extraService, orgService } from '@pwa-easy-rental/shared-services';
 import { PlanCard } from './subscription/PlanCard';
+import { SubscriptionPaymentModal } from './subscription/SubscriptionPaymentModal';
+import type { SubscriptionPaymentMethod } from '@pwa-easy-rental/shared-services';
 
 export const SubscriptionView = ({ orgData, t }: any) => {
   const [plans, setPlans] = useState<any[]>([]);
@@ -11,6 +13,7 @@ export const SubscriptionView = ({ orgData, t }: any) => {
   const [realAgenciesCount, setRealAgenciesCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [paymentPlan, setPaymentPlan] = useState<{ name: string; price: number; billingPeriod?: string; monthlyEquivalentPrice?: number } | null>(null);
 
   useEffect(() => { loadSubscriptionData(); }, [orgData?.id]);
 
@@ -35,17 +38,19 @@ export const SubscriptionView = ({ orgData, t }: any) => {
     }
   };
 
-  const handlePlanChange = async (planName: string) => {
+  const executePlanChange = async (planName: string, paymentMethod?: SubscriptionPaymentMethod) => {
     if (!orgData?.id) return;
-    const isCancellation = planName === 'FREE';
-    if (isCancellation && !window.confirm(t.subscription.confirmFree)) return;
-
     setActionLoading(planName);
     try {
-      const res = await orgService.upgradePlan(orgData.id, planName as any);
+      const res = await orgService.upgradePlan(orgData.id, planName, paymentMethod);
       if (res.ok) {
+        setPaymentPlan(null);
         await loadSubscriptionData();
+        const isCancellation = planName === 'FREE';
         alert(isCancellation ? t.subscription.alertFreeSuccess : `${t.subscription.alertUpgradeSuccess} ${planName}`);
+      } else {
+        const message = (res.data as { message?: string } | null)?.message;
+        alert(message || t.subscription.alertError);
       }
     } catch {
       alert(t.subscription.alertError);
@@ -54,12 +59,75 @@ export const SubscriptionView = ({ orgData, t }: any) => {
     }
   };
 
+  const handlePlanChange = async (planName: string) => {
+    const isCancellation = planName === 'FREE';
+    if (isCancellation && !window.confirm(t.subscription.confirmFree)) return;
+
+    const selectedPlan = plans.find((plan) => plan.name === planName);
+    const isPaidUpgrade = !isCancellation && (selectedPlan?.price ?? 0) > 0;
+
+    if (isPaidUpgrade && selectedPlan) {
+      setPaymentPlan({
+        name: selectedPlan.name,
+        price: selectedPlan.price,
+        billingPeriod: selectedPlan.billingPeriod,
+        monthlyEquivalentPrice: selectedPlan.monthlyEquivalentPrice,
+      });
+      return;
+    }
+
+    await executePlanChange(planName);
+  };
+
+  const handleRenewCurrentPlan = () => {
+    if (!currentSub?.planName || currentSub.planName === 'FREE') return;
+    const selectedPlan = plans.find((plan) => plan.name === currentSub.planName);
+    if (!selectedPlan) return;
+    setPaymentPlan({
+      name: selectedPlan.name,
+      price: selectedPlan.price,
+      billingPeriod: selectedPlan.billingPeriod,
+      monthlyEquivalentPrice: selectedPlan.monthlyEquivalentPrice,
+    });
+  };
+
   if (loading) return <div className="h-96 flex items-center justify-center"><Loader2 className="animate-spin text-[#0528d6] size-10" /></div>;
 
   const isFreePlan = currentSub?.planName === 'FREE';
+  const hasOverQuota = Boolean(
+    currentSub?.overQuotaAgencies
+    || currentSub?.overQuotaVehicles
+    || currentSub?.overQuotaDrivers
+    || currentSub?.overQuotaUsers
+  );
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 pb-10">
+
+      {currentSub?.renewalDueSoon && (
+        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-[1.5rem] p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <p className="text-sm font-black text-amber-700 dark:text-amber-300">{t.subscription.renewalSoonTitle}</p>
+            <p className="text-xs text-amber-800/80 dark:text-amber-200/80 mt-1">
+              {t.subscription.renewalSoonDesc.replace('{days}', String(currentSub.daysRemaining ?? 0))}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleRenewCurrentPlan}
+            className="px-5 py-3 bg-amber-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-amber-700"
+          >
+            {t.subscription.renewBtn}
+          </button>
+        </div>
+      )}
+
+      {hasOverQuota && (
+        <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-[1.5rem] p-6">
+          <p className="text-sm font-black text-orange-700 dark:text-orange-300">{t.subscription.overQuotaTitle}</p>
+          <p className="text-xs text-orange-800/80 dark:text-orange-200/80 mt-1">{t.subscription.overQuotaDesc}</p>
+        </div>
+      )}
       
       {/* SECTION 1 : STATUT ACTUEL */}
       <section className="space-y-6">
@@ -81,7 +149,9 @@ export const SubscriptionView = ({ orgData, t }: any) => {
               </h3>
               <div className="flex items-center gap-2 text-blue-100 text-[11px] font-bold  tracking-tight italic pt-2">
                 <Clock size={14} /> 
-                {currentSub?.expiresAt ? `${t.subscription.expiresOn} ${new Date(currentSub.expiresAt).toLocaleDateString()}` : t.subscription.unlimited}
+                {currentSub?.expiresAt
+                  ? `${t.subscription.expiresOn} ${new Date(currentSub.expiresAt).toLocaleDateString()} (${currentSub.daysRemaining} ${t.subscription.daysRemaining})`
+                  : t.subscription.unlimited}
               </div>
             </div>
           </div>
@@ -151,6 +221,16 @@ export const SubscriptionView = ({ orgData, t }: any) => {
             {actionLoading === 'FREE' ? <Loader2 className="animate-spin size-4" /> : t.subscription.cancelBtn}
           </button>
         </section>
+      )}
+
+      {paymentPlan && (
+        <SubscriptionPaymentModal
+          plan={paymentPlan}
+          loading={!!actionLoading}
+          t={t}
+          onClose={() => setPaymentPlan(null)}
+          onSubmit={(method) => executePlanChange(paymentPlan.name, method)}
+        />
       )}
 
     </div>

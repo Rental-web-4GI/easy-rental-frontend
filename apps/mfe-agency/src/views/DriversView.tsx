@@ -51,6 +51,8 @@ export const DriversView = ({ userData, t, staffPermissions }: any) => {
       } else {
         setBackendError(res.data?.message || t.staff.errorSave);
       }
+    } catch {
+      setBackendError(t.staff.errorSave);
     } finally { setModalLoading(false); }
   };
 

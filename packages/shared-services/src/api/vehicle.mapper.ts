@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { normalizePricing, normalizeScheduleList } from './driver.mapper';
+import { canonicalMediaStoragePath, resolveMediaDisplayUrl } from './media.mapper';
+import { dedupeById } from '../utils/dedupe';
 
 export const DEFAULT_VEHICLE_FUNCTIONALITIES: Record<string, boolean> = {
   air_condition: true,
@@ -118,7 +120,9 @@ export function toApiVehiclePayload(data: Record<string, unknown>): Record<strin
       expiry: insurance.expiry,
     },
     description: data.description ?? [],
-    images: data.images ?? [],
+    images: Array.isArray(data.images)
+        ? data.images.map((img) => canonicalMediaStoragePath(String(img)))
+        : [],
   };
 }
 
@@ -160,14 +164,19 @@ export function normalizeVehicle(raw: Record<string, unknown> | null | undefined
       expiry: insurance.expiry,
     },
     description: raw.description ?? [],
-    images: raw.images ?? [],
+    images: Array.isArray(raw.images)
+        ? raw.images
+            .map((img) => resolveMediaDisplayUrl(canonicalMediaStoragePath(String(img))))
+            .filter((url) => url && url.length > 0)
+        : [],
     pricing,
   };
 }
 
 export function normalizeVehicleList(raw: unknown): any[] {
   if (!Array.isArray(raw)) return [];
-  return raw.map((item) => normalizeVehicle(item as Record<string, unknown>)).filter(Boolean);
+  const list = raw.map((item) => normalizeVehicle(item as Record<string, unknown>)).filter(Boolean);
+  return dedupeById(list);
 }
 
 function normalizeReviewItem(raw: Record<string, unknown>): Record<string, unknown> {

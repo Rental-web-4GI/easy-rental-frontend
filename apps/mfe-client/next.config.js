@@ -19,9 +19,12 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        // On redirige tous les appels /api-rental vers le vrai serveur Render
         source: '/api-rental/:path*',
         destination: 'http://localhost:8081/:path*',
+      },
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:8081/uploads/:path*',
       },
     ];
   },

@@ -1,3 +1,6 @@
+// FILE: packages/shared-services/src/api/api-client.ts
+import { getStoredToken, clearAuthSession } from '../auth/auth-session';
+
 export interface ApiConfig {
   baseUrl: string;
   timeout?: number;
@@ -24,15 +27,17 @@ export interface ApiResponse<T> {
 }
 
 export class ApiClient {
-  private baseUrl: string;
   private headers: Record<string, string>;
   private memoryToken: string | null = null;
 
-  constructor(config: { baseUrl: string }) {
-    this.baseUrl = config.baseUrl;
+  constructor(_config?: { baseUrl?: string }) {
     this.headers = {
       'Content-Type': 'application/json',
     };
+  }
+
+  private resolveBaseUrl(): string {
+    return getDynamicBaseUrl();
   }
 
   setAuthToken(token: string): void {
@@ -48,18 +53,17 @@ export class ApiClient {
     // 1. Construction de l'URL
     // Si l'endpoint commence par /, on l'enlève pour éviter les doubles slashs
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-    const url = `${this.baseUrl}/${cleanEndpoint}`;
+    const url = `${this.resolveBaseUrl()}/${cleanEndpoint}`;
 
     // 2. Récupération dynamique du token
-    const token = this.memoryToken || (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null);
+    const token = this.memoryToken || getStoredToken();
     
     const requestHeaders: Record<string, string> = { 
       ...this.headers,
       'Accept': '*/*', // Aligné sur Swagger
     };
 
-    if (token) {
-      // console.log('Adding auth token to request:', token);
+    if (token && !cleanEndpoint.startsWith('auth/')) {
       requestHeaders['Authorization'] = `Bearer ${token.trim()}`;
     }
 
@@ -72,11 +76,18 @@ export class ApiClient {
     }
 
     try {
+      const isMultipart = data instanceof FormData;
+      const controller = new AbortController();
+      const timeoutMs = isMultipart ? 180_000 : 60_000;
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
       const response = await fetch(url, {
         method,
         headers: requestHeaders,
         body: body,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (response.status === 204) return { data: {} as T, status: 204, ok: true };
 
@@ -84,7 +95,7 @@ export class ApiClient {
 
       if (!response.ok && response.status === 401 && typeof window !== 'undefined') {
         this.memoryToken = null;
-        localStorage.removeItem('auth_token');
+        clearAuthSession();
       }
 
       if (!response.ok) {
@@ -97,8 +108,12 @@ export class ApiClient {
         ok: response.ok,
       };
     } catch (error) {
-      // console.error(`[API Error] ${method} ${url}:`, error);
-      return { data: null as any, status: 0, ok: false };
+      const aborted = error instanceof DOMException && error.name === 'AbortError';
+      return {
+        data: { message: aborted ? 'Délai dépassé lors de l’envoi du fichier. Réduisez la taille ou réessayez.' : 'Erreur réseau' } as any,
+        status: 0,
+        ok: false,
+      };
     }
   }
 
@@ -107,7 +122,7 @@ export class ApiClient {
       return;
     }
     this.memoryToken = null;
-    localStorage.removeItem('auth_token');
+    clearAuthSession();
     window.dispatchEvent(new CustomEvent('auth:session-expired'));
   }
 
@@ -119,26 +134,40 @@ export class ApiClient {
 }
 
 /**
- * Détecte si on est sur /agency ou /organisation pour taper le bon proxy local
+ * Détecte si on est sur /agency ou /organisation pour taper le bon proxy local.
+ * Peut être forcé via configureApiBaseUrl (ex. mfe-admin).
  */
+let apiBaseOverride: string | null = null;
+
+export function configureApiBaseUrl(baseUrl: string): void {
+  apiBaseOverride = baseUrl.replace(/\/$/, '');
+}
+
 const getDynamicBaseUrl = () => {
-  if (typeof window === 'undefined') return 'https://apirental5gi-v2.onrender.com';
-  
+  if (apiBaseOverride) {
+    return apiBaseOverride;
+  }
+
+  if (typeof window === 'undefined') {
+    return '/api-rental';
+  }
+
   const path = window.location.pathname;
+  const port = window.location.port;
+
   if (path.startsWith('/client')) return '/client/api-rental';
   if (path.startsWith('/agency')) return '/agency/api-rental';
   if (path.startsWith('/organisation')) return '/organisation/api-rental';
-  
+  if (path.startsWith('/admin') || port === '3004') return '/admin/api-rental';
+
   return '/api-rental';
 };
 
-export const defaultClient = new ApiClient({
-  baseUrl: getDynamicBaseUrl()
-});
+export const defaultClient = new ApiClient();
 
 /**
  * Fonction utilitaire pour créer de nouvelles instances si nécessaire
  */
-export function createApiClient(baseUrl: string): ApiClient {
-  return new ApiClient({ baseUrl });
+export function createApiClient(_baseUrl?: string): ApiClient {
+  return new ApiClient();
 }

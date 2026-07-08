@@ -55,7 +55,7 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 
 | MFE | Port | Remarques ouvertes |
 |-----|------|-------------------|
-| **mfe-client** | 3001 | 4 |
+| **mfe-client** | 3001 | 2 |
 | **mfe-agency** | 3002 | 1 |
 | **mfe-organisation** | 3003 | 2 |
 | **Transversal** | — | 1 |
@@ -101,11 +101,13 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 
 #### UX-005 — Icône afficher / masquer mot de passe
 - **Priorité :** P1
-- **Statut :** Corrigé (partiel — mfe-organisation auth)
+- **Statut :** Corrigé (mfe-organisation, mfe-agency, mfe-client auth)
 - **Scope :** Tous les champs `type="password"` — Auth, profil, changement MDP.
 - **Remarque :** Ajouter un bouton œil (show/hide) sur les mots de passe partout : **mfe-client**, **mfe-organisation**, **mfe-agency**.
 - **Piste technique :** Composant partagé `PasswordInput` dans `@pwa-easy-rental/shared-ui` ; remplacer les `<input type="password">` existants.
 - **Résolu (2026-06-26) :** `AuthInput` mfe-organisation — toggle œil sur le formulaire de connexion/inscription.
+- **Résolu (2026-07-05) :** `AuthInput` mfe-agency + mfe-client.
+- **Résolu (2026-07-07) :** `AuthView` mfe-admin — toggle œil ; suppression texte d’aide exposant identifiants.
 
 #### UX-006 — API de paiement non intégrée
 - **Priorité :** P3
@@ -343,11 +345,59 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 - **Scope :** backend — création notifications location
 - **Piste résolue :** `resource_id` renseigné (agence) à la création des notifications liées aux rentals.
 
-#### UX-040 — VIN / formulaire véhicule (chevauchement champs)
-- **Priorité :** P2 | **Statut :** Corrigé
-- **App :** `VehicleDetailsBody` — champ VIN pleine largeur, layout fiche.
+#### UX-041 — Création véhicule agence : erreur SpEL RBAC
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-agency, backend `VehicleController`
+- **Symptômes :** `Failed to evaluate expression ... hasPermission(#orgId, 'vehicle:create')` à l'enregistrement depuis l'agence.
+- **Piste résolue :** méthodes synchrones `checkPermission` / `checkAgencyAccess` pour SpEL ; création autorise org ou staff via orgId + agencyId du payload ; véhicule visible côté org via `getVehiclesByOrg`.
 
----
+#### UX-042 — DuckDB worker erreurs console (mfe-client)
+- **Priorité :** P2 | **Statut :** Corrigé
+- **App :** mfe-client — `CatalogView` / `useLocalFirst`
+- **Piste résolue :** init DuckDB silencieuse si worker indisponible ; sync offline non bloquante (catalogue via API).
+
+#### UX-043 — Photos véhicule différentes org vs agence (Mitsubishi)
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-organisation, mfe-agency, `media.mapper`, `vehicle.mapper`
+- **Symptômes :** modification/upload depuis l'org → image cassée ou différente côté agence ; URLs stockées avec préfixe `/organisation/api-rental/uploads/...`.
+- **Piste résolue :** `canonicalMediaStoragePath` + persistance `/uploads/...` uniquement ; `resolveMediaDisplayUrl` sur les cartes org ; correction SQL des images existantes.
+
+#### UX-044 — Login agence : icône œil mot de passe
+- **Priorité :** P1 | **Statut :** Corrigé
+- **App :** mfe-agency `AuthInput.tsx`
+- **Piste résolue :** toggle visibilité (Eye/EyeOff) aligné sur mfe-organisation.
+
+#### UX-045 — Inscription client échoue (kernel + login auto)
+- **Priorité :** P0 | **Statut :** Corrigé
+- **App :** mfe-client — `AuthView`, `page.tsx`, `auth.service.ts` ; backend `AuthUseCaseImpl`
+- **Symptômes :** message générique « Identifiants incorrects ou erreur lors de l'inscription » ; API 400 `Kernel sign-up did not return accessToken`.
+- **Cause :** kernel renvoie `EMAIL_VERIFICATION_REQUIRED` sans token ; frontend lisait `logRes.data.token` au lieu de `loginRes.token`.
+- **Piste résolue :** backend crée le client local + `kernel_user_id` et retourne `emailVerificationRequired` ; frontend affiche succès email (pas d'auto-login) ; login/MFA corrigés ; `easy-rental.client.skip-kernel-auth=true` pour tests locaux.
+
+#### UX-046 — Catalogue client : véhicules fantômes, images, réservation
+- **Priorité :** P0 | **Statut :** Validé
+- **App :** mfe-client — `CatalogView`, `VehicleCard`, `HomeView`, `BookingWizardModal` ; `catalog.filters.ts`, `vehicle.mapper`
+- **Symptômes :** véhicules/agences inexistants ou sans prix ; images uploadées non affichées ; catalogue trop espacé ; téléphone >9 chiffres ; erreur téléphone persistante ; réservation ignore indisponibilités ; bouton FR sans effet sur le header.
+- **Piste résolue :** filtre catalogue (AVAILABLE + prix valides + agence en ligne) ; `resolveMediaDisplayUrl` sur images ; refactor cartes/espacements ; validation téléphone CM 9 chiffres ; contrôle planning avant devis ; i18n header (FR/EN) persisté.
+
+#### UX-047 — Catalogue client : données démo + images + détail véhicule
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-client, backend `VehicleUseCaseImpl`, `AgencyUseCaseImpl`, `DataSeeder`
+- **Symptômes :** véhicules Prestige/Logistics (seeder) visibles alors qu'une seule org (Sahel) ; entrées test `dd qsds` ; images `/uploads/...` cassées ; erreurs DuckDB console ; 6 agences au lieu de 2.
+- **Piste résolue :** purge BDD démo + junk ; requêtes `findCatalogAvailableVehicles` / `findCatalogAgencies` (abonnement ACTIVE) ; `easy-rental.seed.enabled=false` en local ; placeholder SVG ; rewrite `/uploads` ; DuckDB désactivé en dev ; refonte `VehicleDetailsView`.
+
+#### UX-048 — Réservation client : validation init (champs null)
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-client `BookingWizardModal`, `rental.mapper`, backend `RentalInitRequest`, `RentalUseCaseImpl`
+- **Symptômes :** POST `/api/rentals/init` — champs rejetés `null` (snake_case).
+- **Piste résolue :** `toApiRentalInitPayload` ; `driverId` optionnel ; devis sans chauffeur si non exigé.
+
+#### UX-049 — Réservation client : Réserver + contact agence (sans paiement en ligne)
+- **Priorité :** P0 | **Statut :** Corrigé
+- **Apps :** mfe-client `BookingWizardModal`, `ReservationDetail`, `ReservationsView`, `rental.mapper`
+- **Symptômes :** flux paiement MOMO/OM prématuré ; liste réservations sans photo ni agence ; détail « SANS IMMAT ».
+- **Piste résolue :** bouton **Réserver** → succès avec appel/email agence ; `normalizeRentalDetails` ; photo + agence sur cartes et détail ; acompte « à régler en agence ».
+
 
 ## Journal des ajouts (suite)
 
@@ -355,3 +405,28 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 |------|--------|--------|
 | 2026-06-30 | Agent | UX-031..040 : notifications, agences, réservations walk-in, maintenance, montants, planning |
 | 2026-06-30 | Agent | Export 73 captures → `rapport/captures-ecran-optimisation/` |
+| 2026-07-05 | Agent | UX-043/044 : sync images véhicules org↔agence, œil mot de passe login agence |
+| 2026-07-07 | Agent | UX-050..053 : messagerie support, admin console, i18n landing, auto-renew abonnement |
+
+### Transversal — Admin & Support
+
+#### UX-050 — Messagerie support Campus France
+- **Priorité :** P1
+- **Statut :** Corrigé
+- **Piste résolue :** Module `support` backend (threads/messages), widget branché API, inbox admin `mfe-admin`, emails log/SMTP.
+
+#### UX-051 — Lien console admin + i18n CTA landing
+- **Priorité :** P2
+- **Statut :** Corrigé
+- **Piste résolue :** `MFE_URLS.admin` dans Navbar, `LangContext` + CTA final traduit FR/EN.
+
+#### UX-052 — Externalisation email admin support
+- **Priorité :** P1
+- **Statut :** Corrigé
+- **Piste résolue :** `easy-rental.support.admin-email` + `GET /api/support/config`.
+
+#### UX-053 — Auto-renew abonnement (UI org)
+- **Priorité :** P1
+- **Statut :** Corrigé
+- **Piste résolue :** Toggle auto-renew dans `SubscriptionView` + champ `autoRenew` dans `SubscriptionResponseDTO`.
+

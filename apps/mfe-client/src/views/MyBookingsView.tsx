@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Bell, Loader2, Calendar, CreditCard, ChevronRight, X, MapPin, Car, Phone, Mail, Shield, UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { rentalService } from '@shared-services/api/rental.service';
+import { rentalService, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
 import { ReviewModal } from './ReviewModal';
 
 
@@ -19,7 +19,13 @@ export const MyBookingsView = ({ userData, onNavigateToCatalog }: { userData: an
     const fetchRentals = async () => {
       try {
         const data = await rentalService.getClientRentalsHistory();
-        if (data.ok) setRentals(data.data || []);
+        if (data.ok) {
+          const list = data.data || [];
+          setRentals(list);
+          if (list.some((r: any) => r.status === 'COMPLETED')) {
+            markFirstUsageDone();
+          }
+        }
         setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des locations", error);

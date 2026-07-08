@@ -10,7 +10,8 @@ export const en = {
     help: "Help", 
     login: "Pro Space", 
     reserve: "Book Now",
-    install: "Install"
+    install: "Install",
+    admin: "Admin Console",
   },
   hero: {
     badge: "Next-gen rental ecosystem",
@@ -25,36 +26,50 @@ export const en = {
   },
   stakeholders: {
     title: "Access your portal",
-    subtitle: "Select your profile to continue",
+    subtitle: "Three workspaces, one ecosystem — pick your profile",
     org: "Organization",
-    orgDesc: "For fleet owners looking to create their network.",
-    agency: "Freelance",
-    agencyDesc: "For agents managing agency pickups and returns.",
+    orgDesc: "Manage fleet, agencies, subscriptions and revenue from a central dashboard.",
+    orgHighlight: "Fleet · Subscription · Multi-agency",
+    agency: "Agency",
+    agencyDesc: "Handle walk-in bookings, payments, vehicle handovers and returns in clicks.",
+    agencyHighlight: "Counter · Staff RBAC · Operations",
     client: "Client",
-    clientDesc: "To browse the catalog and book instantly.",
+    clientDesc: "Browse the catalog, compare rates and book without waiting in line.",
+    clientHighlight: "Catalog · Booking · Tracking",
     cta: "Enter"
   },
-  features: { 
-    title: "PWA First Technology", 
-    desc: "The speed of a native app directly in your browser.", 
-    f1: "Offline Mode", f1d: "Sync when back.", 
-    f2: "Real-time GPS", f2d: "Map tracking.", 
-    f3: "Auto Invoicing", f3d: "Auto billing.", 
-    f4: "Instant Sync", f4d: "Real-time." 
+  features: {
+    title: "PWA First Technology",
+    desc: "Mobile-first experience built for Cameroon: unstable networks, in-agency payment, always up-to-date data.",
+    f1: "Offline mode",
+    f1d: "Browse catalog and reservations without network. Auto-sync when back online.",
+    f2: "GPS tracking",
+    f2d: "Locate agencies and vehicles on map for real-world pickups and returns.",
+    f3: "Auto billing",
+    f3d: "Quotes, deposits and balances computed from your hourly/daily/monthly rates.",
+    f4: "Instant sync",
+    f4d: "Client booking → agency notification in real time. Zero double entry.",
   },
-  pricing: { 
-    title: "Flexible Pricing", 
-    perMonth: "/mo", 
-    cta: "Choose plan", 
-    starter: "Starter", 
-    pro: "Professional", 
-    enterprise: "Enterprise", 
-    onDemand: "On demand" 
+  footer: {
+    desc: "The new standard in rental software in Cameroon. Agile, digital, built for the field.",
+    copy: "© 2025 PWA EASY RENTAL. ALL RIGHTS RESERVED.",
+    privacy: "Privacy Policy",
+    terms: "Terms",
+    comingSoon: "Page under development",
   },
-  footer: { 
-    desc: "The new standard in rental software. Agile and digital.", 
-    copy: "© 2025 PWA EASY RENTAL. ALL RIGHTS RESERVED.", 
-    privacy: "Privacy Policy", 
-    terms: "Terms" 
-  }
+  testimonials: {
+    badge: "Customer Reviews",
+    title: "They trust",
+    titleAccent: "Us",
+    basedOn: "Based on",
+    certified: "certified reviews",
+    empty: "Be the first to leave a review after your rental!",
+  },
+  ctaFinal: {
+    title: "Ready to hit",
+    titleAccent: "the Road?",
+    desc: "Book your vehicle in under 2 minutes and enjoy the Easy Rental PWA experience.",
+    catalog: "Browse catalog",
+    help: "Need help?",
+  },
 };

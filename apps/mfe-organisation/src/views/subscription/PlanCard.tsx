@@ -3,7 +3,11 @@
 import React from 'react';
 import { Check, Loader2, Zap, ShieldCheck, MessageSquare, LayoutGrid, Car } from 'lucide-react';
 
-export const PlanCard = ({ plan, isCurrent, onSelect, loading, t }: any) => (
+export const PlanCard = ({ plan, isCurrent, onSelect, loading, t }: any) => {
+  const isYearly = plan.billingPeriod === 'YEARLY';
+  const isFree = plan.billingPeriod === 'UNLIMITED' || plan.price <= 0;
+
+  return (
   <div className={`
     relative bg-white dark:bg-[#1a1d2d] p-8 md:p-10 rounded-[2.5rem] border-2 transition-all flex flex-col h-full group text-left
     ${isCurrent ? 'border-[#0528d6] shadow-2xl scale-[1.02] z-10' : 'border-slate-100 dark:border-slate-800 hover:border-blue-200'}
@@ -19,13 +23,25 @@ export const PlanCard = ({ plan, isCurrent, onSelect, loading, t }: any) => (
       <p className="text-xs text-slate-400 mt-2 italic font-medium leading-relaxed">{plan.description}</p>
     </div>
 
-    <div className="mb-10 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border dark:border-slate-800 shadow-inner">
-      <div className="flex items-baseline gap-1">
+    <div className="mb-10 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border dark:border-slate-800 shadow-inner space-y-2">
+      <div className="flex items-baseline gap-1 flex-wrap">
         <span className="text-4xl font-black text-[#0528d6] dark:text-blue-400 tracking-tighter italic">
           {plan.price.toLocaleString()}
         </span>
-        <span className="text-xs font-black text-slate-400 uppercase italic ml-1">XAF {t.subscription.perMonth}</span>
+        <span className="text-xs font-black text-slate-400 uppercase italic ml-1">
+          XAF {isFree ? '' : isYearly ? t.subscription.perYear : t.subscription.perMonth}
+        </span>
       </div>
+      {isYearly && (
+        <p className="text-[10px] font-bold text-slate-500 italic">
+          ≈ {plan.monthlyEquivalentPrice.toLocaleString()} XAF {t.subscription.perMonthEquivalent}
+        </p>
+      )}
+      {!isFree && plan.durationDays > 0 && (
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          {plan.durationDays} {t.subscription.daysActive}
+        </p>
+      )}
     </div>
 
     <ul className="flex-1 space-y-5 mb-10">
@@ -49,7 +65,8 @@ export const PlanCard = ({ plan, isCurrent, onSelect, loading, t }: any) => (
       </div>
     )}
   </div>
-);
+  );
+};
 
 const FeatureItem = ({ label, active, icon }: { label: string, active: boolean, icon: React.ReactNode }) => (
   <li className={`flex items-center gap-4 text-xs font-black uppercase italic transition-opacity ${active ? 'text-slate-600 dark:text-slate-300' : 'text-slate-300 dark:text-slate-600 opacity-40'}`}>

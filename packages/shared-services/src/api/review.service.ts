@@ -8,9 +8,50 @@ export type ReviewPayload = {
   authorName?: string;
 };
 
+export type PlatformFeedbackPayload = {
+  authorName: string;
+  authorRole: string;
+  rating: number;
+  comment?: string;
+};
+
+export type ReviewItem = {
+  id: string;
+  resourceId: string;
+  resourceType: 'VEHICLE' | 'DRIVER' | 'PLATFORM';
+  rating: number;
+  comment?: string;
+  authorName?: string;
+  authorRole?: string;
+  published: boolean;
+  sourceLabel?: string;
+  createdAt?: string;
+};
+
+export type ReviewModerationStats = {
+  publishedCount: number;
+  unpublishedCount: number;
+};
+
 export const reviewService = {
-  addReview: (data: ReviewPayload) => client.post<any>('/api/reviews', data),
+  addReview: (data: ReviewPayload) => client.post<ReviewItem>('/api/reviews', data),
+
+  submitPlatformFeedback: (data: PlatformFeedbackPayload) =>
+    client.post<ReviewItem>('/api/reviews/platform-feedback', data),
 
   getReviews: (type: 'VEHICLE' | 'DRIVER', id: string) =>
-    client.get<any[]>(`/api/reviews/${type}/${id}`),
+    client.get<ReviewItem[]>(`/api/reviews/${type}/${id}`),
+
+  getFeaturedReviews: () => client.get<{
+    reviews: ReviewItem[];
+    averageRating: number;
+    totalCount: number;
+  }>('/api/reviews/featured'),
+
+  listAllForAdmin: () => client.get<ReviewItem[]>('/api/reviews/admin/all'),
+
+  getModerationStats: () => client.get<ReviewModerationStats>('/api/reviews/admin/stats'),
+
+  setPublished: (id: string, published: boolean) =>
+    client.patch<ReviewItem>(`/api/reviews/admin/${id}/published`, { published }),
 };

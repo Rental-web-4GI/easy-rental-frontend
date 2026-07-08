@@ -71,7 +71,12 @@ export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t }: any) =
               <AlertTriangle size={28} />
             </div>
             <h3 className="text-lg font-black uppercase italic text-slate-900 dark:text-white">{t.common?.error || 'Une erreur est survenue'}</h3>
-            <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">{t.common?.noData || 'Aucune donnée disponible'}</p>
+            <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+              {t.common?.noData || 'Aucune donnée disponible'}
+            </p>
+            <p className="mt-1 text-xs font-medium text-slate-400 italic">
+              {t.rentalDetails?.missingVehicleHint || 'Le véhicule lié à ce dossier a peut-être été supprimé de la flotte.'}
+            </p>
             <button onClick={onClose} className="mt-6 px-6 py-3 rounded-2xl bg-[#0528d6] text-white text-xs font-black uppercase italic hover:bg-blue-700 transition-all">
               {t.common?.close || 'Fermer'}
             </button>
@@ -151,7 +156,9 @@ export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t }: any) =
 	                    </div>
 	                    <div>
 	                        <p className="text-[10px] font-black text-[#0528d6] uppercase tracking-widest italic mb-1">{t.rentalDetails.assignedVehicle}</p>
-	                        <h4 className="text-2xl font-black italic uppercase text-slate-800 dark:text-white leading-none">{vehicle?.brand || '---'} {vehicle?.model || ''}</h4>
+	                        <h4 className="text-2xl font-black italic uppercase text-slate-800 dark:text-white leading-none">
+                          {vehicle ? `${vehicle.brand || '---'} ${vehicle.model || ''}`.trim() : (t.rentalDetails?.vehicleRemoved || 'Véhicule supprimé')}
+                        </h4>
 	                        <p className="mt-3 text-sm font-mono font-bold text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-lg inline-block uppercase">{vehicle?.licencePlate || '---'}</p>
                     </div>
                 </div>

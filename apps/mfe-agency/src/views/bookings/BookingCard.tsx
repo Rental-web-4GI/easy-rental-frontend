@@ -60,7 +60,9 @@ export const BookingCard = ({
             <User size={24} />
         </div>
         <div className="overflow-hidden">
-          <h4 className="font-black text-slate-800 dark:text-white leading-tight truncate uppercase italic tracking-tighter leading-none">{rental.clientName || 'Walk-in'}</h4>
+          <h4 className="font-black text-slate-800 dark:text-white leading-tight truncate uppercase italic tracking-tighter leading-none">
+            {rental.clientName?.trim() || (rental.clientId ? 'Client en ligne' : 'Walk-in comptoir')}
+          </h4>
           <p className="flex items-center gap-2 mt-1 text-slate-400 font-bold text-[10px] uppercase italic">
             <Phone size={10} className="text-[#0528d6]"/> {rental.clientPhone}
           </p>

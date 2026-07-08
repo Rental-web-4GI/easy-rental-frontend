@@ -1,225 +1,435 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState, useEffect } from 'react';
-import { X, CreditCard, CheckCircle2, Loader2, ChevronRight, AlertCircle, ShieldCheck } from 'lucide-react';
-import { rentalService, driverService } from '@pwa-easy-rental/shared-services';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  X,
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  Car,
+  Phone,
+  Clock,
+  Calculator,
+  User,
+  MapPin,
+  Mail,
+  Store,
+} from 'lucide-react';
+import {
+  rentalService,
+  driverService,
+  normalizeCmPhone,
+  isValidCmMobile,
+  CM_PHONE_HINT,
+  rentalPeriodOverlapsSchedule,
+  resolveMediaDisplayUrl,
+  computeRentalQuote,
+  resolvePricingRates,
+  hasPricingForType,
+  getPricingRate,
+  type RentalType,
+} from '@pwa-easy-rental/shared-services';
+import { DateTimePicker } from '@pwa-easy-rental/shared-ui';
 import { Portal } from '../../components/Portal';
-import DriverDetailView from '../driver/DriverDetailsView';
 
-export const BookingWizardModal = ({ vehicle, userData, isDriverRequired, initialRentalType, onClose }: any) => {
-  const [step, setStep] = useState(1);
+const VEHICLE_FALLBACK = '/client/vehicle-placeholder.svg';
+
+type Phase = 'form' | 'success';
+
+export const BookingWizardModal = ({
+  vehicle,
+  agency,
+  userData,
+  isDriverRequired,
+  initialRentalType,
+  schedule = [],
+  onClose,
+}: any) => {
+  const localISO = (date: Date) => {
+    const tzOffset = date.getTimezoneOffset() * 60_000;
+    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+  };
+
+  const [phase, setPhase] = useState<Phase>('form');
   const [loading, setLoading] = useState(false);
   const [drivers, setDrivers] = useState<any[]>([]);
+  const [driversLoading, setDriversLoading] = useState(false);
   const [initRes, setInitRes] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [driverDetails, setDriverDetails] = useState<any>(null);
-
-  const localISO = (date: Date) => {
-    const tzOffset: number = date.getTimezoneOffset() * 60_000;
-    const localDate: Date = new Date(date.getTime() - tzOffset);
-    return localDate.toISOString().slice(0, 16);
-  };
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const [form, setForm] = useState({
     vehicleId: vehicle.id,
     driverId: '',
-    clientPhone: userData?.phone || '',
+    clientPhone: normalizeCmPhone(userData?.phone || ''),
     startDate: localISO(new Date(Date.now() + 60 * 60 * 1000)),
-    endDate: localISO(new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000)),
-    rentalType: initialRentalType || 'DAILY'
+    endDate: localISO(new Date(Date.now() + 25 * 60 * 60 * 1000)),
+    rentalType: (initialRentalType || 'DAILY') as RentalType,
   });
 
-  const [paymentAmount, setPaymentAmount] = useState(0);
-  const [method, setMethod] = useState<'MOMO' | 'OM' | 'CARD'>('MOMO');
+  const selectedDriver = drivers.find((d) => d.id === form.driverId);
+  const contactAgency = initRes?.agency ?? agency;
+
+  const quote = useMemo(() => {
+    const vehiclePricing = resolvePricingRates(vehicle?.pricing);
+    if (!vehiclePricing && !selectedDriver?.pricing) return null;
+    const start = new Date(form.startDate);
+    const end = new Date(form.endDate);
+    if (end <= start) return null;
+    if (rentalPeriodOverlapsSchedule(form.startDate, form.endDate, schedule)) return null;
+    return computeRentalQuote(
+      {
+        startDate: start,
+        endDate: end,
+        rentalType: form.rentalType,
+        vehiclePricing: vehiclePricing ?? { pricePerHour: 0, pricePerDay: 0, pricePerMonth: 0 },
+        driverPricing: resolvePricingRates(selectedDriver?.pricing),
+      },
+      true
+    );
+  }, [form, vehicle, selectedDriver, schedule]);
+
+  const missingPrereqs = useMemo(() => {
+    const items: { id: string; message: string }[] = [];
+    const add = (id: string, message: string) => {
+      if (!items.some((i) => i.id === id)) items.push({ id, message });
+    };
+    if (!hasPricingForType(vehicle?.pricing, form.rentalType)) {
+      add('vehicle-pricing', 'Tarif véhicule non configuré pour ce mode.');
+    }
+    if (!isValidCmMobile(form.clientPhone)) {
+      add('phone', `Téléphone invalide. ${CM_PHONE_HINT}`);
+    }
+    const start = new Date(form.startDate);
+    const end = new Date(form.endDate);
+    if (end <= start) add('dates', 'La date de retour doit être après le départ.');
+    if (rentalPeriodOverlapsSchedule(form.startDate, form.endDate, schedule)) {
+      add('schedule', 'Véhicule indisponible sur cette période.');
+    }
+    if (isDriverRequired && !form.driverId) {
+      add('driver', 'Sélectionnez un chauffeur.');
+    }
+    if (isDriverRequired && !driversLoading && drivers.length === 0) {
+      add('no-drivers', 'Aucun chauffeur disponible sur cette période.');
+    }
+    if (selectedDriver && !hasPricingForType(selectedDriver?.pricing, form.rentalType)) {
+      add('driver-pricing', 'Tarif chauffeur non configuré.');
+    }
+    if (quote && quote.baseAmount <= 0) add('zero', 'Montant de base invalide.');
+    return items;
+  }, [form, vehicle, selectedDriver, quote, isDriverRequired, driversLoading, drivers.length]);
+
+  const canSubmit = missingPrereqs.length === 0 && !loading;
+  const estimatedDeposit = quote?.requestedDeposit ?? 0;
 
   useEffect(() => {
-    const fetchAvailableDrivers = async () => {
+    if (!isDriverRequired || !vehicle.agencyId) {
+      setDrivers([]);
+      return;
+    }
+    const start = new Date(form.startDate);
+    const end = new Date(form.endDate);
+    if (end <= start) {
+      setDrivers([]);
+      return;
+    }
+    const load = async () => {
+      setDriversLoading(true);
       const res = await driverService.getAvailableDrivers(vehicle.agencyId, form.startDate, form.endDate);
-      if (res.ok) setDrivers(res.data || []);
+      if (res.ok) {
+        const list = res.data || [];
+        setDrivers(list);
+        if (form.driverId && !list.some((d: any) => d.id === form.driverId)) {
+          setForm((prev) => ({ ...prev, driverId: '' }));
+        }
+      }
+      setDriversLoading(false);
     };
-    fetchAvailableDrivers();
-  }, [form.startDate, form.endDate, vehicle.agencyId]);
+    load();
+  }, [form.startDate, form.endDate, vehicle.agencyId, form.driverId, isDriverRequired]);
 
-  useEffect(() => {
-    const fetchDriverDetails = async () => {
-      const res = await driverService.getDriverDetails(form.driverId);
-      if (res.ok) setDriverDetails(res.data || []);
-    };
-    fetchDriverDetails();
-    console.log("Selected driverId:", form.driverId);
-  }, [form.driverId]);
-
-  const handleCalculate = async () => {
-    if (!form.clientPhone) return setError("Téléphone requis pour valider le trajet.");
-    if (isDriverRequired && !form.driverId) return setError("La sélection d'un chauffeur est obligatoire pour ce véhicule.");
-    
+  const handleReserve = async () => {
+    setSubmitAttempted(true);
+    if (!canSubmit) {
+      setError(missingPrereqs[0]?.message ?? 'Vérifiez le formulaire.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const res = await rentalService.initiateRental(form);
-      if (res.ok && res.data.isAllowed) {
+      if (res.ok && res.data?.isAllowed) {
         setInitRes(res.data);
-        const calculatedAmount = initRes.totalAmount * 0.6; // 60% du montant total
-        setPaymentAmount(calculatedAmount);
-        setStep(3);
+        setPhase('success');
       } else {
-        setError(res.data?.message || "Désolé, ce créneau n'est plus disponible.");
+        setError(res.data?.message || "Ce créneau n'est plus disponible.");
       }
     } catch {
-      setError("Le service de calcul est momentanément indisponible.");
-
+      setError('Impossible d\'enregistrer la demande. Réessayez.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePay = async () => {
-    if (!initRes?.rentalId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      // console.log("Processing payment with rentalId:", initRes.rentalId, "amount:", initRes.totalAmount, "method:", method);
-      const res = await rentalService.payRental(initRes.rentalId, {
-        amount: paymentAmount,
-        method
-      });
-      if (res.ok) {
-        setStep(4);
-      } else {
-        setError("La transaction a été refusée par l'opérateur.");
-      }
-    } catch {
-      setError("Erreur lors du traitement du paiement.");
-    } finally {
-      setLoading(false);
-    }
+  const rentalTypeLabel = (type: RentalType) => {
+    if (type === 'HOURLY') return 'Par heure';
+    if (type === 'MONTHLY') return 'Par mois';
+    return 'Par jour';
   };
 
-  const reste = initRes ? initRes.totalAmount - paymentAmount : 0;
-
-  const getDurationLabel = () => {
-    const start = new Date(form.startDate).getTime();
-    const end = new Date(form.endDate).getTime();
-    const diffMs = end - start;
-    if (form.rentalType === 'DAILY') return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24))) + " Jour(s)";
-    return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60))) + " Heure(s)";
+  const priceForVehicle = () => {
+    const rate = getPricingRate(vehicle?.pricing, form.rentalType);
+    return rate != null ? rate.toLocaleString('fr-FR') : '—';
   };
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 max-h-screen">
-        <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-xl animate-in fade-in" onClick={onClose} />
-        
-        <div className="relative w-full max-w-4xl bg-white dark:bg-[#1a1d2d] rounded-lg shadow-xl overflow-hidden animate-in zoom-in duration-300 border border-white/20 py-2 ">
-          <div className="px-10 py-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
-            <div className="flex gap-2">
-              {[1, 2, 3, 4].map(i => <div key={i} className={`h-1 rounded-full transition-all duration-500 ${step >= i ? 'bg-[#0528d6] w-12' : 'bg-slate-200 dark:bg-slate-700 w-4'}`} />)}
+      <div className="fixed inset-0 z-[1100] flex items-center justify-center p-2 md:p-4">
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} aria-hidden />
+
+        <div className="relative w-full max-w-5xl bg-white dark:bg-[#1a1d2d] rounded-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden border border-white/20">
+          <div className="px-6 md:px-10 py-5 border-b flex justify-between items-center text-white bg-[#0528d6]">
+            <div className="text-left">
+              <h3 className="text-lg md:text-xl font-bold tracking-tight">
+                {phase === 'form' ? 'Réserver ce véhicule' : 'Demande envoyée'}
+              </h3>
+              <p className="text-[10px] opacity-80 font-medium uppercase tracking-widest hidden sm:block">
+                Devis indicatif · confirmation par l&apos;agence
+              </p>
             </div>
-            <button onClick={onClose} className="p-2 bg-white dark:bg-slate-800 rounded-full shadow-sm hover:text-red-500 transition-colors"><X size={20}/></button>
+            <button type="button" onClick={onClose} className="p-2 bg-white/10 rounded-xl hover:bg-white/20">
+              <X size={22} />
+            </button>
           </div>
 
-          <div className="px-10 py-5 text-left">
-            {error && <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900/30 rounded-2xl flex items-center gap-3 text-red-600 dark:text-red-400 text-[10px] font-black  italic"><AlertCircle size={18}/> {error}</div>}
-
-            {step === 1 && (
-              <div className="space-y-8 animate-in slide-in-from-right-4">
-                <h3 className="text-3xl font-[900] italic tracking-tighter  text-[#0528d6] leading-none">Configuration</h3>
-                <div className="space-y-5">
-                  <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-800 dark:text-slate-400  italic ml-1">N° Téléphone de Contact</label><input value={form.clientPhone} onChange={e => setForm({...form, clientPhone: e.target.value})} className="w-full p-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-black text-sm outline-none focus:border-[#0528d6] dark:text-white" placeholder="699 00 00 00" /></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-800 dark:text-slate-400  italic ml-1">Départ</label><input type="datetime-local" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} className="w-full p-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold text-xs outline-none focus:border-[#0528d6] dark:text-white" /></div>
-                    <div className="space-y-1.5"><label className="text-[10px] font-black text-slate-800 dark:text-slate-400  italic ml-1">Retour</label><input type="datetime-local" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} className="w-full p-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold text-xs outline-none focus:border-[#0528d6] dark:text-white" /></div>
-                  </div>
-                </div>
-                <button onClick={() => form.clientPhone ? setStep(2) : setError("Un numéro de téléphone est requis.")} className="w-full py-5 bg-[#0528d6] text-white rounded-[2rem] font-black text-xs  shadow-xl flex items-center justify-center gap-2 italic transition-all hover:bg-blue-700">Continuer <ChevronRight size={18}/></button>
+          <div className="p-6 md:p-10 overflow-y-auto flex-1 text-left space-y-4">
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 rounded-2xl flex items-start gap-2 text-red-600 text-sm">
+                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                <span>{error}</span>
               </div>
             )}
 
-            {step === 2 && (
-              <div className="space-y-8 animate-in slide-in-from-right-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                <div className="flex justify-between items-center">
-                    <h3 className="text-3xl font-[900] italic tracking-tighter leading-none text-[#0528d6]">Chauffeur</h3>
-                    <span className="px-4 py-2 bg-slate-900 text-white rounded-2xl text-[10px] font-black  italic tracking-widest">{getDurationLabel()}</span>
-                </div>
-                <div className='flex gap-6'>
-                <div className="flex-1 grid grid-cols-1 gap-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                  {drivers.map(d => (
-                    <div key={d.id} onClick={() => setForm({...form, driverId: d.id})} 
-                         className={`p-5 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center gap-4 ${form.driverId === d.id ? 'border-[#0528d6] bg-blue-50/10 shadow-md' : 'border-slate-100 dark:border-slate-800 hover:border-blue-200'}`}>
-                       <div className="size-14 rounded-2xl bg-slate-200 dark:bg-slate-700 overflow-hidden shrink-0 border-2 border-white shadow-sm">
-                         <img src={d.profilUrl || `https://ui-avatars.com/api/?name=${d.firstname}&background=0528d6&color=fff`} className="w-full h-full object-cover" alt="driver" />
-                       </div>
-                       <div className="overflow-hidden">
-                          <h4 className="font-bold text-sm truncate leading-none text-slate-900 dark:text-white">{d.firstname} {d.lastname}</h4>
-                          <p className="text-[10px] font-black text-[#0528d6]  mt-2">
-                             +{form.rentalType === 'DAILY' ? d.pricing?.pricePerDay?.toLocaleString() : d.pricing?.pricePerHour?.toLocaleString()} XAF / {form.rentalType === 'DAILY' ? 'j' : 'h'}
-                          </p>
-                       </div>
-                    </div>
-                  ))}
-                </div>
-                <hr className='rotate-90'/>
-                <div className='flex-[2]'>
-                  {form.driverId && driverDetails?(
-                     
-                    <DriverDetailView data = {driverDetails}/>
-                  )
-                : (
-                  <p className="text-xs font-bold text-slate-400 tracking-widest text-center"> Selectionne un chauffeur parmi ceux de la colonne de gauche</p>
+            {phase === 'form' && (
+              <>
+                {submitAttempted && missingPrereqs.length > 0 && (
+                  <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl">
+                    <p className="text-[10px] font-bold uppercase text-amber-700 flex items-center gap-2 mb-2">
+                      <AlertCircle size={14} /> À corriger
+                    </p>
+                    <ul className="text-xs text-amber-800 space-y-1 list-disc pl-4">
+                      {missingPrereqs.map((item) => (
+                        <li key={item.id}>{item.message}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
 
+                {agency && (
+                  <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-xl text-sm">
+                    <Store size={16} className="text-[#0528d6] shrink-0" />
+                    <span>
+                      Retrait chez <strong>{agency.name}</strong>
+                      {agency.city ? ` · ${agency.city}` : ''}
+                    </span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <section className="space-y-5">
+                    <h4 className="text-[11px] font-bold text-[#0528d6] uppercase tracking-widest border-b pb-2 flex items-center gap-2">
+                      <Car size={14} /> 1. Véhicule & options
+                    </h4>
+
+                    <div className="p-4 rounded-xl border-2 border-[#0528d6] bg-blue-50/40 flex items-center gap-4">
+                      <div className="size-14 rounded-xl overflow-hidden bg-slate-200 shrink-0">
+                        <img
+                          src={resolveMediaDisplayUrl(vehicle.images?.[0] || VEHICLE_FALLBACK)}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).src = VEHICLE_FALLBACK; }}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold truncate">{vehicle.brand} {vehicle.model}</p>
+                        <p className="text-[10px] font-mono text-slate-500">{vehicle.licencePlate}</p>
+                        <p className="text-sm font-bold text-[#0528d6] mt-1">{priceForVehicle()} XAF</p>
+                      </div>
+                    </div>
+
+                    <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                      {(['DAILY', 'HOURLY', 'MONTHLY'] as const).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setForm({ ...form, rentalType: type })}
+                          className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                            form.rentalType === type ? 'bg-[#0528d6] text-white' : 'text-slate-400'
+                          }`}
+                        >
+                          {rentalTypeLabel(type)}
+                        </button>
+                      ))}
+                    </div>
+
+                    {isDriverRequired && (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between">
+                          <span className="flex items-center gap-1"><User size={12} /> Chauffeur</span>
+                          <span className="text-red-500">Obligatoire</span>
+                        </label>
+                        {driversLoading ? (
+                          <div className="flex items-center gap-2 p-3 text-xs text-slate-400">
+                            <Loader2 className="animate-spin size-4" /> Chargement…
+                          </div>
+                        ) : drivers.length === 0 ? (
+                          <p className="text-xs text-amber-700 bg-amber-50 p-3 rounded-xl">
+                            Aucun chauffeur disponible sur cette période. Modifiez vos dates ou contactez l&apos;agence.
+                          </p>
+                        ) : (
+                          <select
+                            value={form.driverId}
+                            onChange={(e) => { setForm({ ...form, driverId: e.target.value }); setError(null); }}
+                            className="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-medium outline-none dark:text-white dark:bg-slate-900"
+                          >
+                            <option value="">Choisir un chauffeur</option>
+                            {drivers.map((d) => (
+                              <option key={d.id} value={d.id}>
+                                {d.firstname} {d.lastname}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-5">
+                    <h4 className="text-[11px] font-bold text-[#0528d6] uppercase tracking-widest border-b pb-2 flex items-center gap-2">
+                      <Phone size={14} /> 2. Votre trajet
+                    </h4>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Votre téléphone</label>
+                      <input
+                        inputMode="numeric"
+                        maxLength={9}
+                        value={form.clientPhone}
+                        onChange={(e) => { setForm({ ...form, clientPhone: normalizeCmPhone(e.target.value) }); setError(null); }}
+                        placeholder="678123456"
+                        className="w-full mt-1.5 p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm outline-none focus:border-[#0528d6] dark:text-white dark:bg-slate-900"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <DateTimePicker label="Départ" value={form.startDate} onChange={(v) => { setForm({ ...form, startDate: v }); setError(null); }} required />
+                      <DateTimePicker label="Retour" value={form.endDate} onChange={(v) => { setForm({ ...form, endDate: v }); setError(null); }} required />
+                    </div>
+
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 rounded-2xl space-y-4">
+                      <div className="flex justify-between text-slate-500 text-sm">
+                        <span className="flex items-center gap-2 text-[10px] font-bold uppercase"><Clock size={12} /> Durée</span>
+                        <span className="font-bold">{quote?.billedUnits ?? 0} {quote?.unitLabel ?? ''}</span>
+                      </div>
+
+                      {quote && (
+                        <div className="text-xs space-y-1.5 border-b border-slate-200 pb-3">
+                          <div className="flex justify-between"><span>Tarif véhicule</span><span>{quote.vehicleBaseAmount.toLocaleString('fr-FR')} XAF</span></div>
+                          {quote.driverBaseAmount > 0 && (
+                            <div className="flex justify-between"><span>Tarif chauffeur</span><span>{quote.driverBaseAmount.toLocaleString('fr-FR')} XAF</span></div>
+                          )}
+                          <div className="flex justify-between font-bold"><span>Total dossier</span><span>{quote.total.toLocaleString('fr-FR')} XAF</span></div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-center p-4 bg-[#0528d6] rounded-2xl text-white">
+                        <div>
+                          <p className="text-[9px] font-bold uppercase opacity-80">Acompte estimé (60 %) — à régler en agence</p>
+                          <p className="text-2xl font-bold mt-1">{estimatedDeposit.toLocaleString('fr-FR')} XAF</p>
+                        </div>
+                        <Calculator size={28} className="opacity-30" />
+                      </div>
+
+                      <p className="text-[10px] text-slate-500 leading-relaxed">
+                        Le paiement en ligne arrive bientôt. Pour l&apos;instant, l&apos;agence vous contactera pour confirmer la réservation.
+                      </p>
+                    </div>
+                  </section>
                 </div>
-                  
-                </div>
-                <div className="flex gap-4">
-                  <button onClick={() => setStep(1)} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-2xl font-black text-xs  italic transition-colors">Retour</button>
-                  <button onClick={handleCalculate} disabled={loading || (isDriverRequired && !form.driverId)} className="flex-[2] py-4 bg-[#0528d6] text-white rounded-2xl font-black text-xs  tracking-widest shadow-xl flex items-center justify-center gap-2 disabled:opacity-50">
-                    {loading ? <Loader2 className="animate-spin size-4" /> : "Calculer mon devis"} <ChevronRight size={18}/>
-                  </button>
-                </div>
-              </div>
+              </>
             )}
 
-            {step === 3 && initRes && (
-              <div className="space-y-2 animate-in slide-in-from-right-4">
-                <h3 className="text-xl font-[900] italic tracking-tighter  text-[#0528d6]">Facturation</h3>
-                <div className="bg-[#0528d6] rounded-[1.5rem] p-5 text-white relative overflow-hidden shadow-xl">
-                  <ShieldCheck size={200} className="absolute -bottom-3 -right-10 text-white/5 rotate-12" />
-                  <div className="relative z-10 text-center">
-                    <p className="text-[10px] font-bold  opacity-60 mb-1 tracking-widest italic">Devis Global Certifié</p>
-                    <h4 className="text-xl font-black italic tracking-tighter leading-none">{initRes.totalAmount?.toLocaleString()} <span className="text-2xl">XAF</span></h4>
-                    <p className="text-xs text-white/80 leading-relaxed mt-2">Pour reserver votre véhicule il vous est demandé {"d'effectuer"} un paiement de 60% du montant total.</p>
-                    <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 gap-6 text-[10px] font-black  italic">
-                        <div className="bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner"><p className="opacity-60 mb-1">Montant à débiter</p><p>{paymentAmount?.toLocaleString()} XAF</p></div>
-                        <div className="bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner"><p className="opacity-60 mb-1">Reste</p><p>{reste?.toLocaleString()} XAF</p></div>
+            {phase === 'success' && (
+              <div className="max-w-lg mx-auto space-y-6 py-4">
+                <div className="text-center space-y-3">
+                  <div className="size-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle2 size={40} />
+                  </div>
+                  <h3 className="text-2xl font-bold">Demande enregistrée</h3>
+                  <p className="text-sm text-slate-500">
+                    Votre réservation est en attente de confirmation. Contactez l&apos;agence pour valider le créneau
+                    et régler l&apos;acompte de{' '}
+                    <strong>{estimatedDeposit.toLocaleString('fr-FR')} XAF</strong>.
+                  </p>
+                </div>
+
+                {contactAgency && (
+                  <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                    <p className="text-[10px] font-bold text-[#0528d6] uppercase tracking-widest">Contacter l&apos;agence</p>
+                    <p className="font-bold text-lg">{contactAgency.name}</p>
+                    {(contactAgency.address || contactAgency.city) && (
+                      <p className="text-sm text-slate-600 flex items-start gap-2">
+                        <MapPin size={16} className="shrink-0 mt-0.5 text-[#0528d6]" />
+                        {[contactAgency.address, contactAgency.city].filter(Boolean).join(', ')}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap gap-3">
+                      {contactAgency.phone && (
+                        <a
+                          href={`tel:${contactAgency.phone}`}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-[#0528d6] text-white rounded-xl text-sm font-semibold"
+                        >
+                          <Phone size={16} /> Appeler
+                        </a>
+                      )}
+                      {contactAgency.email && (
+                        <a
+                          href={`mailto:${contactAgency.email}?subject=Réservation Easy Rental`}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200"
+                        >
+                          <Mail size={16} /> Envoyer un email
+                        </a>
+                      )}
                     </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  {['MOMO', 'OM', 'CARD'].map(m => (
-                    <button key={m} onClick={() => setMethod(m as any)} className={`p-6 rounded-[2rem] border-2 flex flex-col items-center gap-3 transition-all ${method === m ? 'border-[#0528d6] bg-blue-50/10 shadow-md' : 'border-slate-100 dark:border-slate-800 text-slate-300'}`}>
-                       <CreditCard size={24} className={method === m ? 'text-[#0528d6]' : 'text-slate-300'} />
-                       <span className="text-[9px] font-black  tracking-tighter">{m}</span>
-                    </button>
-                  ))}
-                </div>
-                <button onClick={handlePay} disabled={loading} className="w-full py-4 bg-green-600 text-white rounded-[2rem] font-black text-xs  tracking-widest shadow-xl hover:bg-green-700 italic flex items-center justify-center gap-2">
-                  {loading ? <Loader2 className="animate-spin size-4" /> : "Payer & Valider la Réservation"}
-                </button>
-                <button onClick={() => setStep(2)} className="w-full text-xs font-black text-slate-400  hover:text-[#0528d6] transition-colors text-center">Modifier mes options</button>
+                )}
+
+                <p className="text-xs text-center text-slate-400">
+                  Retrouvez le suivi dans <strong>Mes réservations</strong>.
+                </p>
               </div>
             )}
+          </div>
 
-            {step === 4 && (
-              <div className="py-12 text-center space-y-10 animate-in zoom-in">
-                <div className="size-28 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center mx-auto border border-green-100 dark:border-green-800 shadow-inner"><CheckCircle2 size={56} /></div>
-                <div>
-                   <h3 className="text-4xl font-[900] italic tracking-tighter  text-slate-900 dark:text-white leading-tight">Voyage <br/><span className="text-[#0528d6]">Confirmé !</span></h3>
-                   <p className="mt-4 text-slate-500 dark:text-slate-400 font-bold italic text-sm max-w-xs mx-auto">Votre dossier est transmis à l&apos;agence. Retrouvez vos détails dans <strong>Mes Réservations</strong>.</p>
-                   <p>Rendez-vous en agence pour récupérer le véhicule</p>
-                </div>
-                <button onClick={onClose} className="w-full py-5 bg-slate-900 dark:bg-white dark:text-[#0528d6] text-white rounded-[2rem] font-black text-xs  italic tracking-widest">Retour au parc</button>
-              </div>
+          <div className="px-6 md:px-10 py-6 border-t bg-slate-50/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+            {phase === 'form' ? (
+              <>
+                <button type="button" onClick={onClose} className="text-sm font-semibold text-slate-500 hover:text-red-500">
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReserve}
+                  disabled={loading}
+                  className="py-3 px-8 bg-[#0528d6] text-white rounded-2xl font-bold text-sm shadow-xl flex items-center gap-2 disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="animate-spin size-4" /> : <><CheckCircle2 size={18} /> Réserver</>}
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={onClose} className="w-full py-3 bg-slate-900 text-white rounded-2xl font-semibold text-sm">
+                Fermer
+              </button>
             )}
           </div>
         </div>

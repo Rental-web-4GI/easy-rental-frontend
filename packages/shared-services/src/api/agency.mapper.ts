@@ -1,5 +1,6 @@
 /** Maps API snake_case agency payloads to camelCase for UI. */
 import { normalizeCmPhone } from '../utils/phone';
+import { dedupeById } from '../utils/dedupe';
 
 export function normalizeAgency(raw: Record<string, unknown> | null | undefined) {
   if (!raw) return null;
@@ -36,7 +37,8 @@ export function normalizeAgency(raw: Record<string, unknown> | null | undefined)
 
 export function normalizeAgencyList(data: unknown) {
   if (!Array.isArray(data)) return [];
-  return data.map((item) => normalizeAgency(item as Record<string, unknown>)).filter(Boolean);
+  const list = data.map((item) => normalizeAgency(item as Record<string, unknown>)).filter(Boolean);
+  return dedupeById(list);
 }
 
 export function normalizeAgencyStats(raw: Record<string, unknown> | null | undefined) {

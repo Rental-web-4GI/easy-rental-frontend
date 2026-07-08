@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { authService } from '@pwa-easy-rental/shared-services';
+import { authService, initAuthSessionWatcher, getStoredToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
+import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
 
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -50,6 +51,7 @@ export default function OrganisationDashboard() {
           setUserData(user);
           setIsOnboarded(Boolean(meRes.data.isOnboarded));
           setIsAuth(true);
+          markFirstUsageDone();
           return true;
         }
       }
@@ -88,13 +90,20 @@ export default function OrganisationDashboard() {
   }
 
 
-    const token = localStorage.getItem('auth_token');
+    const token = getStoredToken();
     if (token) {
       authService.setToken(token);
       fetchProfile();
     } else {
       setIsLoading(false);
     }
+
+    const stopWatcher = initAuthSessionWatcher(() => {
+      setIsAuth(false);
+      setUserData(null);
+      setOrgData(null);
+      alert('Session expirée. Reconnectez-vous.');
+    });
 
     const onSessionExpired = () => {
       setIsAuth(false);
@@ -106,12 +115,12 @@ export default function OrganisationDashboard() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('auth:session-expired', onSessionExpired);
+      stopWatcher();
     };
   }, [fetchProfile]);
 
   const persistTokenAndFetchProfile = async (token: string) => {
     authService.setToken(token);
-    localStorage.setItem('auth_token', token);
     return fetchProfile();
   };
 
@@ -208,6 +217,7 @@ export default function OrganisationDashboard() {
         t={t}
       />
       <main className="flex-1 flex flex-col overflow-hidden relative">
+        <PlatformFeedbackPrompt feedbackUrl="http://localhost:3000/feedback" />
         <Header 
           title={t.views[currentView as 'DASHBOARD' || 'AGENCIES' || 'ROLES' || 'STAFF' || 'SUBSCRIPTION'] || currentView} 
           setCurrentView={setCurrentView} 

@@ -1,12 +1,13 @@
 export const fr = {
   nav: {
     home: "Accueil",
+    catalog: "Catalogue",
+    myTrips: "Mes trajets",
+    reservations: "Réservations",
     vehicles: "Véhicules",
     agencies: "Agences",
-    install: "Installer l'app",
     login: "Connexion",
-    logout: "Déconnexion",
-    backHome: "Accueil Global"
+    client: "Client",
   },
   hero: {
     title: "La Location Parfaite pour votre", accent: "Voyage",

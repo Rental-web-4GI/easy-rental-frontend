@@ -1,4 +1,5 @@
 import { defaultClient as client } from './api-client';
+import { filterCatalogVehicles } from './catalog.filters';
 import {
   extractApiErrorMessage,
   normalizeVehicle,
@@ -8,9 +9,10 @@ import {
 } from './vehicle.mapper';
 import { toApiPricingPayload } from './driver.mapper';
 
-async function mapVehicleListResponse(res: Awaited<ReturnType<typeof client.get<any[]>>>) {
+async function mapVehicleListResponse(res: Awaited<ReturnType<typeof client.get<any[]>>>, clientCatalog = false) {
   if (!res.ok || !Array.isArray(res.data)) return res;
-  return { ...res, data: normalizeVehicleList(res.data) };
+  const normalized = normalizeVehicleList(res.data);
+  return { ...res, data: clientCatalog ? filterCatalogVehicles(normalized) : normalized };
 }
 
 async function mapVehicleResponse(res: Awaited<ReturnType<typeof client.get<any>>>) {
@@ -19,14 +21,15 @@ async function mapVehicleResponse(res: Awaited<ReturnType<typeof client.get<any>
 }
 
 export const vehicleService = {
-  getAvailableVehicles: async () => mapVehicleListResponse(await client.get<any[]>('/api/vehicles/available')),
+  getAvailableVehicles: async () =>
+    mapVehicleListResponse(await client.get<any[]>('/api/vehicles/available'), true),
   getVehiclesByOrg: async (orgId: string) =>
     mapVehicleListResponse(await client.get<any[]>(`/api/vehicles/org/${orgId}`)),
   getVehiclesByAgency: async (agencyId: string) =>
     mapVehicleListResponse(await client.get<any[]>(`/api/vehicles/agency/${agencyId}`)),
   /** Véhicules réservables (statut AVAILABLE) — endpoint public, adapté aux formulaires réservation. */
   getAvailableVehiclesByAgency: async (agencyId: string) =>
-    mapVehicleListResponse(await client.get<any[]>(`/api/vehicles/agency/${agencyId}/available`)),
+    mapVehicleListResponse(await client.get<any[]>(`/api/vehicles/agency/${agencyId}/available`), true),
   getVehicleDetails: async (id: string) => {
     const res = await client.get<any>(`/api/vehicles/${id}/details`);
     if (!res.ok || !res.data) return res;

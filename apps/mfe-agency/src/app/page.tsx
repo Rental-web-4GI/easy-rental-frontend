@@ -8,8 +8,12 @@ import {
   driverService, 
   orgService, 
   vehicleService,
-  staffService // Assurez-vous que staffService est bien exporté
+  staffService,
+  initAuthSessionWatcher,
+  getStoredToken,
+  markFirstUsageDone,
 } from '@pwa-easy-rental/shared-services';
+import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
 
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -105,6 +109,7 @@ export default function AgencyDashboard() {
           });
           
           setIsAuth(true);
+          markFirstUsageDone();
         } else {
           // Utilisateur sans agence assignée
           setIsAuth(false);
@@ -138,13 +143,21 @@ export default function AgencyDashboard() {
   }
 
 
-    const token = localStorage.getItem('auth_token');
+    const token = getStoredToken();
     if (token) {
       authService.setToken(token);
       fetchContext();
     } else {
       setIsLoading(false);
     }
+
+    const stopWatcher = initAuthSessionWatcher(() => {
+      localStorage.removeItem('auth_token');
+      setIsAuth(false);
+      alert('Session expirée. Reconnectez-vous.');
+    });
+
+    return () => stopWatcher();
   }, [fetchContext]);
 
   // --- ACTIONS ---
@@ -198,6 +211,7 @@ export default function AgencyDashboard() {
       />
 
       <main className="flex-1 flex flex-col overflow-hidden relative">
+        <PlatformFeedbackPrompt feedbackUrl="http://localhost:3000/feedback" />
         <Header 
             title={currentView === 'DASHBOARD' ? t.sidebar.dash : t.sidebar[currentView.toLowerCase() as 'systemSubtitle' || 'ops' || 'dash' || 'reservations' || 'rentals' || 'transactions' || 'resources' || 'fleet' || 'drivers' || 'network' || 'logout' || 'status' || 'vehicles' || 'profile'] || currentView}
             userData={userData}

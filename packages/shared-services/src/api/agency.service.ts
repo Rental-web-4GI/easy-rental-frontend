@@ -1,10 +1,22 @@
 import { defaultClient as client } from './api-client';
+import { filterCatalogAgencies } from './catalog.filters';
 import { normalizeAgency, normalizeAgencyList, toApiAgencyPayload } from './agency.mapper';
+import { resolveMediaDisplayUrl } from './media.mapper';
+
+function mapAgencyForClient(raw: ReturnType<typeof normalizeAgency>) {
+  if (!raw) return null;
+  const logo = raw.logoUrl ? resolveMediaDisplayUrl(String(raw.logoUrl)) : raw.logoUrl;
+  return { ...raw, logoUrl: logo };
+}
 
 export const agencyService = {
   getAllAgencies: async () => {
     const res = await client.get<unknown[]>('/api/agencies/all');
-    return res.ok ? { ...res, data: normalizeAgencyList(res.data) } : res;
+    if (!res.ok) return res;
+    const normalized = normalizeAgencyList(res.data)
+      .map((item) => mapAgencyForClient(item))
+      .filter(Boolean);
+    return { ...res, data: filterCatalogAgencies(normalized) };
   },
 
   getAgencies: async (orgId: string) => {
@@ -18,7 +30,8 @@ export const agencyService = {
   getAgencyDetails: async (id: string) => {
     const res = await client.get<Record<string, unknown>>(`/api/agencies/${id}/details`);
     if (res.ok && res.data) {
-      return { ...res, data: normalizeAgency(res.data) };
+      const mapped = mapAgencyForClient(normalizeAgency(res.data));
+      return { ...res, data: mapped };
     }
     return res;
   },

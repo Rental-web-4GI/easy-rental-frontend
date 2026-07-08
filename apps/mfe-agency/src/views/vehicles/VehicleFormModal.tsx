@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Loader2, Hash, Settings, Wind, ShieldCheck, Image as ImageIcon, Trash2, UploadCloud, Binary, Palette } from 'lucide-react';
 import { Portal } from '../../components/Portal';
-import { extraService } from '@pwa-easy-rental/shared-services';
+import { extraService, resolveMediaDisplayUrl } from '@pwa-easy-rental/shared-services';
 
 export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSubmit, onClose, modalLoading, backendError, t }: any) => {
   const [formData, setFormData] = useState(initialData);
@@ -149,7 +149,7 @@ export const VehicleFormModal = ({ editingVehicle, categories, initialData, onSu
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {formData.images.map((url: string, idx: number) => (
                         <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden border-2 border-slate-100 dark:border-slate-800 group shadow-sm">
-                            <img src={url} className="w-full h-full object-cover" alt="car" />
+                            <img src={resolveMediaDisplayUrl(url)} className="w-full h-full object-cover" alt="car" />
                             <button type="button" onClick={() => removeImage(idx)} className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                                 <Trash2 size={12}/>
                             </button>

@@ -10,10 +10,13 @@ import {
   Clock,
   Car,
   Shield,
-  CreditCard,
   Gauge,
   ChevronRight,
+  Store,
 } from "lucide-react";
+import { resolveMediaDisplayUrl } from "@pwa-easy-rental/shared-services";
+
+const VEHICLE_FALLBACK = "/client/vehicle-placeholder.svg";
 
 const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
   const { rental, vehicle, driver, agency } = data;
@@ -49,6 +52,11 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
 
 
   const remaining = (rental?.totalAmount || 0) - (rental?.amountPaid || 0);
+  const hasPaidOnline = Number(rental?.amountPaid ?? 0) > 0;
+  const estimatedDeposit = Math.round(Number(rental?.totalAmount ?? 0) * 0.6);
+  const vehicleImage = vehicle?.images?.[0]
+    ? resolveMediaDisplayUrl(vehicle.images[0])
+    : VEHICLE_FALLBACK;
 
   const SectionTitle = ({ title, icon: Icon }: any) => (
     <div className="flex items-center gap-2 mb-4">
@@ -75,9 +83,10 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
       {/* HEADER : VISUEL & IDENTITÉ */}
       <div className="relative h-72 bg-slate-900">
         <img
-          src={vehicle?.images?.[0] || "/car-placeholder.png"}
-          className="w-full h-full object-cover opacity-60"
-          alt="Véhicule"
+          src={vehicleImage}
+          className="w-full h-full object-cover opacity-70"
+          alt={`${vehicle?.brand ?? ''} ${vehicle?.model ?? ''}`}
+          onError={(e) => { (e.target as HTMLImageElement).src = VEHICLE_FALLBACK; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent" />
         
@@ -95,7 +104,7 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
                 {vehicle?.brand} {vehicle?.model}
               </span>
               <h3 className="text-4xl font-black text-white mt-3 tracking-tighter italic ">
-                {vehicle?.licencePlate || "SANS IMMAT"}
+                {vehicle?.licencePlate || `${vehicle?.brand ?? ''} ${vehicle?.model ?? ''}`.trim() || "Véhicule"}
               </h3>
               <p className="text-sm text-white/60 font-medium">
                 {vehicle?.color} • Modèle {vehicle?.yearProduction?.slice?.(0, 4)}
@@ -116,18 +125,30 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="p-5 bg-slate-900 rounded-[2rem] text-white col-span-1 md:col-span-2 shadow-xl shadow-slate-200">
               <div className="flex justify-between items-center mb-4">
-                <CreditCard size={18} className="text-blue-400" />
-                <span className={`px-3 py-1 rounded-full text-[9px] font-black  tracking-widest ${rental?.status === 'CONFIRMED' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                <Store size={18} className="text-blue-400" />
+                <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${
+                  rental?.status === 'PENDING' ? 'bg-orange-500/20 text-orange-300' : 'bg-blue-500/20 text-blue-300'
+                }`}>
                   {rental?.status}
                 </span>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-white/40  tracking-widest">Reste à régler en agence</p>
-                <p className="text-3xl font-black italic">{remaining.toLocaleString()} <span className="text-xs italic opacity-50">XAF</span></p>
+                <p className="text-[10px] font-bold text-white/40 tracking-widest">
+                  {hasPaidOnline ? 'Reste à régler en agence' : 'Acompte à régler en agence'}
+                </p>
+                <p className="text-3xl font-black italic">
+                  {(hasPaidOnline ? remaining : estimatedDeposit).toLocaleString('fr-FR')}{' '}
+                  <span className="text-xs italic opacity-50">XAF</span>
+                </p>
+                {!hasPaidOnline && (
+                  <p className="text-[10px] text-white/50 mt-2">
+                    Paiement en ligne bientôt disponible — appelez ou écrivez à l&apos;agence pour confirmer.
+                  </p>
+                )}
               </div>
               <div className="mt-4 pt-4 border-t border-white/10 flex justify-between text-[10px] font-bold opacity-60">
-                <span>TOTAL: {rental?.totalAmount?.toLocaleString()}</span>
-                <span>PAYÉ: {rental?.amountPaid?.toLocaleString()}</span>
+                <span>TOTAL: {Number(rental?.totalAmount ?? 0).toLocaleString('fr-FR')}</span>
+                {hasPaidOnline && <span>PAYÉ: {Number(rental?.amountPaid).toLocaleString('fr-FR')}</span>}
               </div>
             </div>
 
@@ -162,18 +183,30 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
           </div>
 
           <div className="space-y-6">
-            <SectionTitle title="Lieu de retrait" icon={MapPin} />
+            <SectionTitle title="Agence de retrait" icon={MapPin} />
             <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
-              <p className="text-sm font-black text-slate-900 mb-1">{agency?.name}</p>
-              <p className="text-xs text-slate-500 mb-4 leading-relaxed">{agency?.address}, {agency?.city}</p>
-              <div className="flex gap-2">
-                <a href={`tel:${agency?.phone}`} className="p-3 bg-white rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 transition-colors">
-                  <Phone size={16} />
-                </a>
-                <a href={`mailto:${agency?.email}`} className="p-3 bg-white rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 transition-colors">
-                  <Mail size={16} />
-                </a>
-              </div>
+              {agency ? (
+                <>
+                  <p className="text-sm font-black text-slate-900 mb-1">{agency.name}</p>
+                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                    {[agency.address, agency.city].filter(Boolean).join(', ') || 'Adresse non renseignée'}
+                  </p>
+                  <div className="flex gap-2">
+                    {agency.phone && (
+                      <a href={`tel:${agency.phone}`} className="p-3 bg-white rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600" title="Appeler">
+                        <Phone size={16} />
+                      </a>
+                    )}
+                    {agency.email && (
+                      <a href={`mailto:${agency.email}`} className="p-3 bg-white rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600" title="Email">
+                        <Mail size={16} />
+                      </a>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-xs text-slate-400">Informations agence indisponibles.</p>
+              )}
             </div>
           </div>
         </section>
@@ -188,7 +221,9 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
                 <UserIcon size={24} />
               </div>
               <div>
-                <p className="text-sm font-black text-slate-900 leading-none mb-1">{rental?.clientName}</p>
+                <p className="text-sm font-black text-slate-900 leading-none mb-1">
+                  {rental?.clientName || 'Client'}
+                </p>
                 <p className="text-[10px] text-slate-500 font-bold">{rental?.clientPhone}</p>
               </div>
             </div>
@@ -201,7 +236,7 @@ const ReservationDetail = ({ data, onClose, onCancel, cancelling }: any) => {
               <div className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
                 <div className="size-12 rounded-xl overflow-hidden bg-slate-100">
                   {driver?.profilUrl ? (
-                    <img src={driver.profilUrl} className="w-full h-full object-cover" />
+                    <img src={resolveMediaDisplayUrl(driver.profilUrl)} className="w-full h-full object-cover" alt="" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400">
                       <UserIcon size={24} />

@@ -12,114 +12,88 @@ import {
 } from 'lucide-react';
 import { MFE_URLS } from '../config/mfe-urls';
 
+const actionBtn =
+  'h-10 inline-flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-black transition-colors';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Navbar = ({ t, lang, onLangToggle, darkMode, onThemeToggle, onInstall }: any) => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-[100] bg-white/90 dark:bg-[#0f1323]/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 h-20">
-        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-              <Zap size={24} fill="currentColor" />
+      <nav className="fixed top-0 w-full z-[100] bg-white/95 dark:bg-[#0f1323]/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 h-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between gap-4">
+          <a href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-9 h-9 bg-[#0528d6] rounded-xl flex items-center justify-center text-white">
+              <Zap size={20} fill="currentColor" />
             </div>
-            <span className="text-xl font-black tracking-tighter text-blue-900 dark:text-white">
-              PWA <span className="text-blue-600">Easy Rental</span>
+            <span className="text-lg font-black tracking-tighter text-slate-900 dark:text-white hidden sm:block">
+              PWA <span className="text-[#0528d6]">Easy Rental</span>
             </span>
+          </a>
+
+          <div className="hidden lg:flex items-center gap-6 text-xs font-black text-slate-500 uppercase tracking-wide">
+            <a href="/#features" className="hover:text-[#0528d6]">{t.nav.features}</a>
+            <a href="/#solutions" className="hover:text-[#0528d6]">{t.nav.solutions}</a>
+            <a href="/feedback" className="hover:text-[#0528d6]">{t.nav.feedback}</a>
+            <a href="/help" className="hover:text-[#0528d6]">{t.nav.help}</a>
+            <a href={MFE_URLS.admin} className="hover:text-[#0528d6] text-slate-400">{t.nav.admin}</a>
           </div>
 
-          {/* Desktop menu */}
-          <div className="hidden lg:flex items-center gap-8 text-sm font-black text-slate-500">
-            <a href="/#features" className="hover:text-blue-600">{t.nav.features}</a>
-            <a href="/#solutions" className="hover:text-blue-600">{t.nav.solutions}</a>
-            <a href="/feedback" className="hover:text-blue-600">{t.nav.feedback}</a>
-            <a href="/help" className="hover:text-blue-600">{t.nav.help}</a>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
             <button
-              onClick={() => window.location.href = MFE_URLS.agency}
-              className="hidden md:block text-sm font-black text-slate-400 hover:text-blue-600"
+              type="button"
+              onClick={() => { window.location.href = MFE_URLS.agency; }}
+              className={`${actionBtn} hidden md:inline-flex text-slate-500 hover:text-[#0528d6]`}
             >
               {t.nav.login}
             </button>
 
-            <button
-              onClick={onInstall}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-sm font-black hover:bg-blue-600 hover:text-white group"
-            >
-              <DownloadCloud size={14} className="text-blue-600 group-hover:text-white" />
-              {t.nav.install}
+            <button type="button" onClick={onInstall} className={`${actionBtn} hidden sm:inline-flex bg-slate-100 dark:bg-slate-800 hover:bg-[#0528d6] hover:text-white`}>
+              <DownloadCloud size={14} /> {t.nav.install}
             </button>
 
             <button
+              type="button"
               onClick={onLangToggle}
-              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm font-black border"
+              className={`${actionBtn} min-w-[4.5rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900`}
+              aria-label="Changer de langue"
             >
-              <Languages size={14} /> {lang}
+              <Languages size={14} className="text-[#0528d6]" />
+              <span>{lang}</span>
             </button>
 
-            <button
-              onClick={onThemeToggle}
-              className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800"
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            <button type="button" onClick={onThemeToggle} className={`${actionBtn} w-10 bg-slate-100 dark:bg-slate-800`}>
+              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
 
-            <a
-              href={MFE_URLS.client}
-              className="hidden lg:block bg-blue-600 text-white px-6 py-2 rounded-2xl font-black text-sm shadow-xl hover:bg-blue-700"
-            >
+            <a href={MFE_URLS.client} className={`${actionBtn} hidden lg:inline-flex bg-[#0528d6] text-white px-5 hover:bg-blue-700`}>
               {t.nav.reserve}
             </a>
 
-            {/* Hamburger */}
-            <button
-              onClick={() => setOpen(true)}
-              className="lg:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800"
-            >
-              <Menu size={22} />
+            <button type="button" onClick={() => setOpen(true)} className={`${actionBtn} lg:hidden w-10 bg-slate-100 dark:bg-slate-800`}>
+              <Menu size={20} />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* MOBILE MENU */}
       {open && (
-        <div className="fixed inset-0 z-[200] bg-white dark:bg-[#0f1323] flex flex-col">
-          <div className="flex items-center justify-between px-6 h-20 border-b">
-            <span className="text-xl font-black">Menu</span>
-            <button onClick={() => setOpen(false)}>
-              <X size={24} />
-            </button>
+        <div className="fixed inset-0 z-[200] bg-white dark:bg-[#0f1323] flex flex-col lg:hidden">
+          <div className="flex items-center justify-between px-6 h-16 border-b">
+            <span className="font-black uppercase italic">Menu</span>
+            <button type="button" onClick={() => setOpen(false)}><X size={24} /></button>
           </div>
-
-          <div className="flex flex-col gap-6 px-6 py-10 text-lg font-black">
-            <a onClick={() => setOpen(false)} href="/#features">{t.nav.features}</a>
-            <a onClick={() => setOpen(false)} href="/#solutions">{t.nav.solutions}</a>
-            <a onClick={() => setOpen(false)} href="/feedback">{t.nav.feedback}</a>
-            <a onClick={() => setOpen(false)} href="/help">{t.nav.help}</a>
-
-            <hr className="my-4" />
-
-            <button onClick={onInstall} className="flex items-center gap-2">
-              <DownloadCloud size={18} /> {t.nav.install}
-            </button>
-
-            <button onClick={() => window.location.href = MFE_URLS.agency}>
-              {t.nav.login}
-            </button>
-
-            <a
-              href={MFE_URLS.client}
-              className="bg-blue-600 text-white py-3 rounded-2xl text-center"
-            >
-              {t.nav.reserve}
-            </a>
+          <div className="flex flex-col gap-4 px-6 py-8 text-sm font-black uppercase">
+            <a href="/#features" onClick={() => setOpen(false)}>{t.nav.features}</a>
+            <a href="/#solutions" onClick={() => setOpen(false)}>{t.nav.solutions}</a>
+            <a href="/feedback" onClick={() => setOpen(false)}>{t.nav.feedback}</a>
+            <a href="/help" onClick={() => setOpen(false)}>{t.nav.help}</a>
+            <a href={MFE_URLS.admin} onClick={() => setOpen(false)} className="text-slate-400">{t.nav.admin}</a>
+            <hr />
+            <button type="button" onClick={onInstall}>{t.nav.install}</button>
+            <button type="button" onClick={() => { window.location.href = MFE_URLS.agency; }}>{t.nav.login}</button>
+            <a href={MFE_URLS.client} className="bg-[#0528d6] text-white py-3 rounded-2xl text-center">{t.nav.reserve}</a>
           </div>
         </div>
       )}

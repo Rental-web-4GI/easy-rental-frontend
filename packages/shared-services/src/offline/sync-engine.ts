@@ -13,7 +13,10 @@ export class SyncEngine {
    * Pulls latest data from PostgreSQL API into local DuckDB.
    */
   async pull(): Promise<Record<string, unknown>> {
-    await initDuckDb();
+    const db = await initDuckDb();
+    if (!db) {
+      return { vehicles: [], agencies: [], rentals: [] };
+    }
     const response = await defaultClient.get<Record<string, unknown>>('/api/sync/pull');
     if (response.ok && response.data) {
       return response.data;
@@ -37,7 +40,10 @@ export class SyncEngine {
    * Initializes local DuckDB schema.
    */
   async initSchema(): Promise<void> {
-    await initDuckDb();
+    const db = await initDuckDb();
+    if (!db) {
+      return;
+    }
     void DUCKDB_SCHEMA;
   }
 }

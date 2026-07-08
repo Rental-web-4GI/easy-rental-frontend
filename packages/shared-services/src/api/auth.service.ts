@@ -1,11 +1,17 @@
 // FILE: packages/shared-services/src/api/auth.service.ts
 import { defaultClient as client } from './api-client';
 import { isOrganizationOnboarded, normalizeOrganization } from './org.mapper';
+import { persistAuthToken } from '../auth/auth-session';
 
 export type LoginResult =
   | { ok: true; token: string }
   | { ok: false; error: string }
   | { mfaRequired: true; mfaToken: string; mfaChannel?: string };
+
+export type RegisterClientResult =
+  | { ok: true; emailVerificationRequired: true; message: string }
+  | { ok: true; emailVerificationRequired: false; user?: Record<string, unknown> }
+  | { ok: false; error: string };
 
 export const authService = {
   getUserMe: () => client.get<any>('/auth/me'),
@@ -41,6 +47,7 @@ export const authService = {
     }
     const token = (dataObj?.token) as string | undefined;
     if (res.ok && token) {
+      persistAuthToken(token);
       return { ok: true, token };
     }
     const message = (dataObj?.message ?? dataObj?.error) as string | undefined;
@@ -56,6 +63,18 @@ export const authService = {
         error: 'Connexion au kernel trop lente. Réessayez dans quelques secondes (réseau vers kernel-core.yowyob.com).',
       };
     }
+    if (res.status === 403) {
+      return {
+        ok: false,
+        error: 'Accès refusé par le serveur (CORS). Redémarrez le backend après mise à jour.',
+      };
+    }
+    if (res.status === 404) {
+      return {
+        ok: false,
+        error: 'API introuvable (proxy). Rechargez la page ou redémarrez mfe-admin (port 3004).',
+      };
+    }
     if (message === 'An internal error occurred' || res.status === 500) {
       return {
         ok: false,
@@ -64,17 +83,52 @@ export const authService = {
     }
     return { ok: false, error: message || 'Identifiants invalides' };
   },
+  isEmailVerificationError: (message?: string) => {
+    if (!message) {
+      return false;
+    }
+    const lower = message.toLowerCase();
+    return message.includes('EMAIL_NOT_VERIFIED') || lower.includes('not verified');
+  },
   confirmMfa: async (mfaToken: string, code: string): Promise<LoginResult> => {
     const res = await client.post<any>('/auth/login/mfa/confirm', { mfaToken, code });
     if (res.ok && res.data?.token) {
+      persistAuthToken(res.data.token);
       return { ok: true, token: res.data.token };
     }
     return { ok: false, error: res.data?.message || 'Code MFA invalide' };
   },
   registerOrg: (data: any) => client.post<any>('/auth/register/organizationOwner', data),
-  registerClient: (data: any) => client.post<any>('/auth/register/client', data),
+  registerClient: async (data: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+  }): Promise<RegisterClientResult> => {
+    const res = await client.post<Record<string, unknown>>('/auth/register/client', data);
+    if (!res.ok) {
+      const message = (res.data?.message as string | undefined) || 'Inscription impossible. Verifiez vos informations.';
+      return { ok: false, error: message };
+    }
+    const body = res.data ?? {};
+    if (body.emailVerificationRequired === true) {
+      return {
+        ok: true,
+        emailVerificationRequired: true,
+        message: (body.message as string) || 'Verifiez votre email avant de vous connecter.',
+      };
+    }
+    return {
+      ok: true,
+      emailVerificationRequired: false,
+      user: body.user as Record<string, unknown> | undefined,
+    };
+  },
   refresh: () => client.post<any>('/auth/refresh', {}),
-  setToken: (token: string) => client.setAuthToken(token),
+  setToken: (token: string) => {
+    persistAuthToken(token);
+    client.setAuthToken(token);
+  },
   updateProfile: (data: any) => client.put<any>('/api/users/profile', data),
   updatePassword: (data: any) => client.put<any>('/api/users/password', data),
 };

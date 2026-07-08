@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { SupportChatWidget } from './SupportChatWidget';
+import { LangProvider } from './LangContext';
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
 
@@ -21,15 +23,18 @@ export default function ClientProviders({ children }: { children: React.ReactNod
 
   useEffect(() => {
     setMounted(true);
-    
-    // Theme Sync
-    const isDark = localStorage.getItem('theme') === 'dark' || 
-                   (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
+
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang === 'EN' || savedLang === 'FR') {
+      setLang(savedLang);
+    }
+
+    const isDark = localStorage.getItem('theme') === 'dark'
+      || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
     setDarkMode(isDark);
     if (isDark) document.documentElement.classList.add('dark');
 
-    // PWA Logic
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -50,6 +55,14 @@ export default function ClientProviders({ children }: { children: React.ReactNod
     }
   };
 
+  const toggleLang = () => {
+    setLang((current) => {
+      const next = current === 'FR' ? 'EN' : 'FR';
+      localStorage.setItem('lang', next);
+      return next;
+    });
+  };
+
   const handleInstallApp = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -60,25 +73,25 @@ export default function ClientProviders({ children }: { children: React.ReactNod
     }
   };
 
-  // On évite le flash de contenu non stylisé (hydration mismatch)
   if (!mounted) {
     return <div className="opacity-0">{children}</div>;
   }
 
   return (
-    <>
-      <Navbar 
-        t={t} 
-        lang={lang} 
-        onLangToggle={() => setLang(l => l === 'FR' ? 'EN' : 'FR')}
-        darkMode={darkMode} 
+    <LangProvider lang={lang}>
+      <Navbar
+        t={t}
+        lang={lang}
+        onLangToggle={toggleLang}
+        darkMode={darkMode}
         onThemeToggle={toggleTheme}
         onInstall={handleInstallApp}
       />
-      <main className="min-h-screen flex flex-col pt-20">
+      <main className="min-h-screen flex flex-col pt-16">
         {children}
       </main>
       <Footer t={t.footer} nav={t.nav} />
-    </>
+      <SupportChatWidget />
+    </LangProvider>
   );
 }
