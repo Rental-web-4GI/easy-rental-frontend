@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd ../.. && npm ci && npm run build --workspace=@pwa-easy-rental/easy-rental-web",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/api-rental/:path*",
+      "destination": "https://YOUR_API_HOST/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://YOUR_API_HOST/uploads/:path*"
+    }
+  ]
+}

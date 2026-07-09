@@ -7,8 +7,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
+    "build": "turbo run build --filter=@pwa-easy-rental/easy-rental-web",
+    "build:all": "turbo run build",
+    "dev": "npm run dev --workspace=@pwa-easy-rental/easy-rental-web",
+    "dev:legacy": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean && rm -rf node_modules"
