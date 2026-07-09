@@ -1,10 +1,29 @@
 const AUTH_TOKEN_KEY = 'auth_token';
 const AUTH_EXPIRES_KEY = 'auth_token_exp';
+const AUTH_LAST_ACTIVITY_KEY = 'auth_last_activity';
+
+/** Idle timeout before forced logout (40 minutes). */
+export const IDLE_TIMEOUT_MS = 40 * 60 * 1000;
+/** Refresh JWT when less than this remains AND user is active. */
+export const REFRESH_BEFORE_EXPIRY_MS = 10 * 60 * 1000;
+const ACTIVITY_THROTTLE_MS = 15_000;
+const WATCHER_INTERVAL_MS = 30_000;
 
 type JwtPayload = {
   exp?: number;
   sub?: string;
 };
+
+type RefreshHandler = () => Promise<string | null>;
+
+let refreshHandler: RefreshHandler | null = null;
+
+/**
+ * Register async token refresh (POST /auth/refresh). Called by auth.service.
+ */
+export function setAuthRefreshHandler(handler: RefreshHandler | null): void {
+  refreshHandler = handler;
+}
 
 export function decodeJwtPayload(token: string): JwtPayload | null {
   try {
@@ -30,6 +49,26 @@ export function isTokenExpired(token: string, skewMs = 30_000): boolean {
   return Date.now() >= exp - skewMs;
 }
 
+export function touchAuthActivity(): void {
+  if (typeof window === 'undefined') return;
+  if (!localStorage.getItem(AUTH_TOKEN_KEY)) return;
+  localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(Date.now()));
+}
+
+export function getLastActivityMs(): number | null {
+  if (typeof window === 'undefined') return null;
+  const raw = localStorage.getItem(AUTH_LAST_ACTIVITY_KEY);
+  if (!raw) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
+export function isIdleExpired(idleMs = IDLE_TIMEOUT_MS): boolean {
+  const last = getLastActivityMs();
+  if (last == null) return false;
+  return Date.now() - last >= idleMs;
+}
+
 export function persistAuthToken(token: string): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(AUTH_TOKEN_KEY, token);
@@ -39,19 +78,21 @@ export function persistAuthToken(token: string): void {
   } else {
     localStorage.removeItem(AUTH_EXPIRES_KEY);
   }
+  localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(Date.now()));
 }
 
 export function clearAuthSession(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(AUTH_TOKEN_KEY);
   localStorage.removeItem(AUTH_EXPIRES_KEY);
+  localStorage.removeItem(AUTH_LAST_ACTIVITY_KEY);
 }
 
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   if (!token) return null;
-  if (isTokenExpired(token)) {
+  if (isTokenExpired(token) || isIdleExpired()) {
     clearAuthSession();
     return null;
   }
@@ -61,21 +102,85 @@ export function getStoredToken(): string | null {
 export function initAuthSessionWatcher(onExpired: () => void): () => void {
   if (typeof window === 'undefined') return () => undefined;
 
-  const check = () => {
+  let lastTouchWrite = 0;
+  let refreshInFlight = false;
+
+  const markActivity = () => {
+    if (!localStorage.getItem(AUTH_TOKEN_KEY)) return;
+    const now = Date.now();
+    if (now - lastTouchWrite < ACTIVITY_THROTTLE_MS) return;
+    lastTouchWrite = now;
+    localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(now));
+  };
+
+  const expireSession = () => {
+    clearAuthSession();
+    onExpired();
+  };
+
+  const maybeRefresh = async () => {
+    if (!refreshHandler || refreshInFlight) return;
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (token && isTokenExpired(token)) {
-      clearAuthSession();
-      onExpired();
+    if (!token || isIdleExpired()) return;
+    const exp = getTokenExpiryMs(token);
+    if (!exp) return;
+    const remaining = exp - Date.now();
+    if (remaining > REFRESH_BEFORE_EXPIRY_MS || remaining <= 0) return;
+    refreshInFlight = true;
+    try {
+      const next = await refreshHandler();
+      if (next) {
+        persistAuthToken(next);
+      } else if (isTokenExpired(token)) {
+        expireSession();
+      }
+    } catch {
+      if (isTokenExpired(token)) {
+        expireSession();
+      }
+    } finally {
+      refreshInFlight = false;
     }
   };
 
-  check();
-  const intervalId = window.setInterval(check, 60_000);
+  const check = () => {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) return;
+    if (isIdleExpired() || isTokenExpired(token)) {
+      expireSession();
+      return;
+    }
+    void maybeRefresh();
+  };
+
+  const activityEvents: Array<keyof WindowEventMap> = [
+    'mousemove',
+    'mousedown',
+    'keydown',
+    'scroll',
+    'touchstart',
+    'click',
+  ];
+
+  activityEvents.forEach((eventName) => {
+    window.addEventListener(eventName, markActivity, { passive: true });
+  });
   window.addEventListener('focus', check);
+
+  // Seed activity for existing sessions that predate AUTH_LAST_ACTIVITY_KEY
+  if (localStorage.getItem(AUTH_TOKEN_KEY) && !localStorage.getItem(AUTH_LAST_ACTIVITY_KEY)) {
+    touchAuthActivity();
+  }
+
+  check();
+  const intervalId = window.setInterval(check, WATCHER_INTERVAL_MS);
 
   return () => {
     window.clearInterval(intervalId);
     window.removeEventListener('focus', check);
+    activityEvents.forEach((eventName) => {
+      window.removeEventListener(eventName, markActivity);
+    });
   };
 }
 

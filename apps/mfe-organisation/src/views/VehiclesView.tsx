@@ -8,6 +8,7 @@ import { VehicleCard } from './vehicles/VehicleCard';
 import { VehicleFormModal } from './vehicles/VehicleFormModal';
 import { VehicleDetailsModal } from './vehicles/VehicleDetailsModal';
 import { QuickStatusModal } from './vehicles/QuickStatusModal';
+import { isOrgGovernanceBlocked } from '../components/GovernanceBanner';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -36,6 +37,7 @@ export const VehiclesView = ({ orgData, t }: any) => {
   const [modalLoading, setModalLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const [quickStatusError, setQuickStatusError] = useState('');
+  const governanceBlocked = isOrgGovernanceBlocked(orgData);
 
   const loadData = useCallback(async () => {
     if (!orgData?.id) return;
@@ -176,7 +178,20 @@ export const VehiclesView = ({ orgData, t }: any) => {
           <input placeholder={t.vehicles.searchPlaceholder} className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-900 border-none rounded-xl text-sm font-black italic outline-none focus:ring-2 focus:ring-[#0528d6]/20 transition-all dark:text-white" 
                  value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
         </div>
-        <button onClick={() => { setEditingVehicle(null); setFormError(''); setActiveModal('FORM'); }} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
+        <button
+          disabled={governanceBlocked}
+          title={governanceBlocked ? 'Organisation non approuvée — création véhicule bloquée.' : undefined}
+          onClick={() => {
+            if (governanceBlocked) {
+              setFormError('Organisation non approuvée — création véhicule bloquée.');
+              return;
+            }
+            setEditingVehicle(null);
+            setFormError('');
+            setActiveModal('FORM');
+          }}
+          className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic disabled:opacity-50 disabled:hover:scale-100"
+        >
           <Plus size={18} /> {t.vehicles.addBtn}
         </button>
       </div>

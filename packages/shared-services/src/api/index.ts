@@ -46,10 +46,13 @@ export {
   getStoredToken,
   hasCompletedFirstUsage,
   hasDismissedFeedbackPrompt,
+  IDLE_TIMEOUT_MS,
   initAuthSessionWatcher,
   isTokenExpired,
   markFirstUsageDone,
   persistAuthToken,
+  setAuthRefreshHandler,
+  touchAuthActivity,
 } from '../auth/auth-session';
 export { isOrganizationOnboarded, normalizeOrganization } from './org.mapper';
 export { resolveMediaDisplayUrl, extractUploadedMediaUrl, canonicalMediaStoragePath } from './media.mapper';

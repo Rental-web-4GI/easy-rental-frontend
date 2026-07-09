@@ -8,6 +8,7 @@ import { AgencyCard } from './agencies/AgencyCard';
 import { AgencyForm } from './agencies/AgencyForm';
 import { AgencyDetailsModal } from './agencies/AgencyDetailsModal';
 import { QuotaAlertModal } from '@/components/QuotaAlertModal';
+import { isOrgGovernanceBlocked } from '../components/GovernanceBanner';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -24,6 +25,7 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
   const [formError, setFormError] = useState('');
 
   const governanceStatus = orgData?.governanceStatus ?? orgData?.governance_status;
+  const governanceBlocked = isOrgGovernanceBlocked(orgData);
   const agencySaveFallback = selectedAgency
     ? 'Impossible de modifier l\'agence. Vérifiez vos informations.'
     : governanceStatus === 'PENDING_APPROVAL'
@@ -80,6 +82,10 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
   };
 
   const handleAddClick = () => {
+    if (governanceBlocked) {
+      setFormError(agencySaveFallback);
+      return;
+    }
     if (agencies.length >= (subscription?.maxAgencies || 1)) setShowQuotaModal(true);
     else { setSelectedAgency(null); setFormError(''); setActiveModal('FORM'); }
   };
@@ -104,7 +110,12 @@ export const AgenciesView = ({ orgData, setCurrentView, t }: any) => {
             onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} 
           />
         </div>
-        <button onClick={handleAddClick} className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic">
+        <button
+          onClick={handleAddClick}
+          disabled={governanceBlocked}
+          title={governanceBlocked ? agencySaveFallback : undefined}
+          className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic disabled:opacity-50 disabled:hover:scale-100"
+        >
           <Plus size={18} /> {t.agencies.addBtn}
         </button>
       </div>

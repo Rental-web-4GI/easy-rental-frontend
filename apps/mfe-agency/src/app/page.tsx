@@ -41,6 +41,8 @@ function normalizeAgencyUser(raw: Record<string, unknown> | null | undefined) {
     organizationId: raw.organizationId ?? raw.organization_id,
     firstname: raw.firstname ?? raw.first_name,
     lastname: raw.lastname ?? raw.last_name,
+    hiredAt: raw.hiredAt ?? raw.hired_at ?? null,
+    createdAt: raw.createdAt ?? raw.created_at ?? null,
   };
 }
 

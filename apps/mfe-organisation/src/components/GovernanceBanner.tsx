@@ -2,7 +2,18 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 
-export const GovernanceBanner = ({ orgData }: { orgData: any }) => {
+type GovernanceBannerProps = {
+  orgData: any;
+  /** When true, companion components should disable mutating actions. */
+  onBlockedChange?: (blocked: boolean) => void;
+};
+
+export function isOrgGovernanceBlocked(orgData: any): boolean {
+  const status = orgData?.governanceStatus ?? orgData?.governance_status;
+  return Boolean(status && status !== 'APPROVED');
+}
+
+export const GovernanceBanner = ({ orgData }: GovernanceBannerProps) => {
   const status = orgData?.governanceStatus ?? orgData?.governance_status;
   if (!status || status === 'APPROVED') {
     return null;
@@ -10,8 +21,8 @@ export const GovernanceBanner = ({ orgData }: { orgData: any }) => {
 
   const messages: Record<string, string> = {
     PENDING_APPROVAL:
-      'Votre organisation est en attente d\'approbation par la plateforme. Certaines actions sont limitées.',
-    SUSPENDED: 'Votre organisation est suspendue. Contactez le support.',
+      'Votre organisation est en attente d\'approbation. Création d\'agences, staff et véhicules bloquée jusqu\'à APPROVED.',
+    SUSPENDED: 'Votre organisation est suspendue. Contactez le support — les actions métier sont bloquées.',
   };
 
   return (

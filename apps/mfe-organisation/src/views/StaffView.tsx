@@ -8,6 +8,7 @@ import { StaffCard } from './staff/StaffCard';
 import { StaffFormModal } from './staff/StaffFormModal';
 import { StaffDetailsModal } from './staff/StaffDetailsModal';
 import { StaffCredentialsModal, parseInviteCredentials } from './staff/StaffCredentialsModal';
+import { isOrgGovernanceBlocked } from '../components/GovernanceBanner';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -18,8 +19,8 @@ function formatStaffInviteError(message?: string) {
   }
   const lower = message.toLowerCase();
   if (lower.includes('not verified') || lower.includes('email_not_verified') || lower.includes('email_verification')) {
-    return 'Le compte kernel nécessite une vérification email (mail envoyé par kernel-core). '
-      + 'En local, Easy Rental n\'envoie pas d\'email : réessayez après vérification, ou utilisez un autre email.';
+    return 'Le kernel a exigé une vérif email sur le compte technique — Easy Rental a créé l\'agent en local. '
+      + 'Utilisez le mot de passe affiché pour la console agence (aucun verify requis pour le personnel).';
   }
   const withoutCode = message.includes(': ') ? message.split(': ').slice(1).join(': ') : message;
   return withoutCode.trim() || message;
@@ -28,6 +29,7 @@ function formatStaffInviteError(message?: string) {
 export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
   const [staffList, setStaffList] = useState<any[]>([]);
   const [agencies, setAgencies] = useState<any[]>([]);
+  const governanceBlocked = isOrgGovernanceBlocked(orgData);
   const [postes, setPostes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -139,8 +141,18 @@ export const StaffView = ({ orgData, t }: { orgData: any, t: any }) => {
                  value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} />
         </div>
         <button
-          onClick={() => { setSelectedStaff(null); setFormError(''); setActiveModal('FORM'); }}
-          className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic"
+          disabled={governanceBlocked}
+          title={governanceBlocked ? 'Organisation non approuvée — recrutement bloqué.' : undefined}
+          onClick={() => {
+            if (governanceBlocked) {
+              setFormError('Organisation non approuvée — recrutement bloqué.');
+              return;
+            }
+            setSelectedStaff(null);
+            setFormError('');
+            setActiveModal('FORM');
+          }}
+          className="w-full md:w-auto px-6 py-3 bg-[#0528d6] text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all italic disabled:opacity-50 disabled:hover:scale-100"
         >
           <Plus size={18} /> {kernelMode ? 'Recruter un agent' : t.staff.recruitBtn}
         </button>

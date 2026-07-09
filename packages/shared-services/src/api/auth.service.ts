@@ -1,7 +1,7 @@
 // FILE: packages/shared-services/src/api/auth.service.ts
 import { defaultClient as client } from './api-client';
 import { isOrganizationOnboarded, normalizeOrganization } from './org.mapper';
-import { persistAuthToken } from '../auth/auth-session';
+import { persistAuthToken, setAuthRefreshHandler } from '../auth/auth-session';
 
 export type LoginResult =
   | { ok: true; token: string }
@@ -12,6 +12,19 @@ export type RegisterClientResult =
   | { ok: true; emailVerificationRequired: true; message: string }
   | { ok: true; emailVerificationRequired: false; user?: Record<string, unknown> }
   | { ok: false; error: string };
+
+const refreshSessionToken = async (): Promise<string | null> => {
+  const res = await client.post<{ token?: string }>('/auth/refresh', {});
+  const token = res.data?.token;
+  if (res.ok && token) {
+    persistAuthToken(token);
+    client.setAuthToken(token);
+    return token;
+  }
+  return null;
+};
+
+setAuthRefreshHandler(refreshSessionToken);
 
 export const authService = {
   getUserMe: () => client.get<any>('/auth/me'),
@@ -124,7 +137,10 @@ export const authService = {
       user: body.user as Record<string, unknown> | undefined,
     };
   },
-  refresh: () => client.post<any>('/auth/refresh', {}),
+  refresh: async (): Promise<{ ok: true; token: string } | { ok: false }> => {
+    const token = await refreshSessionToken();
+    return token ? { ok: true, token } : { ok: false };
+  },
   setToken: (token: string) => {
     persistAuthToken(token);
     client.setAuthToken(token);

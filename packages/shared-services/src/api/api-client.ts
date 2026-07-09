@@ -1,5 +1,5 @@
 // FILE: packages/shared-services/src/api/api-client.ts
-import { getStoredToken, clearAuthSession } from '../auth/auth-session';
+import { getStoredToken, clearAuthSession, touchAuthActivity } from '../auth/auth-session';
 
 export interface ApiConfig {
   baseUrl: string;
@@ -63,7 +63,10 @@ export class ApiClient {
       'Accept': '*/*', // Aligné sur Swagger
     };
 
-    if (token && !cleanEndpoint.startsWith('auth/')) {
+    const needsAuthHeader =
+      Boolean(token) &&
+      (!cleanEndpoint.startsWith('auth/') || cleanEndpoint === 'auth/refresh');
+    if (needsAuthHeader && token) {
       requestHeaders['Authorization'] = `Bearer ${token.trim()}`;
     }
 
@@ -100,6 +103,10 @@ export class ApiClient {
 
       if (!response.ok) {
         this.handleUnauthorized(response.status);
+      }
+
+      if (response.ok && token) {
+        touchAuthActivity();
       }
 
       return {

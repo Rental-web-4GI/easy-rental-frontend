@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 import { Mail, ShieldCheck, Globe2, Briefcase, Calendar, Lock, CheckCircle2, Edit3, X, Loader2 } from 'lucide-react';
 import { authService } from '@pwa-easy-rental/shared-services';
 
+function formatAssignedDate(value: unknown, fallback = '—'): string {
+  if (value == null || value === '') return fallback;
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return fallback;
+  return date.toLocaleDateString();
+}
+
 export const ProfileView = ({ userData, agencyData, parentOrg, onUpdate, t }: any) => {
   const [editProfileMode, setEditProfileMode] = useState(false);
   const [editPasswordMode, setEditPasswordMode] = useState(false);
@@ -66,7 +73,7 @@ export const ProfileView = ({ userData, agencyData, parentOrg, onUpdate, t }: an
           </p>
           <div className="flex flex-wrap justify-center md:justify-start gap-6 text-sm font-bold text-slate-400 italic">
              <span className="flex items-center gap-2"><Mail size={16} className="text-[#0528d6]"/> {userData?.email}</span>
-             <span className="flex items-center gap-2"><Calendar size={16} className="text-[#0528d6]"/> {t.profile.assignedAt} {new Date(userData?.hiredAt).toLocaleDateString()}</span>
+             <span className="flex items-center gap-2"><Calendar size={16} className="text-[#0528d6]"/> {t.profile.assignedAt} {formatAssignedDate(userData?.hiredAt ?? userData?.hired_at ?? userData?.createdAt)}</span>
           </div>
         </div>
       </div>

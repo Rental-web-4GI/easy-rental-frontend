@@ -440,3 +440,13 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 - **Statut :** Corrigé
 - **Piste résolue :** SW + `handleInstallApp` (prompt ou instructions) ; bouton Noter / CTA cards en `#F76513` ; dashboard en courbes area style trading (`SparklineChart`).
 
+#### UX-056 — Admin : quota véhicules désynchronisé (6/50 vs 3 réels)
+- **Priorité :** P0
+- **Statut :** Corrigé
+- **Piste résolue :** `getAllOrganizations` / `getOrganization` recalculent `currentVehicles` via `COUNT(vehicles)` et resynchronisent la colonne dénormalisée.
+
+#### UX-057 — Agence : « Assigné le Invalid Date » sur le profil
+- **Priorité :** P1
+- **Statut :** Corrigé
+- **Piste résolue :** mapping `hired_at` → `hiredAt` + fallback date valide / tiret.
+
