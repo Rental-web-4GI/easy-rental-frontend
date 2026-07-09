@@ -52,7 +52,7 @@ export const HomeView = ({ onSearch, setViewAll, onSelectVehicle, lang = 'FR' }:
       <section className="relative min-h-[240px] md:min-h-[280px] rounded-2xl bg-[#0528d6] overflow-hidden flex flex-col items-center justify-center px-6 py-8 text-white shadow-lg shadow-[#0528d6]/20">
         <div className="absolute inset-0 opacity-20">
           <img
-            src="/client/hero_car.png"
+            src="/client/vehicle-placeholder.svg"
             className="w-full h-full object-cover"
             alt=""
           />
@@ -161,10 +161,10 @@ const FeaturedCard = ({ vehicle, lang, perDay, onClick }: any) => (
   >
     <div className="aspect-[16/10] bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
       <img
-        src={vehicle.images?.[0] || '/client/car.png'}
+        src={vehicle.images?.[0] || '/client/vehicle-placeholder.svg'}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         alt={`${vehicle.brand} ${vehicle.model}`}
-        onError={(e) => { (e.target as HTMLImageElement).src = '/client/car.png'; }}
+        onError={(e) => { (e.target as HTMLImageElement).src = '/client/vehicle-placeholder.svg'; }}
       />
       <div className="absolute top-3 left-3 px-2 py-1 bg-white/95 rounded-lg text-[10px] font-bold text-[#0528d6]">
         {vehicleStatusLabel(vehicle.statut, lang)}

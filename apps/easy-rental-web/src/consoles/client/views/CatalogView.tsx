@@ -2,7 +2,8 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Loader2, Store, Car } from 'lucide-react';
-import { agencyService, vehicleService, useLocalFirst } from '@pwa-easy-rental/shared-services';
+import { agencyService, vehicleService } from '@pwa-easy-rental/shared-services';
+import { useLocalFirst } from '@pwa-easy-rental/shared-services/offline';
 import { MapView } from '@pwa-easy-rental/shared-maps';
 import { VehicleCard } from './catalog/VehicleCard';
 import { VehicleDetailsView } from './VehicleDetailsView';

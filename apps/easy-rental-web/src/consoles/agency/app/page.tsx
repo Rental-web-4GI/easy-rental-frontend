@@ -5,8 +5,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   agencyService, 
   authService, 
+  clearAuthSession,
   driverService, 
   orgService, 
+  persistAuthToken,
   vehicleService,
   staffService,
   initAuthSessionWatcher,
@@ -119,7 +121,7 @@ export default function AgencyDashboard() {
           setIsAuth(false);
         }
       } else {
-        localStorage.removeItem('auth_token');
+        clearAuthSession();
         setIsAuth(false);
       }
     } catch {
@@ -156,7 +158,7 @@ export default function AgencyDashboard() {
     }
 
     const stopWatcher = initAuthSessionWatcher(() => {
-      localStorage.removeItem('auth_token');
+      clearAuthSession();
       setIsAuth(false);
       alert('Session expirée. Reconnectez-vous.');
     });
@@ -171,7 +173,7 @@ export default function AgencyDashboard() {
       const res = await authService.login(form);
       if (res.ok && 'token' in res) {
         authService.setToken(res.token);
-        localStorage.setItem('auth_token', res.token);
+        persistAuthToken(res.token);
         await fetchContext();
         return true;
       }
@@ -207,7 +209,7 @@ export default function AgencyDashboard() {
         setCurrentView={setCurrentView} 
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen}
-        handleLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }}
+        handleLogout={() => { clearAuthSession(); window.location.reload(); }}
         parentOrg={parentOrg}
         userData={userData}
         staffPermissions={staffPermissions}

@@ -85,7 +85,7 @@ export const authService = {
     if (res.status === 404) {
       return {
         ok: false,
-        error: 'API introuvable (proxy). Rechargez la page ou redémarrez mfe-admin (port 3004).',
+        error: 'API introuvable (proxy). Vérifiez que le backend tourne sur le port 8081 et redémarrez le frontend.',
       };
     }
     if (message === 'An internal error occurred' || res.status === 500) {

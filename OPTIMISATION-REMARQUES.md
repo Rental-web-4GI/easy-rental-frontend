@@ -450,3 +450,9 @@ Document vivant : chaque remarque terrain est ajoutée ici, puis traitée par pr
 - **Statut :** Corrigé
 - **Piste résolue :** mapping `hired_at` → `hiredAt` + fallback date valide / tiret.
 
+#### UX-058 — Notifications : bordure trop lourde + accent bleu gauche inutile
+- **Priorité :** P1 | **Statut :** Corrigé
+- **Apps :** client, agence, organisation (`easy-rental-web` + MFE legacy)
+- **Symptômes :** cartes avec `border-l-4` bleu et bordures épaisses ; barre recherche/filtres trop chargée.
+- **Piste résolue :** composants partagés `NotificationCard`, `NotificationsFilterBar`, `NotificationsEmptyState` — bordure fine uniforme type barre Google, pastille bleue discrète pour non-lu, sans bandeau latéral.
+

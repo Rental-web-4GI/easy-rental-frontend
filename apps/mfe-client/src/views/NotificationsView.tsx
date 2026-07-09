@@ -1,34 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Bell, Check, Clock, Info, AlertTriangle, Loader2 } from 'lucide-react';
+import { Clock, Loader2 } from 'lucide-react';
 import { notifService, isNotificationRead } from '@pwa-easy-rental/shared-services';
+import { NotificationCard, NotificationsEmptyState } from '@pwa-easy-rental/shared-ui';
 
 export const NotificationsView = ({ clientId }: { clientId: string }) => {
   const [notifs, setNotifs] = useState<any[]>([]);
-  const[loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const loadNotifs = async (silent = false) => {
     if (!clientId) return;
     if (!silent) setLoading(true);
     try {
       const res = await notifService.getClientNotifications(clientId);
-      if (res.ok) setNotifs(res.data ||[]);
+      if (res.ok) setNotifs(res.data || []);
     } finally {
       if (!silent) setLoading(false);
     }
   };
 
-  // Polling asynchrone toutes les 10 secondes
   useEffect(() => {
     loadNotifs();
-    const interval = setInterval(() => {
-      loadNotifs(true);
-    }, 10000);
+    const interval = setInterval(() => loadNotifs(true), 10000);
     return () => clearInterval(interval);
   }, [clientId]);
 
-  // Marquer comme lu sans recharger la page
   const handleMarkRead = async (id: string) => {
     const res = await notifService.markAsReadClient(id);
     if (res.ok) {
@@ -38,82 +35,56 @@ export const NotificationsView = ({ clientId }: { clientId: string }) => {
     }
   };
 
-  if (loading && notifs.length === 0) return (
-      <div className="h-96 flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#0528d6]" size={40}/>
+  if (loading && notifs.length === 0)
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="size-10 animate-spin text-[#0528d6]" />
       </div>
-  );
+    );
 
   return (
-      <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500 text-left">
-        <div className="flex justify-between items-center mb-8 px-2">
-          <div>
-            <h2 className="text-3xl font-[900] italic tracking-tighter  text-slate-900 dark:text-white">
-              Mes Notifications
-            </h2>
-            <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1 italic">
-              Suivi de vos réservations et alertes en temps réel
-            </p>
-          </div>
-          <button onClick={() => loadNotifs(false)} className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:text-[#0528d6] transition-all">
-            <Clock size={20}/>
-          </button>
+    <div className="mx-auto max-w-4xl space-y-5 text-left animate-in fade-in duration-500">
+      <div className="mb-2 flex items-center justify-between px-1">
+        <div>
+          <h2 className="text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+            Mes Notifications
+          </h2>
+          <p className="mt-1 text-[10px] font-medium tracking-widest text-slate-400">
+            Suivi de vos réservations et alertes en temps réel
+          </p>
         </div>
-
-        {notifs.length === 0 ? (
-            <div className="p-20 text-center bg-white dark:bg-[#1a1d2d] rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-slate-800">
-              <Bell className="mx-auto text-slate-200 mb-4" size={48} />
-              <p className="text-slate-400 font-bold italic  text-xs tracking-widest">Aucune notification pour le moment</p>
-            </div>
-        ) : (
-            <div className="space-y-4">
-              {notifs.map((n) => {
-                const read = isNotificationRead(n, 'CLIENT');
-                return (
-                  <div
-                      key={n.id}
-                      className={`p-6 rounded-[2.5rem] border transition-all flex items-start gap-5 ${
-                          read
-                              ? 'bg-white/50 dark:bg-[#1a1d2d]/50 border-slate-100 dark:border-slate-800 opacity-60'
-                              : 'bg-white dark:bg-[#1a1d2d] border-blue-100 dark:border-blue-900 shadow-md border-l-4 border-l-[#0528d6]'
-                      }`}
-                  >
-                    <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                        n.reason?.includes('ALERT') || n.reason?.includes('CANCELLED') ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-[#0528d6]'
-                    }`}>
-                      {n.reason?.includes('ALERT') || n.reason?.includes('CANCELLED') ? <AlertTriangle size={20}/> : <Info size={20}/>}
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black text-slate-900 dark:text-white  text-xs tracking-tight italic">
-                          {n.reason || 'Information système'}
-                        </h4>
-                        <span className="text-[9px] font-bold text-slate-400 ">{new Date(n.createdAt).toLocaleString()}</span>
-                      </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-4">{n.details}</p>
-
-                      <div className="flex items-center gap-6">
-                        {!read && (
-                            <button
-                                onClick={() => handleMarkRead(n.id)}
-                                className="text-[9px] font-black  text-[#0528d6] flex items-center gap-1.5 hover:underline"
-                            >
-                              <Check size={12}/> Marquer comme lu
-                            </button>
-                        )}
-                        {n.locationId && (
-                            <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[8px] font-black text-slate-500  tracking-tighter italic">
-                              Dossier: #{n.locationId.substring(0,8)}
-                            </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-        )}
+        <button
+          type="button"
+          onClick={() => loadNotifs(false)}
+          className="rounded-full border border-slate-200 bg-white p-3 text-slate-500 shadow-sm transition-all hover:shadow-md hover:text-[#0528d6] dark:border-slate-700 dark:bg-[#1a1d2d]"
+          aria-label="Actualiser"
+        >
+          <Clock size={18} />
+        </button>
       </div>
+
+      {notifs.length === 0 ? (
+        <NotificationsEmptyState message="Aucune notification pour le moment" />
+      ) : (
+        <div className="space-y-3">
+          {notifs.map((n) => {
+            const read = isNotificationRead(n, 'CLIENT');
+            const isAlert = n.reason?.includes('ALERT') || n.reason?.includes('CANCELLED');
+            return (
+              <NotificationCard
+                key={n.id}
+                title={n.reason || 'Information système'}
+                details={n.details}
+                date={new Date(n.createdAt).toLocaleString()}
+                read={read}
+                isAlert={isAlert}
+                locationId={n.locationId}
+                onMarkRead={read ? undefined : () => handleMarkRead(n.id)}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };

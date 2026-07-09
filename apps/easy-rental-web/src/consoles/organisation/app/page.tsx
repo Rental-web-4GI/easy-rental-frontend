@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { authService, initAuthSessionWatcher, getStoredToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
+import { authService, clearAuthSession, initAuthSessionWatcher, getStoredToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
 import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
 import { SupportChatWidget } from '@pwa-easy-rental/shared-ui';
 
@@ -57,7 +57,7 @@ export default function OrganisationDashboard() {
         }
       }
       // Si on arrive ici, c'est que l'appel a échoué
-      localStorage.removeItem('auth_token');
+      clearAuthSession();
       setIsAuth(false);
       return false;
     } catch {
@@ -218,7 +218,7 @@ export default function OrganisationDashboard() {
         initialName={orgData?.name} 
         initialOrg={orgData}
         onComplete={() => { setIsOnboarded(true); fetchProfile(); }} 
-        onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} 
+        onLogout={() => { clearAuthSession(); window.location.reload(); }} 
         t={t} 
       />
     </div>
@@ -232,7 +232,7 @@ export default function OrganisationDashboard() {
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen} 
         handleInstall={handleInstallApp} 
-        handleLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }} 
+        handleLogout={() => { clearAuthSession(); window.location.reload(); }} 
         userData={userData}
         t={t}
       />

@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Footer } from '@shared-ui/components/ui/Footer';
-import { authService, initAuthSessionWatcher, getStoredToken, persistAuthToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
+import { authService, clearAuthSession, initAuthSessionWatcher, getStoredToken, persistAuthToken, markFirstUsageDone } from '@pwa-easy-rental/shared-services';
 import { PlatformFeedbackPrompt } from '@shared-ui/components/ui/PlatformFeedbackPrompt';
 import { SupportChatWidget } from '@pwa-easy-rental/shared-ui';
 
@@ -42,7 +42,7 @@ export default function ClientDashboard() {
         setUserData(res.data);
         setIsAuth(true);
       } else {
-        localStorage.removeItem('auth_token');
+        clearAuthSession();
         setIsAuth(false);
       }
     } catch {
@@ -195,7 +195,7 @@ export default function ClientDashboard() {
             setLang={setLang}
             t={t}
             setSidebarOpen={setSidebarOpen}
-            onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }}
+            onLogout={() => { clearAuthSession(); window.location.reload(); }}
         />
 
         {isAuth && (
@@ -216,7 +216,7 @@ export default function ClientDashboard() {
               userData={userData}
               onBack={() => setCurrentView('HOME')}
               onProfileUpdated={(updated) => setUserData(updated)}
-              onLogout={() => { localStorage.removeItem('auth_token'); window.location.reload(); }}
+              onLogout={() => { clearAuthSession(); window.location.reload(); }}
             />
           )}
 

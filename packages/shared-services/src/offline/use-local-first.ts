@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { syncEngine } from './sync-engine';
 
 /**
  * React hook for local-first DuckDB sync with PostgreSQL backend.
@@ -27,6 +26,7 @@ export function useLocalFirst() {
   const sync = useCallback(async () => {
     setIsSyncing(true);
     try {
+      const { syncEngine } = await import('./sync-engine');
       await syncEngine.pull();
       setLastSync(Date.now());
     } catch {

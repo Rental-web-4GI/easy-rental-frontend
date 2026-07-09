@@ -56,7 +56,14 @@ export class ApiClient {
     const url = `${this.resolveBaseUrl()}/${cleanEndpoint}`;
 
     // 2. Récupération dynamique du token
-    const token = this.memoryToken || getStoredToken();
+    const storedToken = getStoredToken();
+    this.memoryToken = storedToken;
+    if (storedToken) {
+      this.headers['Authorization'] = `Bearer ${storedToken.trim()}`;
+    } else {
+      delete this.headers['Authorization'];
+    }
+    const token = storedToken;
     
     const requestHeaders: Record<string, string> = { 
       ...this.headers,

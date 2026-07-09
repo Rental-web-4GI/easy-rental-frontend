@@ -2,6 +2,25 @@ const AUTH_TOKEN_KEY = 'auth_token';
 const AUTH_EXPIRES_KEY = 'auth_token_exp';
 const AUTH_LAST_ACTIVITY_KEY = 'auth_last_activity';
 
+type SessionScope = 'client' | 'agency' | 'organisation' | 'admin' | 'shared';
+
+function getSessionScope(): SessionScope {
+  if (typeof window === 'undefined') return 'shared';
+  const path = window.location.pathname;
+  const port = window.location.port;
+
+  if (path.startsWith('/client')) return 'client';
+  if (path.startsWith('/agency')) return 'agency';
+  if (path.startsWith('/organisation')) return 'organisation';
+  if (path.startsWith('/admin') || port === '3004') return 'admin';
+  return 'shared';
+}
+
+function scopedKey(baseKey: string): string {
+  const scope = getSessionScope();
+  return scope === 'shared' ? baseKey : `${baseKey}_${scope}`;
+}
+
 /** Idle timeout before forced logout (40 minutes). */
 export const IDLE_TIMEOUT_MS = 40 * 60 * 1000;
 /** Refresh JWT when less than this remains AND user is active. */
@@ -51,13 +70,15 @@ export function isTokenExpired(token: string, skewMs = 30_000): boolean {
 
 export function touchAuthActivity(): void {
   if (typeof window === 'undefined') return;
-  if (!localStorage.getItem(AUTH_TOKEN_KEY)) return;
-  localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(Date.now()));
+  const tokenKey = scopedKey(AUTH_TOKEN_KEY);
+  const activityKey = scopedKey(AUTH_LAST_ACTIVITY_KEY);
+  if (!localStorage.getItem(tokenKey)) return;
+  localStorage.setItem(activityKey, String(Date.now()));
 }
 
 export function getLastActivityMs(): number | null {
   if (typeof window === 'undefined') return null;
-  const raw = localStorage.getItem(AUTH_LAST_ACTIVITY_KEY);
+  const raw = localStorage.getItem(scopedKey(AUTH_LAST_ACTIVITY_KEY));
   if (!raw) return null;
   const value = Number(raw);
   return Number.isFinite(value) ? value : null;
@@ -71,26 +92,29 @@ export function isIdleExpired(idleMs = IDLE_TIMEOUT_MS): boolean {
 
 export function persistAuthToken(token: string): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  const tokenKey = scopedKey(AUTH_TOKEN_KEY);
+  const expiryKey = scopedKey(AUTH_EXPIRES_KEY);
+  const activityKey = scopedKey(AUTH_LAST_ACTIVITY_KEY);
+  localStorage.setItem(tokenKey, token);
   const exp = getTokenExpiryMs(token);
   if (exp) {
-    localStorage.setItem(AUTH_EXPIRES_KEY, String(exp));
+    localStorage.setItem(expiryKey, String(exp));
   } else {
-    localStorage.removeItem(AUTH_EXPIRES_KEY);
+    localStorage.removeItem(expiryKey);
   }
-  localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(Date.now()));
+  localStorage.setItem(activityKey, String(Date.now()));
 }
 
 export function clearAuthSession(): void {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-  localStorage.removeItem(AUTH_EXPIRES_KEY);
-  localStorage.removeItem(AUTH_LAST_ACTIVITY_KEY);
+  localStorage.removeItem(scopedKey(AUTH_TOKEN_KEY));
+  localStorage.removeItem(scopedKey(AUTH_EXPIRES_KEY));
+  localStorage.removeItem(scopedKey(AUTH_LAST_ACTIVITY_KEY));
 }
 
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const token = localStorage.getItem(scopedKey(AUTH_TOKEN_KEY));
   if (!token) return null;
   if (isTokenExpired(token) || isIdleExpired()) {
     clearAuthSession();
@@ -104,13 +128,15 @@ export function initAuthSessionWatcher(onExpired: () => void): () => void {
 
   let lastTouchWrite = 0;
   let refreshInFlight = false;
+  const tokenKey = scopedKey(AUTH_TOKEN_KEY);
+  const activityKey = scopedKey(AUTH_LAST_ACTIVITY_KEY);
 
   const markActivity = () => {
-    if (!localStorage.getItem(AUTH_TOKEN_KEY)) return;
+    if (!localStorage.getItem(tokenKey)) return;
     const now = Date.now();
     if (now - lastTouchWrite < ACTIVITY_THROTTLE_MS) return;
     lastTouchWrite = now;
-    localStorage.setItem(AUTH_LAST_ACTIVITY_KEY, String(now));
+    localStorage.setItem(activityKey, String(now));
   };
 
   const expireSession = () => {
@@ -120,7 +146,7 @@ export function initAuthSessionWatcher(onExpired: () => void): () => void {
 
   const maybeRefresh = async () => {
     if (!refreshHandler || refreshInFlight) return;
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const token = localStorage.getItem(tokenKey);
     if (!token || isIdleExpired()) return;
     const exp = getTokenExpiryMs(token);
     if (!exp) return;
@@ -144,7 +170,7 @@ export function initAuthSessionWatcher(onExpired: () => void): () => void {
   };
 
   const check = () => {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const token = localStorage.getItem(tokenKey);
     if (!token) return;
     if (isIdleExpired() || isTokenExpired(token)) {
       expireSession();
@@ -168,7 +194,7 @@ export function initAuthSessionWatcher(onExpired: () => void): () => void {
   window.addEventListener('focus', check);
 
   // Seed activity for existing sessions that predate AUTH_LAST_ACTIVITY_KEY
-  if (localStorage.getItem(AUTH_TOKEN_KEY) && !localStorage.getItem(AUTH_LAST_ACTIVITY_KEY)) {
+  if (localStorage.getItem(tokenKey) && !localStorage.getItem(activityKey)) {
     touchAuthActivity();
   }
 

@@ -182,7 +182,7 @@ export const ProfileView = ({
 
       <section className="relative overflow-hidden rounded-2xl bg-[#0528d6] text-white shadow-xl shadow-[#0528d6]/20">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <img src="/client/hero_car.png" alt="" className="w-full h-full object-cover" />
+          <img src="/client/vehicle-placeholder.svg" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="absolute -top-16 -right-10 w-56 h-56 bg-white/10 rounded-full blur-3xl" />
         <div className="relative px-6 pt-8 pb-6 md:px-8 md:pt-10 md:pb-8 flex flex-col sm:flex-row items-center sm:items-end gap-5">
