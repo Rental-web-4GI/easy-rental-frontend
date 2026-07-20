@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, CheckCircle2, XCircle, ShieldAlert } from 'lucide-react';
 import { adminService } from '@pwa-easy-rental/shared-services';
 import type { NormalizedSubscriptionPlan } from '@pwa-easy-rental/shared-services';
 
@@ -37,7 +37,14 @@ export const OrganizationsView = ({ plans, onDataChanged }: OrganizationsViewPro
   const [orgs, setOrgs] = useState<OrgRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [assigningId, setAssigningId] = useState<string | null>(null);
+  const [governanceId, setGovernanceId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  const pendingOrgs = useMemo(
+    () => orgs.filter((o) => o.governanceStatus === 'PENDING_APPROVAL'),
+    [orgs],
+  );
 
   const planById = useMemo(
     () => new Map(plans.map((plan) => [plan.id, plan])),
@@ -73,6 +80,23 @@ export const OrganizationsView = ({ plans, onDataChanged }: OrganizationsViewPro
     setAssigningId(null);
   };
 
+  const handleGovernance = async (orgId: string, approve: boolean) => {
+    setGovernanceId(orgId);
+    setError('');
+    setMessage('');
+    const res = approve
+      ? await adminService.approveOrganization(orgId)
+      : await adminService.rejectOrganization(orgId);
+    if (!res.ok) {
+      setError(approve ? "Échec de l'approbation." : 'Échec du rejet.');
+    } else {
+      setMessage(approve ? 'Organisation approuvée.' : 'Organisation rejetée.');
+      await loadOrgs();
+      onDataChanged?.();
+    }
+    setGovernanceId(null);
+  };
+
   if (loading) {
     return (
       <div className="h-64 flex items-center justify-center">
@@ -100,6 +124,65 @@ export const OrganizationsView = ({ plans, onDataChanged }: OrganizationsViewPro
         <p className="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
           {error}
         </p>
+      )}
+      {message && (
+        <p className="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-950/30 p-3 rounded-xl border border-green-100 dark:border-green-900/30">
+          {message}
+        </p>
+      )}
+
+      {pendingOrgs.length > 0 && (
+        <div className="bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 rounded-3xl p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-2xl bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center text-orange-600">
+              <ShieldAlert size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black italic tracking-tighter text-orange-900 dark:text-orange-100">
+                {pendingOrgs.length} demande{pendingOrgs.length > 1 ? 's' : ''} d&apos;approbation
+              </h3>
+              <p className="text-[10px] font-bold text-orange-600 uppercase tracking-widest italic">
+                Ces organisations attendent votre validation pour accéder à leur console
+              </p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {pendingOrgs.map((org) => (
+              <div
+                key={org.id}
+                className="flex items-center justify-between bg-white dark:bg-[#1a1d2d] rounded-2xl px-4 py-3 border border-orange-100 dark:border-orange-500/20"
+              >
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-900 dark:text-white truncate">{org.name}</p>
+                  <p className="text-[10px] text-slate-400 italic truncate">{org.email}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={governanceId === org.id}
+                    onClick={() => handleGovernance(org.id, false)}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-black uppercase italic tracking-widest text-red-500 border border-red-200 dark:border-red-500/30 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-all disabled:opacity-50"
+                  >
+                    <XCircle size={14} /> Rejeter
+                  </button>
+                  <button
+                    type="button"
+                    disabled={governanceId === org.id}
+                    onClick={() => handleGovernance(org.id, true)}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-black uppercase italic tracking-widest text-white bg-green-600 rounded-xl hover:bg-green-700 transition-all disabled:opacity-50"
+                  >
+                    {governanceId === org.id ? (
+                      <Loader2 className="animate-spin" size={14} />
+                    ) : (
+                      <CheckCircle2 size={14} />
+                    )}
+                    Approuver
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1a1d2d] shadow-sm">
@@ -135,7 +218,17 @@ export const OrganizationsView = ({ plans, onDataChanged }: OrganizationsViewPro
                     <p>Véhicules {org.currentVehicles}/{plan?.maxVehicles ?? '—'}</p>
                   </td>
                   <td className="p-4">
-                    <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800">
+                    <span
+                      className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full border ${
+                        org.governanceStatus === 'APPROVED'
+                          ? 'bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:border-green-500/30'
+                          : org.governanceStatus === 'PENDING_APPROVAL'
+                          ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/10 dark:border-orange-500/30'
+                          : org.governanceStatus === 'REJECTED'
+                          ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-500/30'
+                          : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700'
+                      }`}
+                    >
                       {org.governanceStatus}
                     </span>
                   </td>
