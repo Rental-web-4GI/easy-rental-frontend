@@ -112,6 +112,15 @@ export const authService = {
     return { ok: false, error: res.data?.message || 'Code MFA invalide' };
   },
   registerOrg: (data: any) => client.post<any>('/auth/register/organizationOwner', data),
+  registerFreelance: (data: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    city: string;
+    password: string;
+    planId?: string;
+  }) => client.post<any>('/auth/register/freelance', data),
   registerClient: async (data: {
     firstname: string;
     lastname: string;

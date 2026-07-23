@@ -241,14 +241,15 @@ export default function OrganisationDashboard() {
 
   return (
     <div className="flex h-screen bg-white dark:bg-[#080b14] overflow-hidden transition-colors duration-500">
-      <Sidebar 
-        currentView={currentView} 
-        setCurrentView={setCurrentView} 
-        sidebarOpen={sidebarOpen} 
-        setSidebarOpen={setSidebarOpen} 
-        handleInstall={handleInstallApp} 
-        handleLogout={() => { clearAuthSession(); window.location.reload(); }} 
+      <Sidebar
+        currentView={currentView}
+        setCurrentView={setCurrentView}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        handleInstall={handleInstallApp}
+        handleLogout={() => { clearAuthSession(); window.location.reload(); }}
         userData={userData}
+        accountType={orgData?.accountType}
         t={t}
       />
       <main className="flex-1 flex flex-col overflow-hidden relative">
