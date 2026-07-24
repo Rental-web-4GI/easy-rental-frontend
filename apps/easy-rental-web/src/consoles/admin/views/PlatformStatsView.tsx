@@ -18,9 +18,10 @@ import { statisticsService } from '@pwa-easy-rental/shared-services';
 import type { PlatformStats } from '@pwa-easy-rental/shared-services';
 import { StatCard } from '../components/StatCard';
 
-function formatFcfa(value: number): string {
-  const n = Number.isFinite(value) ? value : 0;
-  return `${n.toLocaleString('fr-FR')} FCFA`;
+function formatFcfa(value: number | string | null | undefined): string {
+  const n = value == null ? 0 : Number(value);
+  const safe = Number.isFinite(n) ? n : 0;
+  return `${safe.toLocaleString('fr-FR')} FCFA`;
 }
 
 export const PlatformStatsView = () => {
