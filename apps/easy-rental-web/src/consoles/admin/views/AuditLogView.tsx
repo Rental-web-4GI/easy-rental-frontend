@@ -183,6 +183,7 @@ export const AuditLogView = () => {
                 <tr>
                   <th className="px-4 py-3">Date</th>
                   <th className="px-4 py-3">Action</th>
+                  <th className="px-4 py-3">Console</th>
                   <th className="px-4 py-3">User ID</th>
                   <th className="px-4 py-3">IP</th>
                   <th className="px-4 py-3">Metadata</th>
@@ -191,35 +192,58 @@ export const AuditLogView = () => {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {events.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-400 font-medium">
+                    <td colSpan={6} className="px-4 py-8 text-center text-slate-400 font-medium">
                       Aucun événement trouvé.
                     </td>
                   </tr>
                 )}
-                {events.map((evt) => (
-                  <tr key={evt.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300 font-medium">
-                      {formatDate(evt.createdAt)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${actionBadgeClasses(evt.action)}`}
+                {events.map((evt) => {
+                  const createdAt = evt.createdAt ?? evt.created_at;
+                  const userId = evt.userId ?? evt.user_id;
+                  const rawMeta = evt.metadata ?? '';
+                  let sourceLabel: string | null = null;
+                  try {
+                    const parsed = rawMeta ? JSON.parse(rawMeta) : null;
+                    if (parsed && typeof parsed === 'object' && parsed.source) {
+                      sourceLabel = String(parsed.source);
+                    }
+                  } catch {
+                    /* metadata pas JSON, ignore */
+                  }
+                  return (
+                    <tr key={evt.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300 font-medium">
+                        {formatDate(createdAt)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${actionBadgeClasses(evt.action)}`}
+                        >
+                          {evt.action}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {sourceLabel ? (
+                          <span className="inline-flex px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300">
+                            {sourceLabel}
+                          </span>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={userId ?? ''}>
+                        {shortId(userId)}
+                      </td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{evt.ip ?? '—'}</td>
+                      <td
+                        className="px-4 py-3 max-w-[220px] truncate text-slate-500 dark:text-slate-400"
+                        title={rawMeta}
                       >
-                        {evt.action}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={evt.userId ?? ''}>
-                      {shortId(evt.userId)}
-                    </td>
-                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{evt.ip ?? '—'}</td>
-                    <td
-                      className="px-4 py-3 max-w-[220px] truncate text-slate-500 dark:text-slate-400"
-                      title={evt.metadata ?? ''}
-                    >
-                      {evt.metadata ?? '—'}
-                    </td>
-                  </tr>
-                ))}
+                        {rawMeta || '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
