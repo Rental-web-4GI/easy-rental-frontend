@@ -2,7 +2,7 @@
 import React from 'react';
 import { Building2, CreditCard, LogOut, MessageSquare, Shield, Star, X, ChevronRight, Activity, BarChart3, ScrollText } from 'lucide-react';
 
-export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'MESSAGES' | 'REVIEWS' | 'AUDIT';
+export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'BILLING' | 'MESSAGES' | 'REVIEWS' | 'AUDIT';
 
 type AdminSidebarProps = {
   tab: AdminTab;
@@ -78,6 +78,12 @@ export const AdminSidebar = ({
               label="Plans"
               active={tab === 'PLANS'}
               onClick={() => { setTab('PLANS'); setSidebarOpen(false); }}
+            />
+            <SidebarItem
+              icon={<CreditCard size={20} />}
+              label="Facturation"
+              active={tab === 'BILLING'}
+              onClick={() => { setTab('BILLING'); setSidebarOpen(false); }}
             />
             <SidebarItem
               icon={<MessageSquare size={20} />}

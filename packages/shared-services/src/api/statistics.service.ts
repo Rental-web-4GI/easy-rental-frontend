@@ -6,7 +6,7 @@ export type PlatformStats = {
   agencies: { total: number; averagePerCompany: number };
   vehicles: { total: number; published: number };
   rentals: { total: number; ongoing: number; completed: number; monthlyCompleted: number };
-  revenue: { subscriptionsMonthlyMRR: number; subscriptionsActiveCount: number };
+  revenue: { monthlyRecurringRevenue: number; subscriptionsActiveCount: number };
 };
 
 /**
@@ -30,10 +30,28 @@ const deepCamelize = (input: any): any => {
   return out;
 };
 
+export type SubscriptionBilling = {
+  subscriptionId: string;
+  organizationId: string;
+  organizationName: string;
+  organizationEmail: string | null;
+  accountType: string | null;
+  planName: string;
+  price: number | string | null;
+  status: string;
+  startDate: string | null;
+  endDate: string | null;
+};
+
 export const statisticsService = {
   getPlatformStats: async () => {
     const res = await client.get<PlatformStats>('/api/admin/stats/platform');
     if (!res.ok || !res.data) return res;
     return { ...res, data: deepCamelize(res.data) as PlatformStats };
+  },
+  listActiveSubscriptionsBilling: async () => {
+    const res = await client.get<SubscriptionBilling[]>('/api/admin/stats/billing/subscriptions');
+    if (!res.ok || !res.data) return res;
+    return { ...res, data: (res.data as unknown[]).map((row) => deepCamelize(row)) as SubscriptionBilling[] };
   },
 };

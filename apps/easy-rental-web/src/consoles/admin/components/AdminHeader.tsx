@@ -8,6 +8,7 @@ const TAB_TITLES: Record<AdminTab, string> = {
   STATS: 'Statistiques',
   ORGS: 'Organisations',
   PLANS: 'Plans d\'abonnement',
+  BILLING: 'Facturation',
   MESSAGES: 'Messagerie support',
   REVIEWS: 'Modération des avis',
   AUDIT: 'Journal d\'audit',

@@ -16,6 +16,7 @@ import { SupportInboxView } from '../views/SupportInboxView';
 import { ReviewsModerationView } from '../views/ReviewsModerationView';
 import { PlatformStatsView } from '../views/PlatformStatsView';
 import { AuditLogView } from '../views/AuditLogView';
+import { BillingView } from '../views/BillingView';
 import { AdminSidebar, type AdminTab } from '../components/AdminSidebar';
 import { AdminHeader } from '../components/AdminHeader';
 import { StatCard } from '../components/StatCard';
@@ -235,6 +236,7 @@ export default function AdminConsole() {
               <ReviewsModerationView onActivityChange={loadStats} />
             )}
             {tab === 'AUDIT' && <AuditLogView />}
+            {tab === 'BILLING' && <BillingView />}
           </div>
         </div>
       </main>

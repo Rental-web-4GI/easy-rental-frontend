@@ -112,7 +112,7 @@ export const PlatformStatsView = () => {
               MRR Abonnements
             </p>
             <p className="text-3xl font-black text-white leading-none truncate tracking-tighter italic">
-              {formatFcfa(stats.revenue.subscriptionsMonthlyMRR)}
+              {formatFcfa(stats.revenue.monthlyRecurringRevenue)}
             </p>
           </div>
         </div>
