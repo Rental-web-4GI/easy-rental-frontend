@@ -53,7 +53,14 @@ export const AgencyDetailsView = ({ agencyId, userData, onBack }: { agencyId: st
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h2 className="text-3xl font-black  italic text-slate-900 dark:text-white leading-none">{agency?.name}</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-3xl font-black  italic text-slate-900 dark:text-white leading-none">{agency?.name}</h2>
+            {(agency?.organizationAccountType === 'FREELANCE' || agency?.organization_account_type === 'FREELANCE') && (
+              <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-500/10 text-amber-700 text-[9px] font-black rounded-full border border-amber-100">
+                Particulier
+              </span>
+            )}
+          </div>
           <p className="text-[10px] font-black text-slate-400 tracking-[0.2em] mt-2">{"Détails de l'agence "}</p>
         </div>
       </div>
