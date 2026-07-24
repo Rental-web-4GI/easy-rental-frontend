@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import { Building2, CreditCard, LogOut, MessageSquare, Shield, Star, X, ChevronRight, Activity, BarChart3 } from 'lucide-react';
+import { Building2, CreditCard, LogOut, MessageSquare, Shield, Star, X, ChevronRight, Activity, BarChart3, ScrollText } from 'lucide-react';
 
-export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'MESSAGES' | 'REVIEWS';
+export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'MESSAGES' | 'REVIEWS' | 'AUDIT';
 
 type AdminSidebarProps = {
   tab: AdminTab;
@@ -92,6 +92,12 @@ export const AdminSidebar = ({
               active={tab === 'REVIEWS'}
               badge={pendingReviews > 0 ? pendingReviews : undefined}
               onClick={() => { setTab('REVIEWS'); setSidebarOpen(false); }}
+            />
+            <SidebarItem
+              icon={<ScrollText size={20} />}
+              label="Journal"
+              active={tab === 'AUDIT'}
+              onClick={() => { setTab('AUDIT'); setSidebarOpen(false); }}
             />
           </div>
         </div>

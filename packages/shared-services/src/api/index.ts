@@ -38,6 +38,8 @@ export { rentalService } from './rental.service';
 export { statsService } from './stats.service';
 export { statisticsService } from './statistics.service';
 export type { PlatformStats } from './statistics.service';
+export { auditService } from './audit.service';
+export type { AuditEvent, AuditEventFilters } from './audit.service';
 export { transactionService } from './transaction.service';
 export { reviewService } from './review.service';
 export type { ReviewItem, ReviewModerationStats, PlatformFeedbackPayload } from './review.service';

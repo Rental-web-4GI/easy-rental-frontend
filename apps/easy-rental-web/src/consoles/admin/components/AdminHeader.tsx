@@ -10,6 +10,7 @@ const TAB_TITLES: Record<AdminTab, string> = {
   PLANS: 'Plans d\'abonnement',
   MESSAGES: 'Messagerie support',
   REVIEWS: 'Modération des avis',
+  AUDIT: 'Journal d\'audit',
 };
 
 type AdminHeaderProps = {
