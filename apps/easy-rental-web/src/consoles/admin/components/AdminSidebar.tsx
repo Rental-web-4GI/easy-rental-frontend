@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import { Building2, CreditCard, LogOut, MessageSquare, Shield, Star, X, ChevronRight, Activity } from 'lucide-react';
+import { Building2, CreditCard, LogOut, MessageSquare, Shield, Star, X, ChevronRight, Activity, BarChart3 } from 'lucide-react';
 
-export type AdminTab = 'ORGS' | 'PLANS' | 'MESSAGES' | 'REVIEWS';
+export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'MESSAGES' | 'REVIEWS';
 
 type AdminSidebarProps = {
   tab: AdminTab;
@@ -61,6 +61,12 @@ export const AdminSidebar = ({
             Gestion
           </p>
           <div className="space-y-1">
+            <SidebarItem
+              icon={<BarChart3 size={20} />}
+              label="Statistiques"
+              active={tab === 'STATS'}
+              onClick={() => { setTab('STATS'); setSidebarOpen(false); }}
+            />
             <SidebarItem
               icon={<Building2 size={20} />}
               label="Organisations"

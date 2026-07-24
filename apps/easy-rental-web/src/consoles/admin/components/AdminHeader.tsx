@@ -5,6 +5,7 @@ import { HeaderIconButton } from './HeaderIconButton';
 import type { AdminTab } from './AdminSidebar';
 
 const TAB_TITLES: Record<AdminTab, string> = {
+  STATS: 'Statistiques',
   ORGS: 'Organisations',
   PLANS: 'Plans d\'abonnement',
   MESSAGES: 'Messagerie support',

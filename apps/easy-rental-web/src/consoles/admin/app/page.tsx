@@ -14,6 +14,7 @@ import { OrganizationsView } from '../views/OrganizationsView';
 import { PlansView } from '../views/PlansView';
 import { SupportInboxView } from '../views/SupportInboxView';
 import { ReviewsModerationView } from '../views/ReviewsModerationView';
+import { PlatformStatsView } from '../views/PlatformStatsView';
 import { AdminSidebar, type AdminTab } from '../components/AdminSidebar';
 import { AdminHeader } from '../components/AdminHeader';
 import { StatCard } from '../components/StatCard';
@@ -216,6 +217,7 @@ export default function AdminConsole() {
               <StatCard label="Avis en attente" value={pendingReviews} icon={<Star />} />
             </div>
 
+            {tab === 'STATS' && <PlatformStatsView />}
             {tab === 'ORGS' && (
               <OrganizationsView
                 plans={plans}
