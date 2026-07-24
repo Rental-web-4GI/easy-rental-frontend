@@ -27,6 +27,7 @@ import { FreelanceDriversView } from '../views/freelance/FreelanceDriversView';
 import { FreelanceReservationsView } from '../views/freelance/FreelanceReservationsView';
 import { FreelanceRentalsView } from '../views/freelance/FreelanceRentalsView';
 import { FreelanceTransactionsView } from '../views/freelance/FreelanceTransactionsView';
+import { UpgradeToCompanyView } from '../views/freelance/UpgradeToCompanyView';
 
 import { Loader2 } from 'lucide-react';
 import { fr } from '../locales/fr';
@@ -305,7 +306,7 @@ export default function OrganisationDashboard() {
               <FreelanceDriversView agencyId={userData?.defaultAgencyId} organizationId={orgData?.id} userData={userData} t={agencyT} />
             )}
             {currentView === 'UPGRADE' && isFreelance && (
-              <div className="p-6 text-slate-500 italic">Prochainement</div>
+              <UpgradeToCompanyView />
             )}
 
             {currentView === 'AGENCIES' && <AgenciesView orgData={orgData} setCurrentView={setCurrentView} t={t} />}
