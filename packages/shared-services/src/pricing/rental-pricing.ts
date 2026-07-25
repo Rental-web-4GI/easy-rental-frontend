@@ -18,6 +18,8 @@ export type RentalQuoteInput = {
   rentalType: RentalType;
   vehiclePricing: PricingRates;
   driverPricing?: PricingRates | null;
+  /** Taux de caution en fraction (ex 0.30 pour 30%). Défaut = DEPOSIT_RATE (0.10). */
+  cautionRate?: number | null;
 };
 
 export type RentalQuote = {
@@ -28,6 +30,8 @@ export type RentalQuote = {
   baseAmount: number;
   commission: number;
   deposit: number;
+  /** Alias R2 de `deposit` — montant de la caution (escrow). */
+  caution: number;
   total: number;
   requestedDeposit: number;
   savingsVsHourly: number;
@@ -113,8 +117,11 @@ export function computeRentalQuote(input: RentalQuoteInput, reservationMode = tr
   const savingsVsHourly = Math.max(0, hourlyBase - baseAmount);
 
   const commission = baseAmount * PLATFORM_COMMISSION_RATE;
-  const deposit = baseAmount * DEPOSIT_RATE;
+  // R2 : caution = base × taux caution agence (fallback 10%). Incluse dans le total.
+  const cautionRate = input.cautionRate != null && input.cautionRate >= 0 ? input.cautionRate : DEPOSIT_RATE;
+  const deposit = baseAmount * cautionRate;
   const total = baseAmount + commission + deposit;
+  // R2 : acompte = 60% du total (caution incluse).
   const requestedDeposit = reservationMode ? total * RESERVATION_DEPOSIT_RATE : total;
 
   return {
@@ -125,6 +132,7 @@ export function computeRentalQuote(input: RentalQuoteInput, reservationMode = tr
     baseAmount,
     commission,
     deposit,
+    caution: deposit,
     total,
     requestedDeposit,
     savingsVsHourly,

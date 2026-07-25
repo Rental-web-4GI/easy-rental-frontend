@@ -35,6 +35,12 @@ export {
 } from './support-visitor';
 export type { SupportVisitorContext } from './support-visitor';
 export { rentalService } from './rental.service';
+export { inspectionService, DEFAULT_INSPECTION_ITEMS, INSPECTION_ITEM_LABELS, ITEM_STATUS_LABELS } from './inspection.service';
+export type { Inspection, InspectionItem, InspectionComparison, ItemDiff } from './inspection.service';
+export { trackingService } from './tracking.service';
+export type { Position, TrackingSummary } from './tracking.service';
+export { ratingService } from './rating.service';
+export type { Rating, RatingStats } from './rating.service';
 export { statsService } from './stats.service';
 export { statisticsService } from './statistics.service';
 export type { PlatformStats } from './statistics.service';
