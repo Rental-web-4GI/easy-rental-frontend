@@ -1,4 +1,5 @@
 import { defaultClient as client } from './api-client';
+import { deepCamelize } from '../utils/camelize';
 
 export type InspectionItem = {
   itemCode: string;
@@ -66,12 +67,21 @@ export const ITEM_STATUS_LABELS: Record<string, string> = {
 };
 
 export const inspectionService = {
-  listByRental: (rentalId: string) =>
-    client.get<Inspection[]>(`/api/inspections/rentals/${rentalId}/all`),
+  listByRental: async (rentalId: string) => {
+    const res = await client.get<any>(`/api/inspections/rentals/${rentalId}/all`);
+    if (res.ok && Array.isArray(res.data)) return { ...res, data: res.data.map(deepCamelize) as Inspection[] };
+    return res;
+  },
 
-  getById: (inspectionId: string) =>
-    client.get<Inspection>(`/api/inspections/${inspectionId}`),
+  getById: async (inspectionId: string) => {
+    const res = await client.get<any>(`/api/inspections/${inspectionId}`);
+    if (res.ok && res.data) return { ...res, data: deepCamelize(res.data) as Inspection };
+    return res;
+  },
 
-  compare: (rentalId: string) =>
-    client.get<InspectionComparison>(`/api/inspections/rentals/${rentalId}/comparison`),
+  compare: async (rentalId: string) => {
+    const res = await client.get<any>(`/api/inspections/rentals/${rentalId}/comparison`);
+    if (res.ok && res.data) return { ...res, data: deepCamelize(res.data) as InspectionComparison };
+    return res;
+  },
 };

@@ -10,6 +10,29 @@ import {
   toApiRentalInitPayload,
 } from './rental.mapper';
 
+/** Convertit le payload inspection en snake_case (Jackson backend). */
+function toApiInspection(
+  type: 'CHECK_IN' | 'CHECK_OUT',
+  insp: {
+    odometer?: number | null;
+    fuelLevel?: number | null;
+    notes?: string | null;
+    photoUrls: string[];
+    items?: Array<{ itemCode: string; status: string; note?: string | null }> | null;
+  },
+) {
+  return {
+    type,
+    odometer: insp.odometer ?? null,
+    fuel_level: insp.fuelLevel ?? null,
+    notes: insp.notes ?? null,
+    photo_urls: insp.photoUrls,
+    items: insp.items
+      ? insp.items.map((it) => ({ item_code: it.itemCode, status: it.status, note: it.note ?? null }))
+      : null,
+  };
+}
+
 export const rentalService = {
   initiateRental: async (data: Record<string, unknown>) => {
     const res = await client.post<Record<string, unknown>>(
@@ -63,15 +86,8 @@ export const rentalService = {
     };
   }) => {
     const res = await client.post<any>(`/api/rentals/${id}/check-in`, {
-      startOdometer: payload.startOdometer ?? null,
-      inspection: {
-        type: 'CHECK_IN',
-        odometer: payload.inspection.odometer ?? null,
-        fuelLevel: payload.inspection.fuelLevel ?? null,
-        notes: payload.inspection.notes ?? null,
-        photoUrls: payload.inspection.photoUrls,
-        items: payload.inspection.items ?? null,
-      },
+      start_odometer: payload.startOdometer ?? null,
+      inspection: toApiInspection('CHECK_IN', payload.inspection),
     });
     if (!res.ok) return { ...res, data: { message: formatRentalApiError(res.data, 'Check-in impossible.') } };
     return { ...res, data: normalizeRentalDetails(res.data as Record<string, unknown>) };
@@ -96,27 +112,31 @@ export const rentalService = {
     };
   }) => {
     const res = await client.post<any>(`/api/rentals/${id}/check-out`, {
-      endOdometer: payload.endOdometer ?? null,
-      inspection: {
-        type: 'CHECK_OUT',
-        odometer: payload.inspection.odometer ?? null,
-        fuelLevel: payload.inspection.fuelLevel ?? null,
-        notes: payload.inspection.notes ?? null,
-        photoUrls: payload.inspection.photoUrls,
-        items: payload.inspection.items ?? null,
-      },
+      end_odometer: payload.endOdometer ?? null,
+      inspection: toApiInspection('CHECK_OUT', payload.inspection),
     });
     if (!res.ok) return { ...res, data: { message: formatRentalApiError(res.data, 'Check-out impossible.') } };
     return { ...res, data: normalizeRentalDetails(res.data as Record<string, unknown>) };
   },
 
-  /** Agence : règlement du retour — retenue caution (+ motif) et clôture. */
-  settleReturn: async (id: string, payload: { cautionDeduction: number; retentionReason?: string | null }) => {
+  /**
+   * Agence : règlement du retour. On saisit le COÛT DES DOMMAGES ; le backend
+   * calcule retenue = min(dommages, caution), remboursement = le reste,
+   * supplément dû = max(0, dommages − caution).
+   */
+  settleReturn: async (id: string, payload: { damageCost: number; reason?: string | null }) => {
     const res = await client.put<any>(`/api/rentals/${id}/settle-return`, {
-      cautionDeduction: payload.cautionDeduction,
-      retentionReason: payload.retentionReason ?? null,
+      damage_cost: payload.damageCost,
+      reason: payload.reason ?? null,
     });
     if (!res.ok) return { ...res, data: { message: formatRentalApiError(res.data, 'Règlement impossible.') } };
+    return { ...res, data: normalizeRentalDetails(res.data as Record<string, unknown>) };
+  },
+
+  /** Agence : encaisser le supplément dû (créance) par le client. */
+  collectSupplement: async (id: string, amount: number) => {
+    const res = await client.post<any>(`/api/rentals/${id}/collect-supplement`, { amount });
+    if (!res.ok) return { ...res, data: { message: formatRentalApiError(res.data, 'Encaissement impossible.') } };
     return { ...res, data: normalizeRentalDetails(res.data as Record<string, unknown>) };
   },
 

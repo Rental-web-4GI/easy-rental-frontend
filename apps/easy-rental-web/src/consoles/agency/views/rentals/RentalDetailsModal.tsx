@@ -124,12 +124,23 @@ export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t, initialT
     } finally { setSubmitting(false); }
   };
 
-  const doSettle = async (deduction: number, reason: string) => {
+  const doSettle = async (damageCost: number, reason: string) => {
     setSubmitting(true);
     try {
-      const res = await rentalService.settleReturn(rentalId, { cautionDeduction: deduction, retentionReason: reason });
-      if (res.ok) { await loadDetails(); onValidated?.(); onClose(); }
+      const res = await rentalService.settleReturn(rentalId, { damageCost, reason });
+      if (res.ok) { await loadDetails(); onValidated?.(); }
       else alert(res.data?.message || 'Règlement impossible.');
+    } finally { setSubmitting(false); }
+  };
+
+  const doCollectSupplement = async () => {
+    const due = Number(data?.rental?.supplementDue ?? 0);
+    if (due <= 0) return;
+    setSubmitting(true);
+    try {
+      const res = await rentalService.collectSupplement(rentalId, due);
+      if (res.ok) { await loadDetails(); onValidated?.(); }
+      else alert(res.data?.message || 'Encaissement impossible.');
     } finally { setSubmitting(false); }
   };
 
@@ -289,6 +300,29 @@ export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t, initialT
             {tab === 'CAUTION' && (
               <div className="space-y-6">
                 <RentalFinancialTimeline rental={rental} />
+
+                {/* Créance : supplément dû par le client */}
+                {Number(rental.supplementDue ?? 0) > 0 && (
+                  <div className="p-5 rounded-[2rem] bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-[11px] font-black uppercase italic tracking-widest text-red-600">Supplément dû par le client</h4>
+                        <p className="text-2xl font-black italic text-red-600 mt-1">{Number(rental.supplementDue).toLocaleString()} FCFA</p>
+                        <p className="text-[10px] text-slate-500 italic mt-1">Les dommages ont dépassé la caution.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={doCollectSupplement}
+                        disabled={submitting}
+                        className="px-5 py-3 rounded-2xl bg-red-600 text-white text-xs font-black uppercase italic disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
+                        Encaisser
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {rental.status === 'UNDER_REVIEW' && inspections.some((i) => i.type === 'CHECK_OUT') && (
                   <div className="p-5 rounded-[2rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
                     <h4 className="text-[11px] font-black uppercase italic tracking-widest text-slate-500 mb-4">Règlement de la caution</h4>

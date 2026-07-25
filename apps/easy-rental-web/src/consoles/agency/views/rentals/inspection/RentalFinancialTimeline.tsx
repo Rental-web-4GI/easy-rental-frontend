@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { Banknote, ShieldCheck, RotateCcw, MinusCircle } from 'lucide-react';
+import { Banknote, ShieldCheck, RotateCcw, MinusCircle, AlertTriangle } from 'lucide-react';
 
 /**
  * Timeline financière d'une location : location, caution, retenue, remboursement.
@@ -16,13 +16,15 @@ export const RentalFinancialTimeline = ({ rental }: { rental: any }) => {
   const cautionHeld = Number(rental.cautionHeld ?? 0);
   const cautionDeducted = Number(rental.cautionDeducted ?? 0);
   const cautionRefunded = Number(rental.cautionRefunded ?? 0);
+  const supplementDue = Number(rental.supplementDue ?? 0);
 
   if (rentalAmount > 0) rows.push({ icon: <Banknote size={16} />, label: 'Location (facturable)', amount: rentalAmount, tone: 'blue' });
   if (cautionAmount > 0) rows.push({ icon: <ShieldCheck size={16} />, label: 'Caution (escrow)', amount: cautionAmount, tone: 'slate' });
   if (rentalPaid > 0) rows.push({ icon: <Banknote size={16} />, label: 'Location encaissée', amount: rentalPaid, tone: 'green' });
   if (cautionHeld > 0) rows.push({ icon: <ShieldCheck size={16} />, label: 'Caution détenue', amount: cautionHeld, tone: 'green' });
-  if (cautionDeducted > 0) rows.push({ icon: <MinusCircle size={16} />, label: 'Retenue caution', amount: -cautionDeducted, tone: 'red' });
+  if (cautionDeducted > 0) rows.push({ icon: <MinusCircle size={16} />, label: 'Retenue caution (revenu)', amount: cautionDeducted, tone: 'blue' });
   if (cautionRefunded > 0) rows.push({ icon: <RotateCcw size={16} />, label: 'Caution remboursée', amount: cautionRefunded, tone: 'emerald' });
+  if (supplementDue > 0) rows.push({ icon: <AlertTriangle size={16} />, label: 'Supplément dû (créance)', amount: supplementDue, tone: 'red' });
 
   const toneClass = (t: string) => {
     switch (t) {

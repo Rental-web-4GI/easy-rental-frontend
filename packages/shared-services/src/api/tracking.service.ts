@@ -1,4 +1,5 @@
 import { defaultClient as client } from './api-client';
+import { deepCamelize } from '../utils/camelize';
 
 export type Position = {
   id: string;
@@ -26,6 +27,9 @@ export const trackingService = {
     }),
 
   /** Résumé du tracking : positions + km + source (GPS ou ODOMETER). */
-  getSummary: (rentalId: string) =>
-    client.get<TrackingSummary>(`/api/rentals/${rentalId}/tracking`),
+  getSummary: async (rentalId: string) => {
+    const res = await client.get<any>(`/api/rentals/${rentalId}/tracking`);
+    if (res.ok && res.data) return { ...res, data: deepCamelize(res.data) as TrackingSummary };
+    return res;
+  },
 };
