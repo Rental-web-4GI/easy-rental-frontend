@@ -335,28 +335,49 @@ export const BookingWizardModal = ({
                     </div>
 
                     <div className="p-6 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 rounded-2xl space-y-4">
-                      <div className="flex justify-between text-slate-500 text-sm">
-                        <span className="flex items-center gap-2 text-[10px] font-bold uppercase"><Clock size={12} /> Durée</span>
-                        <span className="font-bold">{quote?.billedUnits ?? 0} {quote?.unitLabel ?? ''}</span>
+                      {/* Tarifs indicatifs (toujours visibles) */}
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {(['HOURLY', 'DAILY', 'MONTHLY'] as const).map((mode) => {
+                          const r = getPricingRate(vehicle?.pricing, mode);
+                          const lbl = mode === 'HOURLY' ? '/heure' : mode === 'DAILY' ? '/jour' : '/mois';
+                          return (
+                            <div key={mode} className={`p-2 rounded-xl border ${form.rentalType === mode ? 'border-[#0528d6] bg-blue-50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800'}`}>
+                              <div className="text-[8px] font-black uppercase text-slate-400">{lbl}</div>
+                              <div className="text-xs font-black text-slate-700 dark:text-slate-200">{r != null ? `${r.toLocaleString('fr-FR')}` : '—'}</div>
+                            </div>
+                          );
+                        })}
                       </div>
 
-                      {quote && (
-                        <div className="text-xs space-y-1.5 border-b border-slate-200 pb-3">
-                          <div className="flex justify-between"><span>Tarif véhicule</span><span>{quote.vehicleBaseAmount.toLocaleString('fr-FR')} XAF</span></div>
-                          {quote.driverBaseAmount > 0 && (
-                            <div className="flex justify-between"><span>Tarif chauffeur</span><span>{quote.driverBaseAmount.toLocaleString('fr-FR')} XAF</span></div>
-                          )}
-                          <div className="flex justify-between font-bold"><span>Total dossier</span><span>{quote.total.toLocaleString('fr-FR')} XAF</span></div>
+                      {!quote || !quote.valid ? (
+                        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 text-[11px] font-bold italic text-amber-700 text-center">
+                          Choisissez une période valide (le retour doit être après le départ) pour voir le tarif.
                         </div>
+                      ) : (
+                        <>
+                          <div className="flex justify-between text-slate-500 text-sm">
+                            <span className="flex items-center gap-2 text-[10px] font-bold uppercase"><Clock size={12} /> Facturé</span>
+                            <span className="font-bold">{quote.billedLabel}</span>
+                          </div>
+
+                          <div className="text-xs space-y-1.5 border-b border-slate-200 pb-3">
+                            <div className="flex justify-between"><span>Tarif véhicule</span><span>{Math.round(quote.vehicleBaseAmount).toLocaleString('fr-FR')} XAF</span></div>
+                            {quote.driverBaseAmount > 0 && (
+                              <div className="flex justify-between"><span>Tarif chauffeur</span><span>{Math.round(quote.driverBaseAmount).toLocaleString('fr-FR')} XAF</span></div>
+                            )}
+                            <div className="flex justify-between text-slate-400"><span>Caution (restituée au retour)</span><span>{Math.round(quote.caution).toLocaleString('fr-FR')} XAF</span></div>
+                            <div className="flex justify-between font-bold"><span>Total dossier</span><span>{Math.round(quote.total).toLocaleString('fr-FR')} XAF</span></div>
+                          </div>
+
+                          <div className="flex justify-between items-center p-4 bg-[#0528d6] rounded-2xl text-white">
+                            <div>
+                              <p className="text-[9px] font-bold uppercase opacity-80">Acompte estimé (60 %) — à régler en agence</p>
+                              <p className="text-2xl font-bold mt-1">{Math.round(estimatedDeposit).toLocaleString('fr-FR')} XAF</p>
+                            </div>
+                            <Calculator size={28} className="opacity-30" />
+                          </div>
+                        </>
                       )}
-
-                      <div className="flex justify-between items-center p-4 bg-[#0528d6] rounded-2xl text-white">
-                        <div>
-                          <p className="text-[9px] font-bold uppercase opacity-80">Acompte estimé (60 %) — à régler en agence</p>
-                          <p className="text-2xl font-bold mt-1">{estimatedDeposit.toLocaleString('fr-FR')} XAF</p>
-                        </div>
-                        <Calculator size={28} className="opacity-30" />
-                      </div>
 
                       <p className="text-[10px] text-slate-500 leading-relaxed">
                         Le paiement en ligne arrive bientôt. Pour l&apos;instant, l&apos;agence vous contactera pour confirmer la réservation.
