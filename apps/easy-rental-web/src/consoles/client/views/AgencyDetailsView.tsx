@@ -98,13 +98,25 @@ export const AgencyDetailsView = ({ agencyId, userData, onBack }: { agencyId: st
               <ContactRow icon={<Phone size={16} />} label="Téléphone" value={agency?.phone} />
               <ContactRow icon={<Mail size={16} />} label="Email" value={agency?.email} />
             </div>
+            {(agency?.ratingsCount ?? 0) > 0 && (
+              <div className="pt-6 border-t border-white/10">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-[10px] font-black tracking-widest text-slate-400">Note clients</span>
+                </div>
+                <p className="text-xl font-black italic flex items-center gap-2">
+                  <span className="text-amber-400">★</span>
+                  {Number(agency?.averageRating ?? 0).toFixed(1)}
+                  <span className="text-[11px] font-bold text-slate-400">({agency?.ratingsCount} avis)</span>
+                </p>
+              </div>
+            )}
             <div className="pt-6 border-t border-white/10">
               <div className="flex items-center gap-3 mb-2">
                 <CreditCard className="text-blue-400" size={18} />
                 <span className="text-[10px] font-black  tracking-widest text-slate-400">Conditions</span>
               </div>
-              <p className="text-xl font-black italic">{agency?.depositPercentage}% {"d'acompte"}</p>
-              <p className="text-[10px] text-slate-400 mt-1 ">Requis pour confirmer la réservation</p>
+              <p className="text-xl font-black italic">{agency?.depositPercentage}% {"de caution"}</p>
+              <p className="text-[10px] text-slate-400 mt-1 ">Caution restituée au retour, déduction faite des dommages</p>
             </div>
           </div>
         </div>

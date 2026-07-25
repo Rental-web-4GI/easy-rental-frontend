@@ -79,6 +79,7 @@ export const BookingWizardModal = ({
     // No quote / billing preview for a start date already in the past
     if (start.getTime() < Date.now() - 60_000) return null;
     if (rentalPeriodOverlapsSchedule(form.startDate, form.endDate, schedule)) return null;
+    const depositPct = Number(agency?.depositPercentage);
     return computeRentalQuote(
       {
         startDate: start,
@@ -86,10 +87,11 @@ export const BookingWizardModal = ({
         rentalType: form.rentalType,
         vehiclePricing: vehiclePricing ?? { pricePerHour: 0, pricePerDay: 0, pricePerMonth: 0 },
         driverPricing: resolvePricingRates(selectedDriver?.pricing),
+        cautionRate: Number.isFinite(depositPct) && depositPct > 0 ? depositPct / 100 : null,
       },
       true
     );
-  }, [form, vehicle, selectedDriver, schedule]);
+  }, [form, vehicle, selectedDriver, schedule, agency]);
 
   const missingPrereqs = useMemo(() => {
     const items: { id: string; message: string }[] = [];
