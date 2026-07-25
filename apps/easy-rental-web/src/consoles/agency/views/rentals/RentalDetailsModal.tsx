@@ -17,11 +17,11 @@ import { RentalFinancialTimeline } from './inspection/RentalFinancialTimeline';
 
 type Tab = 'DETAILS' | 'INSPECTION' | 'TRACKING' | 'CAUTION';
 
-export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t }: any) => {
+export const RentalDetailsModal = ({ rentalId, onClose, onValidated, t, initialTab }: any) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [tab, setTab] = useState<Tab>('DETAILS');
+  const [tab, setTab] = useState<Tab>(initialTab || 'DETAILS');
   const [submitting, setSubmitting] = useState(false);
 
   const [inspections, setInspections] = useState<Inspection[]>([]);
