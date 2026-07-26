@@ -4,7 +4,7 @@
 import React from 'react';
 import { 
   LayoutDashboard, Car, Users, 
-  LogOut, X, ChevronRight, Activity, CalendarDays, CalendarCheck, Banknote
+  LogOut, X, ChevronRight, Activity, CalendarDays, CalendarCheck, Banknote, ClipboardCheck
 } from 'lucide-react';
 import { hasPermission } from '@/consoles/agency/utils/permissions';
 
@@ -68,6 +68,7 @@ export const Sidebar = ({
               <>
                 <SidebarItem icon={<CalendarDays size={20}/>} label={t.sidebar.reservations} active={currentView === 'RESERVATIONS'} onClick={() => { setCurrentView('RESERVATIONS'); setSidebarOpen(false); }} />
                 <SidebarItem icon={<CalendarCheck size={20}/>} label={t.sidebar.rentals} active={currentView === 'RENTALS'} onClick={() => { setCurrentView('RENTALS'); setSidebarOpen(false); }} />
+                <SidebarItem icon={<ClipboardCheck size={20}/>} label={t.sidebar.inspections || 'Inspections'} active={currentView === 'INSPECTIONS'} onClick={() => { setCurrentView('INSPECTIONS'); setSidebarOpen(false); }} />
               </>
             )}
             

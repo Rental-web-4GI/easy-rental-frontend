@@ -27,6 +27,7 @@ import { VehiclesView } from '../views/VehiclesView';
 import { DriversView } from '../views/DriversView';
 import { ReservationsView } from '../views/ReservationsView';
 import { RentalsView } from '../views/RentalsView';
+import { InspectionsView } from '../views/InspectionsView';
 import { TransactionsView } from '../views/TransactionsView';
 import { NotificationsView } from '../views/NotificationsView';
 
@@ -244,6 +245,10 @@ export default function AgencyDashboard() {
 
             {currentView === 'RENTALS' && hasPermission(userData, staffPermissions, 'rental:list') && (
                 <RentalsView userData={userData} staffPermissions={staffPermissions} t={t} />
+            )}
+
+            {currentView === 'INSPECTIONS' && hasPermission(userData, staffPermissions, 'rental:list') && (
+                <InspectionsView userData={userData} t={t} />
             )}
 
             {currentView === 'TRANSACTIONS' && hasPermission(userData, staffPermissions, 'finance:transactions') && (

@@ -37,6 +37,7 @@ export const en = {
     dash: "Dashboard",
     reservations: "Reservations",
     rentals: "Rentals",
+    inspections: "Inspections",
     transactions: "Transactions",
     resources: "Resources",
     fleet: "My Fleet",

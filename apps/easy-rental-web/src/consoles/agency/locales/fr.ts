@@ -37,6 +37,7 @@ export const fr = {
     dash: "Tableau de Bord",
     reservations: "Réservations",
     rentals: "Locations",
+    inspections: "Inspections",
     transactions: "Transactions",
     resources: "Ressources",
     fleet: "Ma Flotte",
