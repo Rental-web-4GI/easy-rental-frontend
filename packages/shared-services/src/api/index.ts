@@ -51,6 +51,8 @@ export type { AuditEvent, AuditEventFilters } from './audit.service';
 export { transactionService } from './transaction.service';
 export { reviewService } from './review.service';
 export type { ReviewItem, ReviewModerationStats, PlatformFeedbackPayload } from './review.service';
+export { conversationService } from './conversation.service';
+export type { Conversation, ChatMessage } from './conversation.service';
 export {
   clearAuthSession,
   decodeJwtPayload,

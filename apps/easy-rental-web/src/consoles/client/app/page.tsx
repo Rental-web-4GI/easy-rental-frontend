@@ -16,6 +16,7 @@ import { MyBookingsView } from '../views/MyBookingsView';
 import { ProfileView } from '../views/ProfileView';
 import { NotificationsView } from '../views/NotificationsView';
 import { LoyaltyView } from '../views/LoyaltyView';
+import { ChatPanel } from '../../shared-chat/ChatPanel';
 
 import { useClientI18n } from '../hooks/useClientI18n';
 import { Loader2 } from 'lucide-react';
@@ -237,6 +238,7 @@ export default function ClientDashboard() {
             )}
 
             {currentView === 'NOTIFICATIONS' && <NotificationsView clientId={userData?.id} />}
+            {currentView === 'MESSAGES' && <ChatPanel role="CLIENT" selfId={userData?.id} />}
           </main>
           <Footer t={t.footer} nav={{ features: t.footer.features }} landingBaseUrl="http://localhost:3000" />
           {isAuth && <SupportChatWidget />}

@@ -17,6 +17,7 @@ import { ReviewsModerationView } from '../views/ReviewsModerationView';
 import { PlatformStatsView } from '../views/PlatformStatsView';
 import { AuditLogView } from '../views/AuditLogView';
 import { BillingView } from '../views/BillingView';
+import { ChatAuditView } from '../views/ChatAuditView';
 import { AdminSidebar, type AdminTab } from '../components/AdminSidebar';
 import { AdminHeader } from '../components/AdminHeader';
 import { StatCard } from '../components/StatCard';
@@ -237,6 +238,7 @@ export default function AdminConsole() {
             )}
             {tab === 'AUDIT' && <AuditLogView />}
             {tab === 'BILLING' && <BillingView />}
+            {tab === 'CHAT' && <ChatAuditView />}
           </div>
         </div>
       </main>

@@ -30,6 +30,7 @@ import { RentalsView } from '../views/RentalsView';
 import { InspectionsView } from '../views/InspectionsView';
 import { TransactionsView } from '../views/TransactionsView';
 import { NotificationsView } from '../views/NotificationsView';
+import { ChatPanel } from '../../shared-chat/ChatPanel';
 
 import { Loader2 } from 'lucide-react';
 import { fr } from '../locales/fr';
@@ -265,6 +266,10 @@ export default function AgencyDashboard() {
 
             {currentView === 'NOTIFICATIONS' && (
                 <NotificationsView agencyId={agencyData?.id} t={t} />
+            )}
+
+            {currentView === 'MESSAGES' && (
+                <ChatPanel role="AGENCY" selfId={userData?.agencyId} />
             )}
 
             {currentView === 'PROFILE' && (

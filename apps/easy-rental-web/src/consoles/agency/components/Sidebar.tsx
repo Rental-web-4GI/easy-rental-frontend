@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React from 'react';
-import { 
-  LayoutDashboard, Car, Users, 
-  LogOut, X, ChevronRight, Activity, CalendarDays, CalendarCheck, Banknote, ClipboardCheck
+import {
+  LayoutDashboard, Car, Users,
+  LogOut, X, ChevronRight, Activity, CalendarDays, CalendarCheck, Banknote, ClipboardCheck, MessageSquare
 } from 'lucide-react';
 import { hasPermission } from '@/consoles/agency/utils/permissions';
 
@@ -75,6 +75,7 @@ export const Sidebar = ({
             {hasPermission(userData, staffPermissions, 'finance:transactions') && (
                 <SidebarItem icon={<Banknote size={20}/>} label={t.sidebar.transactions} active={currentView === 'TRANSACTIONS'} onClick={() => { setCurrentView('TRANSACTIONS'); setSidebarOpen(false); }} />
             )}
+            <SidebarItem icon={<MessageSquare size={20}/>} label={t.sidebar.messages || 'Messages'} active={currentView === 'MESSAGES'} onClick={() => { setCurrentView('MESSAGES'); setSidebarOpen(false); }} />
           </div>
         </div>
 

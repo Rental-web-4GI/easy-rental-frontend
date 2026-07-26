@@ -39,6 +39,7 @@ export const fr = {
     rentals: "Locations",
     inspections: "Inspections",
     transactions: "Transactions",
+    messages: "Messages",
     resources: "Ressources",
     fleet: "Ma Flotte",
     drivers: "Mes Chauffeurs",

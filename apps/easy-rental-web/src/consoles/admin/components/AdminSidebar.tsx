@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import { Building2, CreditCard, LogOut, MessageSquare, Shield, Star, X, ChevronRight, Activity, BarChart3, ScrollText } from 'lucide-react';
+import { Building2, CreditCard, LogOut, MessageSquare, MessagesSquare, Shield, Star, X, ChevronRight, Activity, BarChart3, ScrollText } from 'lucide-react';
 
-export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'BILLING' | 'MESSAGES' | 'REVIEWS' | 'AUDIT';
+export type AdminTab = 'STATS' | 'ORGS' | 'PLANS' | 'BILLING' | 'MESSAGES' | 'CHAT' | 'REVIEWS' | 'AUDIT';
 
 type AdminSidebarProps = {
   tab: AdminTab;
@@ -91,6 +91,12 @@ export const AdminSidebar = ({
               active={tab === 'MESSAGES'}
               badge={supportUnread > 0 ? supportUnread : undefined}
               onClick={() => { setTab('MESSAGES'); setSidebarOpen(false); }}
+            />
+            <SidebarItem
+              icon={<MessagesSquare size={20} />}
+              label="Messagerie (audit)"
+              active={tab === 'CHAT'}
+              onClick={() => { setTab('CHAT'); setSidebarOpen(false); }}
             />
             <SidebarItem
               icon={<Star size={20} />}
