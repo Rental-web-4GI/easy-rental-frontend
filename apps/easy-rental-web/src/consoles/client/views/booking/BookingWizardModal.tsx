@@ -334,6 +334,34 @@ export const BookingWizardModal = ({
                       <DateTimePicker label="Retour" value={form.endDate} onChange={(v) => { setForm({ ...form, endDate: v }); setError(null); }} required />
                     </div>
 
+                    {/* Indisponibilités du véhicule (déjà réservé / maintenance) */}
+                    {(() => {
+                      const blocks = (schedule || [])
+                        .filter((b: any) => ['RENTED', 'MAINTENANCE', 'UNAVAILABLE', 'RESERVED'].includes(String(b.status ?? '').toUpperCase()))
+                        .filter((b: any) => b.startDate && b.endDate && new Date(b.endDate).getTime() >= Date.now())
+                        .sort((a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+                      if (blocks.length === 0) return null;
+                      return (
+                        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30">
+                          <p className="text-[10px] font-black uppercase italic tracking-widest text-amber-700 mb-2">
+                            Véhicule indisponible sur ces périodes
+                          </p>
+                          <div className="space-y-1.5 max-h-32 overflow-y-auto">
+                            {blocks.map((b: any, i: number) => (
+                              <div key={i} className="flex items-center justify-between text-[11px] font-bold text-amber-800 dark:text-amber-300">
+                                <span>
+                                  {new Date(b.startDate).toLocaleDateString('fr-FR')} → {new Date(b.endDate).toLocaleDateString('fr-FR')}
+                                </span>
+                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40">
+                                  {String(b.status).toUpperCase() === 'MAINTENANCE' ? 'Maintenance' : 'Réservé'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     <div className="p-6 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 rounded-2xl space-y-4">
                       {/* Tarifs indicatifs (toujours visibles) */}
                       <div className="grid grid-cols-3 gap-2 text-center">
