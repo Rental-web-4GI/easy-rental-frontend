@@ -14,10 +14,12 @@ import {
   MapPin,
   Mail,
   Store,
+  Gift,
 } from 'lucide-react';
 import {
   rentalService,
   driverService,
+  loyaltyService,
   normalizeCmPhone,
   isValidCmMobile,
   CM_PHONE_HINT,
@@ -58,6 +60,9 @@ export const BookingWizardModal = ({
   const [error, setError] = useState<string | null>(null);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [outstandingDebt, setOutstandingDebt] = useState(0);
+  const [pointsBalance, setPointsBalance] = useState(0);
+  const [useRedeem, setUseRedeem] = useState(false);
+  const [redeemPoints, setRedeemPoints] = useState(0);
 
   useEffect(() => {
     const clientId = userData?.id;
@@ -69,6 +74,16 @@ export const BookingWizardModal = ({
     });
     return () => { cancelled = true; };
   }, [userData?.id, vehicle?.agencyId]);
+
+  useEffect(() => {
+    const clientId = userData?.id;
+    if (!clientId) return;
+    let cancelled = false;
+    loyaltyService.getBalance(clientId).then((r: any) => {
+      if (!cancelled && r.ok && r.data) setPointsBalance(Number(r.data.balance) || 0);
+    });
+    return () => { cancelled = true; };
+  }, [userData?.id]);
 
   const [form, setForm] = useState({
     vehicleId: vehicle.id,
@@ -177,7 +192,8 @@ export const BookingWizardModal = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await rentalService.initiateRental(form);
+      const effectiveRedeem = useRedeem ? Math.max(0, Math.min(redeemPoints, pointsBalance)) : 0;
+      const res = await rentalService.initiateRental({ ...form, redeemPoints: effectiveRedeem });
       if (res.ok && res.data?.isAllowed) {
         setInitRes(res.data);
         setPhase('success');
@@ -409,6 +425,53 @@ export const BookingWizardModal = ({
                             <div className="flex justify-between font-bold"><span>Total dossier</span><span>{Math.round(quote.total).toLocaleString('fr-FR')} XAF</span></div>
                           </div>
 
+                          {pointsBalance > 0 && (
+                            <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 space-y-3">
+                              <label className="flex items-center justify-between gap-3 cursor-pointer">
+                                <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-amber-700">
+                                  <Gift size={14} /> Utiliser mes points (solde: {pointsBalance.toLocaleString('fr-FR')})
+                                </span>
+                                <input
+                                  type="checkbox"
+                                  checked={useRedeem}
+                                  onChange={(e) => {
+                                    setUseRedeem(e.target.checked);
+                                    if (!e.target.checked) setRedeemPoints(0);
+                                  }}
+                                  className="size-4 accent-[#0528d6]"
+                                />
+                              </label>
+                              {useRedeem && (
+                                <div className="space-y-2">
+                                  <input
+                                    type="range"
+                                    min={0}
+                                    max={pointsBalance}
+                                    value={redeemPoints}
+                                    onChange={(e) => setRedeemPoints(Number(e.target.value))}
+                                    className="w-full accent-[#0528d6]"
+                                  />
+                                  <div className="flex items-center justify-between text-[11px]">
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={pointsBalance}
+                                      value={redeemPoints}
+                                      onChange={(e) => {
+                                        const v = Number(e.target.value);
+                                        setRedeemPoints(Number.isFinite(v) ? Math.max(0, Math.min(v, pointsBalance)) : 0);
+                                      }}
+                                      className="w-20 p-1.5 text-center bg-white dark:bg-slate-900 border border-amber-200 rounded-lg text-xs font-bold outline-none"
+                                    />
+                                    <span className="font-bold text-amber-700">
+                                      Remise: {(redeemPoints * 10).toLocaleString('fr-FR')} XAF
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {outstandingDebt > 0 && (
                             <div className="flex justify-between items-center p-3 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 text-red-600">
                               <span className="text-[10px] font-black uppercase italic tracking-widest">Dette antérieure à régler</span>
@@ -449,6 +512,11 @@ export const BookingWizardModal = ({
                     et régler l&apos;acompte de{' '}
                     <strong>{estimatedDeposit.toLocaleString('fr-FR')} XAF</strong>.
                   </p>
+                  {Number(initRes?.loyaltyDiscount) > 0 && (
+                    <p className="text-xs font-black text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 inline-flex items-center gap-2">
+                      <Gift size={14} /> Remise fidélité: −{Number(initRes.loyaltyDiscount).toLocaleString('fr-FR')} XAF
+                    </p>
+                  )}
                 </div>
 
                 {contactAgency && (

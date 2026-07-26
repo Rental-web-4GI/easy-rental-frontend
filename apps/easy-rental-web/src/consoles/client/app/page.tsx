@@ -15,6 +15,7 @@ import { VehicleDetailsView } from '../views/VehicleDetailsView';
 import { MyBookingsView } from '../views/MyBookingsView';
 import { ProfileView } from '../views/ProfileView';
 import { NotificationsView } from '../views/NotificationsView';
+import { LoyaltyView } from '../views/LoyaltyView';
 
 import { useClientI18n } from '../hooks/useClientI18n';
 import { Loader2 } from 'lucide-react';
@@ -224,6 +225,7 @@ export default function ClientDashboard() {
             {currentView === 'DETAILS' && selectedVehicleId && <VehicleDetailsView vehicleId={selectedVehicleId} isAuth={isAuth} onBack={() => setCurrentView('CATALOG')} onAuthRequired={() => setCurrentView('AUTH')} onStartBooking={() => setCurrentView('CATALOG')} />}
             {currentView === 'MY_BOOKINGS' && <MyBookingsView lang={lang} userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
             {currentView === 'MY_RESERVATIONS' && <MyReservationsView lang={lang} userData={userData} onNavigateToCatalog={() => setCurrentView('CATALOG')} />}
+            {currentView === 'LOYALTY' && <LoyaltyView userData={userData} lang={lang} />}
             {currentView === 'PROFILE' && (
               <ProfileView
                 lang={lang}

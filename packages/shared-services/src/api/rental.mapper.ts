@@ -14,6 +14,7 @@ export function toApiRentalInitPayload(data: Record<string, unknown>): Record<st
     end_date: data.endDate ?? data.end_date,
     rental_type: data.rentalType ?? data.rental_type,
     client_phone: data.clientPhone ?? data.client_phone,
+    redeem_points: data.redeemPoints ?? data.redeem_points ?? undefined,
   };
 }
 
@@ -108,6 +109,7 @@ export function normalizeRentalInitResponse(raw: Record<string, unknown> | null 
     depositAmount: raw.depositAmount ?? raw.deposit_amount,
     commissionAmount: raw.commissionAmount ?? raw.commission_amount,
     isAllowed: raw.isAllowed ?? raw.is_allowed,
+    loyaltyDiscount: raw.loyaltyDiscount ?? raw.loyalty_discount,
     message: raw.message,
     agency: agencyRaw ? normalizeAgency(agencyRaw) : null,
   };
