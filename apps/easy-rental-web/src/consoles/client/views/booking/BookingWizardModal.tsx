@@ -57,6 +57,18 @@ export const BookingWizardModal = ({
   const [initRes, setInitRes] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [outstandingDebt, setOutstandingDebt] = useState(0);
+
+  useEffect(() => {
+    const clientId = userData?.id;
+    const agencyId = vehicle?.agencyId;
+    if (!clientId || !agencyId) return;
+    let cancelled = false;
+    rentalService.getClientDebtForAgency(clientId, agencyId).then((r: any) => {
+      if (!cancelled && r.ok) setOutstandingDebt(r.debt || 0);
+    });
+    return () => { cancelled = true; };
+  }, [userData?.id, vehicle?.agencyId]);
 
   const [form, setForm] = useState({
     vehicleId: vehicle.id,
@@ -397,10 +409,19 @@ export const BookingWizardModal = ({
                             <div className="flex justify-between font-bold"><span>Total dossier</span><span>{Math.round(quote.total).toLocaleString('fr-FR')} XAF</span></div>
                           </div>
 
+                          {outstandingDebt > 0 && (
+                            <div className="flex justify-between items-center p-3 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 text-red-600">
+                              <span className="text-[10px] font-black uppercase italic tracking-widest">Dette antérieure à régler</span>
+                              <span className="text-sm font-black italic">+ {Math.round(outstandingDebt).toLocaleString('fr-FR')} XAF</span>
+                            </div>
+                          )}
+
                           <div className="flex justify-between items-center p-4 bg-[#0528d6] rounded-2xl text-white">
                             <div>
-                              <p className="text-[9px] font-bold uppercase opacity-80">Acompte estimé (60 %) — à régler en agence</p>
-                              <p className="text-2xl font-bold mt-1">{Math.round(estimatedDeposit).toLocaleString('fr-FR')} XAF</p>
+                              <p className="text-[9px] font-bold uppercase opacity-80">
+                                {outstandingDebt > 0 ? 'À régler en agence (acompte 60 % + dette)' : 'Acompte estimé (60 %) — à régler en agence'}
+                              </p>
+                              <p className="text-2xl font-bold mt-1">{Math.round(estimatedDeposit + outstandingDebt).toLocaleString('fr-FR')} XAF</p>
                             </div>
                             <Calculator size={28} className="opacity-30" />
                           </div>

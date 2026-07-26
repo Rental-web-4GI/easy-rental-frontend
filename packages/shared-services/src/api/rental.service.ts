@@ -133,6 +133,19 @@ export const rentalService = {
     return { ...res, data: normalizeRentalDetails(res.data as Record<string, unknown>) };
   },
 
+  /** Dette totale du client dans l'organisation de l'agence (pour l'afficher au booking). */
+  getClientDebtForAgency: async (clientId: string, agencyId: string) => {
+    const res = await client.get<any>(`/api/rentals/debt/client/${clientId}/agency/${agencyId}`);
+    const debt = res.ok ? Number(res.data?.debt ?? 0) : 0;
+    return { ok: res.ok, debt: Number.isFinite(debt) ? debt : 0 };
+  },
+
+  /** Dettes impayées d'une agence (dossiers). */
+  getAgencyDebts: (agencyId: string) => client.get<any[]>(`/api/rentals/debts/agency/${agencyId}`),
+
+  /** Dettes impayées d'une organisation (dossiers). */
+  getOrganizationDebts: (orgId: string) => client.get<any[]>(`/api/rentals/debts/organization/${orgId}`),
+
   /** Agence : encaisser le supplément dû (créance) par le client. */
   collectSupplement: async (id: string, amount: number) => {
     const res = await client.post<any>(`/api/rentals/${id}/collect-supplement`, { amount });
