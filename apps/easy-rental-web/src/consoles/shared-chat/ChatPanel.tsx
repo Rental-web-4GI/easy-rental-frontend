@@ -20,7 +20,9 @@ const PARTICIPANT_LABELS: Record<string, string> = {
   ADMIN: 'Support',
 };
 
-function participantLabel(type?: string | null, id?: string | null): string {
+function participantLabel(name?: string | null, type?: string | null, id?: string | null): string {
+  // Priorité au vrai nom (client/agence) résolu côté backend ; sinon type ; sinon #id court.
+  if (name && name.trim()) return name.trim();
   const label = (type && PARTICIPANT_LABELS[type]) || type || 'Inconnu';
   const shortId = id ? ` #${id.slice(0, 8)}` : '';
   return `${label}${shortId}`;
@@ -28,13 +30,14 @@ function participantLabel(type?: string | null, id?: string | null): string {
 
 function conversationTitle(conv: Conversation, role: ChatRole): string {
   if (role === 'ADMIN') {
-    return `${participantLabel(conv.participantAType, conv.participantAId)} ↔ ${participantLabel(conv.participantBType, conv.participantBId)}`;
+    return `${participantLabel(conv.participantAName, conv.participantAType, conv.participantAId)}`
+      + ` ↔ ${participantLabel(conv.participantBName, conv.participantBType, conv.participantBId)}`;
   }
   const aIsSelf = conv.participantAType === role;
   const other = aIsSelf
-    ? { type: conv.participantBType, id: conv.participantBId }
-    : { type: conv.participantAType, id: conv.participantAId };
-  return participantLabel(other.type, other.id);
+    ? { name: conv.participantBName, type: conv.participantBType, id: conv.participantBId }
+    : { name: conv.participantAName, type: conv.participantAType, id: conv.participantAId };
+  return participantLabel(other.name, other.type, other.id);
 }
 
 function formatWhen(iso?: string | null): string {

@@ -3,8 +3,8 @@ import { deepCamelize } from '../utils/camelize';
 
 export type Conversation = {
   id: string; type: string;
-  participantAType: string; participantAId?: string | null;
-  participantBType: string; participantBId?: string | null;
+  participantAType: string; participantAId?: string | null; participantAName?: string | null;
+  participantBType: string; participantBId?: string | null; participantBName?: string | null;
   subject?: string | null; unread: number; lastMessageAt?: string | null;
 };
 export type ChatMessage = {
