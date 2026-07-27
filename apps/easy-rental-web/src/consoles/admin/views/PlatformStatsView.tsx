@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   Wallet,
   Repeat,
+  Ban,
+  AlertTriangle,
 } from 'lucide-react';
 import { statisticsService } from '@pwa-easy-rental/shared-services';
 import type { PlatformStats } from '@pwa-easy-rental/shared-services';
@@ -101,7 +103,17 @@ export const PlatformStatsView = () => {
         <StatCard label="Complétées ce mois" value={stats.rentals.monthlyCompleted} icon={<CheckCircle2 />} />
       </div>
 
-      {/* Ligne 3 : mise en avant revenu */}
+      {/* Ligne 3 : suspensions & dettes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <StatCard label="Organisations suspendues" value={stats.organizations.suspended} icon={<Ban />} />
+        <StatCard
+          label="Dettes en cours"
+          value={`${(stats.revenue.totalOutstandingDebt ?? 0).toLocaleString()} FCFA`}
+          icon={<AlertTriangle />}
+        />
+      </div>
+
+      {/* Ligne 4 : mise en avant revenu */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         <div className="bg-gradient-to-br from-[#0528d6] to-[#0a3fd8] p-8 rounded-3xl shadow-lg shadow-blue-600/20 flex items-center gap-6">
           <div className="size-16 bg-white/15 rounded-2xl flex items-center justify-center text-white shrink-0">

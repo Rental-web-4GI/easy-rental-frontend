@@ -6,7 +6,7 @@ export type PlatformStats = {
   agencies: { total: number; averagePerCompany: number };
   vehicles: { total: number; published: number };
   rentals: { total: number; ongoing: number; completed: number; monthlyCompleted: number };
-  revenue: { monthlyRecurringRevenue: number; subscriptionsActiveCount: number };
+  revenue: { monthlyRecurringRevenue: number; subscriptionsActiveCount: number; totalOutstandingDebt: number };
 };
 
 /**
